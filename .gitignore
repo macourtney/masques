@@ -1,0 +1,13 @@
+/pom.xml
+*jar
+/lib
+/classes
+/native
+/.lein-failures
+/checkouts
+.classpath
+.project
+/bin
+/data
+/log
+/.lein-deps-sum

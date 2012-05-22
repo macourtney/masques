@@ -2,5 +2,5 @@
   (:use [masques.core])
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(deftest test-init
+  (is (init-args ["-m" "test"])))
