@@ -7,6 +7,6 @@
    { :directory "/src/masques/database/migrations"
      :init core/init-args
      :ns-content "\n  (:use drift-db.core)"
-     :migration-number-generator builder/incremental-migration-number-generator
+     :migration-number-generator builder/timestamp-migration-number-generator
      :current-version drift-db-migrate/current-version
      :update-version drift-db-migrate/update-version })
