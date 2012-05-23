@@ -6,13 +6,42 @@
             [drift.runner :as drift-runner]
             [drift-db.core :as drift-db]))
 
+(def initialized? (atom false))
+
 (def database-initialized? (atom false))
+
+(def db (atom {}))
+
+(defn
+  create-db-map [_]
+  (select-keys (drift-db/db-map) [:datasource :username :password :subprotocol]))
+
+(defn resolve-fn [ns-symbol fn-symbol]
+  (require ns-symbol)
+  (ns-resolve (find-ns ns-symbol) fn-symbol))
+
+(defn run-fn [ns-symbol fn-symbol]
+  ((resolve-fn ns-symbol fn-symbol)))
 
 (defn database-init []
   (when (compare-and-set! database-initialized? false true)
     (environment/environment-init)
     (drift-db/init-flavor (db-config/load-config))
+    (swap! db create-db-map)
     (drift-runner/update-to-version Integer/MAX_VALUE)))
+
+(defn
+  init-promise-fn []
+  ; Lazy load the following to make sure everything is initialized first.
+  (run-fn 'masques.initialization 'init)
+  (deliver init? true))
+
+(defn
+#^{ :doc "Initializes the masques server. This function should be called immediately after a successful login." }
+  init []
+  (when (compare-and-set! initialized? false true)
+    (init-promise-fn))
+  @init?)
 
 (defn
 #^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
