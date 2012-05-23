@@ -11,4 +11,9 @@
                  [org.drift-db/drift-db-h2 "1.0.8-SNAPSHOT"]
                  [seesaw "1.2.1"]]
   :dev-dependencies [[drift "1.4.4-SNAPSHOT"]
-                     [org.clojure/clojure "1.2.1"]])
+                     [org.clojure/clojure "1.2.1"]]
+
+  :main masques.main
+  
+  :run-aliases { :development masques.development-main
+                 :dev masques.development-main })

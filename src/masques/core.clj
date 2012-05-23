@@ -56,8 +56,8 @@ production, or test." }
   (cli/cli args
     ["-m" "--mode" "The server mode. For example, development, production, or test." :default nil]))
 
-(defn arg-mode [parsed-args]
-  (get parsed-args :mode))
+(defn arg-mode [args-map]
+  (get args-map :mode))
 
 (defn init-args [args]
   (let [[args-map remaining help] (parse-arguments args)]
