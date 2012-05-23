@@ -12,6 +12,8 @@
 
 (def db (atom {}))
 
+(def init? (promise))
+
 (defn
   create-db-map [_]
   (select-keys (drift-db/db-map) [:datasource :username :password :subprotocol]))
