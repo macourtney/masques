@@ -1,6 +1,5 @@
 (ns masques.model.peer
-  (:require [clojure.contrib.logging :as logging]
-            [clojure.java.io :as java-io]
+  (:require [clojure.java.io :as java-io]
             [clojure.tools.loading-utils :as loading-utils]
             [clj-i2p.peer-service.persister-protocol :as persister-protocol]
             [clj-record.boot :as clj-record-boot]
@@ -17,9 +16,6 @@
 (def peer-update-listeners (atom []))
 
 (def peer-delete-listeners (atom []))
-
-(defn remove-listener [listener-seq listener]
-  (remove #(= %1 listener) listener-seq))
 
 (defn add-peer-update-listener [listener]
   (swap! peer-update-listeners conj listener))

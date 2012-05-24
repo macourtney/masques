@@ -1,6 +1,5 @@
 (ns masques.model.property
-  (:require [clj-record.boot :as clj-record-boot]
-            [clojure.contrib.logging :as logging])
+  (:require [clj-record.boot :as clj-record-boot])
   (:use masques.model.base))
 
 (clj-record.core/init-model)

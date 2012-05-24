@@ -9,7 +9,8 @@
     (string :name)
     (string :public_key)
     (string :public_key_algorithm)
-    (belongs-to :peer)))
+    (belongs-to :peer)
+    (integer :is_online)))
   
 (defn down
   "Drops the identities table in the database."
