@@ -1,6 +1,6 @@
 (ns masques.model.base
   (:require [clojure.string :as string]
-            [clojure.contrib.logging :as logging]
+            [clojure.tools.logging :as logging]
             [masques.core :as masques-core])
   (:import [java.sql Clob]))
 

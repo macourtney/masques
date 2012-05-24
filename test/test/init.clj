@@ -12,6 +12,6 @@
     (masques-core/set-mode "test")
     (masques-core/database-init)
     (drift-runner/update-to-version 0) ; Reset the test database
-    (drift-runner/update-to-version Integer/MAX_VALUE)))
+    (drift-runner/update-to-version Long/MAX_VALUE)))
 
 (init-tests)
