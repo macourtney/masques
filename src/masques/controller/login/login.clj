@@ -2,7 +2,7 @@
   (:require [clojure.tools.logging :as logging]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.login.create-user :as create-user]
-            ;[masques.controller.main.main-frame :as main-frame]
+            [masques.controller.main.main-frame :as main-frame]
             [masques.controller.utils :as controller-utils]
             [masques.core :as core]
             [masques.model.user :as user-model]
@@ -45,7 +45,7 @@
 
 (defn login-success [login-frame]
   (core/init)
-  ;(main-frame/show)
+  (main-frame/show)
   (actions-utils/close-window login-frame))
 
 (defn user-not-selected [login-frame]
