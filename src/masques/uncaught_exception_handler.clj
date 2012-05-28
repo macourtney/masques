@@ -5,4 +5,4 @@
   (Thread/setDefaultUncaughtExceptionHandler
     (reify Thread$UncaughtExceptionHandler
       (uncaughtException [this thread throwable]
-        (logging/error "Uncaught Exception:" throwable)))))
+        (logging/error throwable "Uncaught Exception:")))))

@@ -11,5 +11,5 @@
 
 (defn -main [& args]
   (let [[args-map remaining help] (parse-arguments args)]
-    (apply main/-main "-mode" (core/arg-mode args-map) remaining)
+    (apply main/-main "-m" (core/arg-mode args-map) remaining)
     @(promise)))

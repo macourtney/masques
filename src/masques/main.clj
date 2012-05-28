@@ -5,7 +5,6 @@
 (defn -main
   [& args]
   (core/init-args args)
-  ;(let [login-frame-ns 'darkexchange.controller.login.login]
-  ;  (require login-frame-ns)
-  ;  ((ns-resolve (find-ns login-frame-ns) 'show)))
-  )
+  (let [login-frame-ns 'masques.controller.login.login]
+    (require login-frame-ns)
+    ((ns-resolve (find-ns login-frame-ns) 'show))))

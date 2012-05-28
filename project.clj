@@ -10,14 +10,16 @@
                  [log4j/log4j "1.2.16"]
                  [org.clojure/clojure "1.2.1"]
                  [org.clojure/tools.cli "0.2.1"]
+                 [org.clojure/tools.logging "0.2.3"]
                  [org.drift-db/drift-db-h2 "1.0.8-SNAPSHOT"]
-                 [seesaw "1.2.1"]]
+                 [seesaw "1.4.1"]]
   :dev-dependencies [[drift "1.4.4-SNAPSHOT"]
                      [org.clojure/clojure "1.2.1"]]
 
   :resources-path "pkg/resources"
 
   :main masques.main
-  
+
+  ; To run in development mode use: lein run :development [<arg> ...]
   :run-aliases { :development masques.development-main
                  :dev masques.development-main })

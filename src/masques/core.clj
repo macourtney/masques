@@ -30,7 +30,7 @@
     (environment/environment-init)
     (drift-db/init-flavor (db-config/load-config))
     (swap! db create-db-map)
-    (drift-runner/update-to-version Integer/MAX_VALUE)))
+    (drift-runner/update-to-version Long/MAX_VALUE)))
 
 (defn
   init-promise-fn []
@@ -49,7 +49,8 @@
 #^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
 production, or test." }
   set-mode [mode]
-  (when mode 
+  (when mode
+    (println "Setting mode to" mode)
     (environment/set-evironment-property (conjure-str-utils/str-keyword mode))))
 
 (defn parse-arguments
