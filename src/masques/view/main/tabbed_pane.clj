@@ -2,7 +2,6 @@
   (:require [masques.view.main.home-tab :as home-tab]
             [masques.view.main.identity-tab :as identity-tab]
             [masques.view.main.peer-tab :as peer-tab]
-            ;[masques.view.main.search.search-tab :as search-tab]
             [seesaw.core :as seesaw-core]))
 
 (defn create-tabs []
