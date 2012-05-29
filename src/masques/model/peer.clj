@@ -118,3 +118,6 @@ registered."
   []
   (when (not (persister-protocol/protocol-registered?))
     (persister-protocol/register (create-peer-persister))))
+
+(defn local? [peer]
+  (as-boolean (:local peer)))

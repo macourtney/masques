@@ -35,9 +35,21 @@
 (defn find-my-identity-label [main-frame]
   (seesaw-core/select main-frame ["#my-identity"]))
 
+(defn set-identity-label
+  ([main-frame] (set-identity-label main-frame (identity-model/current-user-identity)))
+  ([main-frame my-identity]
+    (.setText (find-my-identity-label main-frame) (identity-model/identity-text my-identity))))
+
+(defn create-new-identity-listener [main-frame]
+  (fn new-identity-listener [identity]
+    (when (identity-model/is-user-identity? identity)
+      (identity-model/remove-identity-add-listener new-identity-listener)
+      (set-identity-label main-frame identity))))
+
 (defn load-my-identity [main-frame]
-  (when-let [my-identity (identity-model/current-user-identity)]
-    (.setText (find-my-identity-label main-frame) (identity-model/identity-text my-identity)))
+  (if-let [my-identity (identity-model/current-user-identity)]
+    (set-identity-label main-frame my-identity)
+    (identity-model/add-identity-add-listener (create-new-identity-listener main-frame)))
   main-frame)
 
 (defn delete-identity-from-table [main-frame identity]

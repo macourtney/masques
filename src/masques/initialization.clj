@@ -1,5 +1,6 @@
 (ns masques.initialization
   (:require [clj-i2p.server :as clj-i2p-server]
+            [masques.model.identity :as identity-model]
             [masques.model.peer :as peer-model]))
 
 (defn init
@@ -7,4 +8,5 @@
 function should be called after a successful login."
   []
   (peer-model/init)
+  (identity-model/init)
   (clj-i2p-server/init))

@@ -1,9 +1,11 @@
 (ns masques.model.identity
   (:require [clj-crypto.core :as clj-crypto]
             [clj-i2p.client :as client]
+            [clj-i2p.core :as clj-i2p-core]
             [clj-i2p.peer-service.peer :as clj-i2p-peer]
             [clj-record.boot :as clj-record-boot]
             [clj-internationalization.core :as clj-i18n]
+            [clojure.tools.logging :as logging]
             [masques.model.peer :as peer]
             [masques.model.user :as user])
   (:use masques.model.base)
@@ -17,6 +19,9 @@
 
 (defn add-identity-add-listener [listener]
   (swap! identity-add-listeners conj listener))
+
+(defn remove-identity-add-listener [listener]
+  (swap! identity-add-listeners remove-listener listener))
 
 (defn add-identity-update-listener [listener]
   (swap! identity-update-listeners conj listener))
@@ -90,7 +95,8 @@
   (when (and user-name public-key destination)
     (or 
       (find-identity user-name public-key public-key-algorithm)
-      (get-record (add-identity user-name public-key public-key-algorithm destination)))))
+      (when-let [identity-id (add-identity user-name public-key public-key-algorithm destination)]
+        (get-record identity-id)))))
 
 (defn destination-for
   ([user-name public-key public-key-algorithm]
@@ -175,3 +181,17 @@
 
 (defn get-table-identity [id]
   (table-identity (get-record id)))
+
+(defn add-or-create-user-identity [database-user]
+  (when database-user
+    (find-or-create-identity (:name database-user) (:public_key database-user) (:public_key_algorithm database-user)
+                             (client/base-64-destination))))
+
+(defn add-all-local-users [database-peer]
+  (when (peer/local? database-peer)
+    (peer/remove-peer-update-listener add-all-local-users)
+    (doseq [database-user (user/all-users)]
+      (add-or-create-user-identity database-user))))
+
+(defn init []
+  (peer/add-peer-update-listener add-all-local-users))
