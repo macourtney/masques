@@ -36,6 +36,9 @@
     :north (clj-i18n/address)
     :center (create-address-text)))
 
+(defn create-button []
+  (seesaw-core/button :id :update-button :text (clj-i18n/update)))
+
 (defn create []
   (seesaw-core/border-panel
     :border 9
@@ -47,4 +50,6 @@
               [:fill-v 3]
               (create-phone-number-panel)
               [:fill-v 3]
-              (create-address-panel)])))
+              (create-address-panel)
+              [:fill-v 3]
+              (create-button)])))
