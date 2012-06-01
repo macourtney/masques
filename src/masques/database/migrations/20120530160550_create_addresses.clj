@@ -7,6 +7,10 @@
   (create-table :addresses
     (id)
     (string :address)
+    (string :country)
+    (string :province)
+    (string :city)
+    (string :postal_code)
     (belongs-to :identity)))
   
 (defn down

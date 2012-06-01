@@ -25,7 +25,7 @@
   (doto (seesaw-core/text
           :id :address-text
           :multi-line? true
-          :preferred-size [800 :by 100])
+          :preferred-size [400 :by 50])
     (.setLineWrap true)))
 
 (defn create-address-text []
@@ -34,10 +34,30 @@
 (defn create-address-panel []
   (seesaw-core/border-panel
     :north (clj-i18n/address)
-    :center (create-address-text)))
+    :west (create-address-text)))
+
+(defn create-country-state-city-zip-panel []
+  (seesaw-core/border-panel
+    :west (seesaw-core/horizontal-panel
+            :items [(seesaw-core/label :text (clj-i18n/country))
+                    [:fill-h 3]
+                    (seesaw-core/text :id :country-text :text "data" :preferred-size [100 :by 20])
+                    [:fill-h 3]
+                    (seesaw-core/label :text (clj-i18n/province-or-state))
+                    [:fill-h 3]
+                    (seesaw-core/text :id :province-text :text "data" :preferred-size [100 :by 20])
+                    [:fill-h 3]
+                    (seesaw-core/label :text (clj-i18n/city))
+                    [:fill-h 3]
+                    (seesaw-core/text :id :city-text :text "data" :preferred-size [100 :by 20])
+                    [:fill-h 3]
+                    (seesaw-core/label :text (clj-i18n/postal-code))
+                    [:fill-h 3]
+                    (seesaw-core/text :id :postal-code-text :text "data" :preferred-size [100 :by 20])])))
 
 (defn create-button []
-  (seesaw-core/button :id :update-button :text (clj-i18n/update)))
+  (seesaw-core/border-panel
+    :west (seesaw-core/button :id :update-button :text (clj-i18n/update))))
 
 (defn create []
   (seesaw-core/border-panel
@@ -51,5 +71,7 @@
               (create-phone-number-panel)
               [:fill-v 3]
               (create-address-panel)
+              [:fill-v 3]
+              (create-country-state-city-zip-panel)
               [:fill-v 3]
               (create-button)])))
