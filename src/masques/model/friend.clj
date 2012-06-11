@@ -9,5 +9,6 @@
 
 (defn all-friends
   "Returns all of the friends for the current identity"
-  []
-  (find-records { :identity_id (:id (identity/current-user-identity)) }))
+  ([] (all-friends (identity/current-user-identity)))
+  ([identity]
+    (find-records { :identity_id (:id identity) })))
