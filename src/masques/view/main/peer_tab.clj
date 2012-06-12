@@ -48,6 +48,7 @@
 
 (defn create []
   (seesaw-core/border-panel
+    :id :peer-tab-panel
     :border 5
     :vgap 5
     :north (create-destination-panel)

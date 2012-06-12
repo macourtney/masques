@@ -9,6 +9,12 @@
             [masques.view.main.peer-tab :as peer-tab-view]
             [seesaw.core :as seesaw-core]))
 
+(def peer-update-listener-key "peer-update-listener")
+(def peer-delete-listener-key "peer-delete-listener")
+
+(defn find-peer-tab-panel [main-frame]
+  (seesaw-core/select main-frame ["#peer-tab-panel"]))
+
 (defn find-destination-text [main-frame]
   (seesaw-core/select main-frame ["#destination-text"]))
 
@@ -57,9 +63,40 @@
   (action-utils/attach-listener main-frame "#add-button" 
     (fn [e] (add-destination/show main-frame #(reload-table-data main-frame)))))
 
+(defn save-listener [main-frame listener-key listener]
+  (controller-utils/save-component-property (find-peer-tab-panel main-frame) listener-key listener)
+  main-frame)
+
+(defn retrieve-listener [main-frame listener-key]
+  (controller-utils/retrieve-component-property (find-peer-tab-panel main-frame) listener-key))
+
+(defn remove-listener [main-frame listener-key]
+  (let [peer-listener (retrieve-listener main-frame listener-key)]
+    (controller-utils/save-component-property (find-peer-tab-panel main-frame) listener-key nil)
+    peer-listener))
+
+(defn attach-peer-update-listener [main-frame]
+  (let [peer-update-listener (fn [peer] (seesaw-core/invoke-later (update-peer-id-table main-frame peer)))]
+    (peers-model/add-peer-update-listener peer-update-listener)
+    (save-listener main-frame peer-update-listener-key peer-update-listener)))
+
+(defn attach-peer-delete-listener [main-frame]
+  (let [peer-delete-listener (fn [peer] (seesaw-core/invoke-later (delete-peer-from-table main-frame peer)))]
+    (peers-model/add-peer-delete-listener peer-delete-listener)
+    (save-listener main-frame peer-delete-listener-key peer-delete-listener)))
+
+(defn detach-peer-update-listener [main-frame]
+  (peers-model/remove-peer-update-listener (remove-listener main-frame peer-update-listener-key))
+  main-frame)
+
+(defn detach-peer-delete-listener [main-frame]
+  (peers-model/remove-peer-delete-listener (remove-listener main-frame peer-delete-listener-key))
+  main-frame)
+
 (defn attach-peer-listener [main-frame]
-  (peers-model/add-peer-update-listener (fn [peer] (seesaw-core/invoke-later (update-peer-id-table main-frame peer))))
-  (peers-model/add-peer-delete-listener (fn [peer] (seesaw-core/invoke-later (delete-peer-from-table main-frame peer))))
+  (seesaw-core/listen main-frame
+                      :window-opened (fn [e] (attach-peer-delete-listener (attach-peer-update-listener main-frame)))
+                      :window-closed (fn [e] (detach-peer-delete-listener (detach-peer-update-listener main-frame))))
   main-frame)
 
 (defn load-data [main-frame]

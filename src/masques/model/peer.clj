@@ -23,19 +23,25 @@
 (defn remove-peer-update-listener [listener]
   (swap! peer-update-listeners remove-listener listener))
 
+(defn peer-update [peer]
+  (doseq [listener @peer-update-listeners]
+    (listener peer)))
+
+(defn peer-update-listener-count []
+  (count @peer-update-listeners))
+
 (defn add-peer-delete-listener [listener]
   (swap! peer-delete-listeners conj listener))
 
 (defn remove-peer-delete-listener [listener]
   (swap! peer-delete-listeners remove-listener listener))
 
-(defn peer-update [peer]
-  (doseq [listener @peer-update-listeners]
-    (listener peer)))
-
 (defn peer-delete [peer]
   (doseq [listener @peer-delete-listeners]
     (listener peer)))
+
+(defn peer-delete-listener-count []
+  (count @peer-delete-listeners))
 
 (defn peer-clean-up [peer]
   (clean-clob-key peer :destination))
