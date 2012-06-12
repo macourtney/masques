@@ -23,23 +23,38 @@
 (defn remove-identity-add-listener [listener]
   (swap! identity-add-listeners remove-listener listener))
 
-(defn add-identity-update-listener [listener]
-  (swap! identity-update-listeners conj listener))
-
-(defn add-identity-delete-listener [listener]
-  (swap! identity-delete-listeners conj listener))
-
 (defn identity-add [identity]
   (doseq [listener @identity-add-listeners]
     (listener identity)))
+
+(defn identity-add-listener-count []
+  (count @identity-add-listeners))
+
+(defn add-identity-update-listener [listener]
+  (swap! identity-update-listeners conj listener))
+
+(defn remove-identity-update-listener [listener]
+  (swap! identity-update-listeners remove-listener listener))
 
 (defn identity-update [identity]
   (doseq [listener @identity-update-listeners]
     (listener identity)))
 
+(defn identity-update-listener-count []
+  (count @identity-update-listeners))
+
+(defn add-identity-delete-listener [listener]
+  (swap! identity-delete-listeners conj listener))
+
+(defn remove-identity-delete-listener [listener]
+  (swap! identity-delete-listeners remove-listener listener))
+
 (defn identity-delete [identity]
   (doseq [listener @identity-delete-listeners]
     (listener identity)))
+
+(defn identity-delete-listener-count []
+  (count @identity-delete-listeners))
 
 (clj-record.core/init-model
   (:associations (belongs-to peer)
@@ -127,7 +142,7 @@
   (clj-crypto/verify-signature (public-key target-identity) data (decode-base64 signature)))
 
 (defn current-user-identity []
-  (let [user (user/current-user)]
+  (when-let [user (user/current-user)]
     (find-identity (:name user) (:public_key user) (:public_key_algorithm user))))
 
 (defn shortened-public-key-str [public-key]

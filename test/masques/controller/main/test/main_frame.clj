@@ -1,25 +1,40 @@
 (ns masques.controller.main.test.main-frame
-  (:require [fixtures.peer :as peer-fixture]
+  (:require [fixtures.identity :as identity-fixture]
+            [fixtures.user :as user-fixture]
             [fixtures.util :as fixtures-util]
+            [masques.model.identity :as identity-model]
             [masques.model.peer :as peer-model]
+            [masques.test.util :as test-util]
             [seesaw.core :as seesaw-core])
   (:use clojure.test
         masques.controller.main.main-frame))
 
-(fixtures-util/use-fixture-maps :once peer-fixture/fixture-map)
+(use-fixtures :once (join-fixtures
+                      [(fixtures-util/create-fixture [identity-fixture/fixture-map user-fixture/fixture-map])
+                       test-util/login-fixture]))
+
+(defn assert-listener-count [test-count]
+  (is (= (peer-model/peer-update-listener-count) test-count)) 
+  (is (= (peer-model/peer-delete-listener-count) test-count))
+  (is (= (identity-model/identity-add-listener-count) test-count))
+  (is (= (identity-model/identity-update-listener-count) test-count))
+  (is (= (identity-model/identity-delete-listener-count) test-count)))
+
+(defn assert-no-listeners []
+  (assert-listener-count 0))
+
+(defn assert-one-listener-each []
+  (assert-listener-count 1))
 
 (deftest test-show
-  (is (= (peer-model/peer-update-listener-count) 0)) 
-  (is (= (peer-model/peer-delete-listener-count) 0))
+  (assert-no-listeners)
   (let [frame (show)]
     (Thread/sleep 100)
     (is frame)
     (is (.isShowing frame))
-    (is (= (peer-model/peer-update-listener-count) 1)) 
-    (is (= (peer-model/peer-delete-listener-count) 1))
+    (assert-one-listener-each)
     (.setVisible frame false)
     (.dispose frame)
     (Thread/sleep 100)
     (is (not (.isShowing frame)))
-    (is (= (peer-model/peer-update-listener-count) 0)) 
-    (is (= (peer-model/peer-delete-listener-count) 0))))
+    (assert-no-listeners)))

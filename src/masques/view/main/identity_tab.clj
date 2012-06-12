@@ -50,6 +50,7 @@
 
 (defn create []
   (seesaw-core/border-panel
+    :id :identity-tab-panel
     :border 5
     :vgap 5
     :north (create-my-identity-panel)

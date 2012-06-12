@@ -67,13 +67,8 @@
   (controller-utils/save-component-property (find-peer-tab-panel main-frame) listener-key listener)
   main-frame)
 
-(defn retrieve-listener [main-frame listener-key]
-  (controller-utils/retrieve-component-property (find-peer-tab-panel main-frame) listener-key))
-
 (defn remove-listener [main-frame listener-key]
-  (let [peer-listener (retrieve-listener main-frame listener-key)]
-    (controller-utils/save-component-property (find-peer-tab-panel main-frame) listener-key nil)
-    peer-listener))
+  (controller-utils/remove-component-property (find-peer-tab-panel main-frame) listener-key))
 
 (defn attach-peer-update-listener [main-frame]
   (let [peer-update-listener (fn [peer] (seesaw-core/invoke-later (update-peer-id-table main-frame peer)))]
