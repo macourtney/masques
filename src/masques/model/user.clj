@@ -144,4 +144,7 @@
   (clj-crypto/verify-signature (current-user-key-pair) data (decode-base64 signature)))
 
 (defn xml [user]
-  (data-xml/element :user (select-keys user [:name :public_key :public_key_algorithm])))
+  (when-let [user-name (:name user)]
+    (when-let [public-key (:public_key user)]
+      (when-let [public-key-algorithm (:public_key_algorithm user)]
+        (data-xml/element :user { :name user-name  :publicKey public-key :publicKeyAlgorithm public-key-algorithm })))))

@@ -88,9 +88,17 @@
     (is (test-bytes key-bytes decrypted-bytes))))
 
 (deftest test-xml
+  (is (nil? (xml { :name "test-user" :public_key "" })))
+  (is (nil? (xml { :name "test-user" :public_key_algorithm "RSA" })))
+  (is (nil? (xml { :public_key "" :public_key_algorithm "RSA" })))
+  (is (nil? (xml { :name "test-user" })))
+  (is (nil? (xml { :public_key "" })))
+  (is (nil? (xml { :public_key_algorithm "RSA" })))
+  (is (nil? (xml {})))
+  (is (nil? (xml nil)))
   (let [test-user (first records)
         user-xml (xml test-user)]
     (is (= (count (:attrs user-xml)) 3))
     (is (= (:name test-user) (:name (:attrs user-xml))))
-    (is (= (:public_key test-user) (:public_key (:attrs user-xml))))
-    (is (= (:public_key_algorithm test-user) (:public_key_algorithm (:attrs user-xml))))))
+    (is (= (:public_key test-user) (:publicKey (:attrs user-xml))))
+    (is (= (:public_key_algorithm test-user) (:publicKeyAlgorithm (:attrs user-xml))))))
