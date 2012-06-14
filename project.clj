@@ -9,6 +9,7 @@
                  [drift "1.4.4-SNAPSHOT"]
                  [log4j/log4j "1.2.16"]
                  [org.clojure/clojure "1.2.1"]
+                 [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.2.3"]
                  [org.drift-db/drift-db-h2 "1.0.8-SNAPSHOT"]
