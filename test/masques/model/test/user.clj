@@ -1,5 +1,6 @@
 (ns masques.model.test.user
   (:require [clj-crypto.core :as clj-crypto]
+            [clojure.data.xml :as data-xml]
             [fixtures.util :as fixtures-util])
   (:use clojure.test
         fixtures.user
@@ -99,6 +100,23 @@
   (let [test-user (first records)
         user-xml (xml test-user)]
     (is (= (count (:attrs user-xml)) 3))
+    (is (= (:name test-user) (:name (:attrs user-xml))))
+    (is (= (:public_key test-user) (:publicKey (:attrs user-xml))))
+    (is (= (:public_key_algorithm test-user) (:publicKeyAlgorithm (:attrs user-xml))))))
+
+(deftest test-parse-xml
+  (is (nil? (parse-xml (data-xml/element :fail { :name "test-user" :publicKey "" :publicKeyAlgorithm "RSA" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :publicKey "" :publicKeyAlgorithm "RSA" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :name "test-user" :publicKeyAlgorithm "RSA" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :name "test-user" :publicKey "" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :name "test-user" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :publicKey "" }))))
+  (is (nil? (parse-xml (data-xml/element :user { :publicKeyAlgorithm "RSA" }))))
+  (is (nil? (parse-xml (data-xml/element :user {}))))
+  (is (nil? (parse-xml nil)))
+  (let [user-xml (data-xml/element :user { :name "test-user" :publicKey "" :publicKeyAlgorithm "RSA" })
+        test-user (parse-xml user-xml)]
+    (is test-user)
     (is (= (:name test-user) (:name (:attrs user-xml))))
     (is (= (:public_key test-user) (:publicKey (:attrs user-xml))))
     (is (= (:public_key_algorithm test-user) (:publicKeyAlgorithm (:attrs user-xml))))))

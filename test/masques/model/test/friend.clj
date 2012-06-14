@@ -1,7 +1,9 @@
 (ns masques.model.test.friend
-  (:require [clojure.java.io :as io]
+  (:require [clojure.data.xml :as data-xml]
+            [clojure.java.io :as io]
             [fixtures.identity :as fixtures-identity]
             [fixtures.user :as fixtures-user]
+            [fixtures.util :as fixtures-util]
             [masques.model.user :as user-model]) 
   (:use clojure.test
         masques.model.friend))
@@ -14,6 +16,8 @@
 (def test-friend { :identity_id (:id test-identity) :friend_id (:id test-identity-2) })
 
 (def test-user (first fixtures-user/records))
+
+(fixtures-util/use-fixture-maps :once fixtures-identity/fixture-map)
 
 (deftest test-all-friends
   (let [friend-id (insert test-friend)]
@@ -49,6 +53,35 @@
     (is test-xml)
     (is (= (first (:content test-xml)) (user-model/xml test-user)))
     (is (= (first (:content (second (:content test-xml)))) test-destination))))
+
+(deftest test-parse-destination-xml
+  (is (nil? (parse-destination-xml (data-xml/element :fail {} test-destination))))
+  (is (nil? (parse-destination-xml (data-xml/element :destination {}))))
+  (is (nil? (parse-destination-xml nil)))
+  (let [destination-xml (data-xml/element :destination {} test-destination)
+        parsed-destination (parse-destination-xml destination-xml)]
+    (is parsed-destination)
+    (is (= parsed-destination test-destination))))
+
+(deftest test-load-friend-xml
+  (is (nil? (load-friend-xml
+              (data-xml/element :fail {}
+                                (data-xml/element :user { :name "test-user" :publicKey "" :publicKeyAlgorithm "RSA" })
+                                (data-xml/element :destination {} test-destination)))))
+  (is (nil? (load-friend-xml
+              (data-xml/element :friend {}
+                                (data-xml/element :user { :name "test-user" :publicKey "" :publicKeyAlgorithm "RSA" })))))
+  (is (nil? (load-friend-xml
+              (data-xml/element :friend {} (data-xml/element :destination {} test-destination)))))
+  (is (nil? (load-friend-xml (data-xml/element :friend {}))))
+  (is (nil? (load-friend-xml nil)))
+  (let [friend-xml (data-xml/element :friend {}
+                                     (data-xml/element :user { :name "test-user" :publicKey "" :publicKeyAlgorithm "RSA" })
+                                     (data-xml/element :destination {} test-destination))
+        friend-id (load-friend-xml friend-xml test-identity)]
+    (is friend-id)
+    (when friend-id
+      (destroy-record { :id friend-id }))))
 
 (deftest test-write-friend-xml
   (let [test-file (io/as-file "./test/test_friend.xml")]

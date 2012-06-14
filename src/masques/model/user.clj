@@ -121,7 +121,7 @@
   (decode-base64 (:public_key user)))
 
 (defn public-key-map [user]
-  { :algorithm (:public_key_algorithm user)  :bytes (public-key-bytes user) })
+  { :algorithm (:public_key_algorithm user) :bytes (public-key-bytes user) })
 
 (defn private-key-bytes [user]
   (decode-base64
@@ -148,3 +148,14 @@
     (when-let [public-key (:public_key user)]
       (when-let [public-key-algorithm (:public_key_algorithm user)]
         (data-xml/element :user { :name user-name  :publicKey public-key :publicKeyAlgorithm public-key-algorithm })))))
+
+(defn parse-xml
+  "Reads the given xml element and loads the data in to the database. If the xml element is malformed, this function
+returns nil."
+  [xml-element]
+    (when (= (:tag xml-element) :user)
+      (when-let [xml-attrs (:attrs xml-element)]
+        (when-let [user-name (:name xml-attrs)]
+          (when-let [public-key (:publicKey xml-attrs)]
+            (when-let [public-key-algorithm (:publicKeyAlgorithm xml-attrs)]
+              { :name user-name :public_key public-key :public_key_algorithm public-key-algorithm }))))))

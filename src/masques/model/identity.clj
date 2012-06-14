@@ -105,10 +105,12 @@
 (defn find-identity-by-destination [destination]
   (find-identity-by-peer (clj-i2p-peer/find-peer destination)))
 
-(defn add-or-update-identity [user-name public-key public-key-algorithm destination]
-  (if-let [current-identity (find-identity user-name public-key public-key-algorithm)]
-    (update-identity current-identity user-name destination)
-    (add-identity user-name public-key public-key-algorithm destination)))
+(defn add-or-update-identity
+  ([user destination] (add-or-update-identity (:name user) (:public_key user) (:public_key_algorithm user) destination))
+  ([user-name public-key public-key-algorithm destination]
+    (if-let [current-identity (find-identity user-name public-key public-key-algorithm)]
+      (update-identity current-identity user-name destination)
+      (add-identity user-name public-key public-key-algorithm destination))))
 
 (defn identity-not-online [destination]
   (update-identity-is-online (find-identity-by-destination destination) false))
