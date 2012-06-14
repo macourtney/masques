@@ -1,6 +1,9 @@
 (ns masques.model.friend
-  (:require [clj-record.boot :as clj-record-boot]
-            [masques.model.identity :as identity])
+  (:require [clj-i2p.core :as clj-i2p]
+            [clj-record.boot :as clj-record-boot]
+            [clojure.data.xml :as data-xml]
+            [masques.model.identity :as identity]
+            [masques.model.user :as user])
   (:use masques.model.base))
 
 (clj-record.core/init-model
@@ -36,3 +39,10 @@
     (when-let [friend-to-remove (friend? friend-identity identity)]
       (destroy-record friend-to-remove))))
 
+(defn friend-xml
+  "Returns the xml needed to add the logged in user as a friend to another peer."
+  ([] (friend-xml (user/current-user) (clj-i2p/base-64-destination)))
+  ([user destination]
+  (data-xml/element :friend {}
+    (user/xml user)
+    (data-xml/element :destination {} (clj-i2p/as-destination-str destination)))))

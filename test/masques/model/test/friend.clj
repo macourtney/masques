@@ -1,5 +1,7 @@
 (ns masques.model.test.friend
-  (:require [fixtures.identity :as fixtures-identity]) 
+  (:require [fixtures.identity :as fixtures-identity]
+            [fixtures.user :as fixtures-user]
+            [masques.model.user :as user-model]) 
   (:use clojure.test
         masques.model.friend))
 
@@ -33,3 +35,11 @@
         (when friend-id
           (remove-friend test-identity-2 test-identity)
           (is (not (find-record { :id friend-id }))))))))
+
+(deftest test-friend-xml
+  (let [test-user (first fixtures-user/records)
+        test-destination "LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA"
+        test-xml (friend-xml test-user test-destination)]
+    (is test-xml)
+    (is (= (first (:content test-xml)) (user-model/xml test-user)))
+    (is (= (first (:content (second (:content test-xml)))) test-destination))))
