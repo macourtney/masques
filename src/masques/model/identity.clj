@@ -90,8 +90,13 @@
   (update-identity-is-online current-identity true)
   (:id current-identity))
 
-(defn find-identity [user-name public-key public-key-algorithm]
-  (find-record { :name user-name :public_key public-key :public_key_algorithm public-key-algorithm }))
+(defn find-identity
+  "Finds the identity based on the name, public key and public key algorithm or by the user."
+  ([user]
+    (find-identity (:name user) (:public_key user) (:public_key_algorithm user)))
+  ([user-name public-key public-key-algorithm]
+    (when (and user-name public-key public-key-algorithm)
+      (find-record { :name user-name :public_key public-key :public_key_algorithm public-key-algorithm }))))
 
 (defn find-identity-by-peer [peer]
   (when peer
@@ -143,7 +148,7 @@
 
 (defn current-user-identity []
   (when-let [user (user/current-user)]
-    (find-identity (:name user) (:public_key user) (:public_key_algorithm user))))
+    (find-identity user)))
 
 (defn shortened-public-key-str [public-key]
   (when public-key

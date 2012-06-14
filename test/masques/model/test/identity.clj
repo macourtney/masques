@@ -1,6 +1,7 @@
 (ns masques.model.test.identity
   (:require [fixtures.identity :as identity-fixture]
             [fixtures.peer :as peer-fixture]
+            [fixtures.user :as user-fixture] 
             [fixtures.util :as fixtures-util]) 
   (:use clojure.test
         masques.model.identity))
@@ -78,3 +79,9 @@
             (is (= new-name (:name final-identity)) "Name not updated for the test identity.")
             (is (= (:id new-peer) (:peer_id final-identity)) "Peer not updated for the test identity."))))
       (destroy-record { :id id }))))
+
+(deftest test-find-identity
+  (let [test-identity (first identity-fixture/records)]
+    (is (= (find-identity (:name test-identity) (:public_key test-identity) (:public_key_algorithm test-identity))
+           test-identity))
+    (is (= (find-identity (first user-fixture/records)) (second identity-fixture/records)))))
