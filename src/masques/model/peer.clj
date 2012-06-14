@@ -1,8 +1,9 @@
 (ns masques.model.peer
-  (:require [clojure.java.io :as java-io]
-            [clojure.tools.loading-utils :as loading-utils]
-            [clj-i2p.peer-service.persister-protocol :as persister-protocol]
+  (:require [clj-i2p.peer-service.persister-protocol :as persister-protocol]
             [clj-record.boot :as clj-record-boot]
+            [clojure.data.xml :as data-xml]
+            [clojure.java.io :as java-io]
+            [clojure.tools.loading-utils :as loading-utils]
             [config.environment :as environment]
             [masques.model.property :as property])
   (:use masques.model.base)
@@ -127,3 +128,6 @@ registered."
 
 (defn local? [peer]
   (as-boolean (:local peer)))
+
+(defn xml [peer]
+  (data-xml/element :peer (select-keys peer [:destination])))

@@ -86,3 +86,11 @@
                                              :private_key_encryption_algorithm clj-crypto/default-symmetrical-algorithm })]
     (is (= (count key-bytes) (count decrypted-bytes))) 
     (is (test-bytes key-bytes decrypted-bytes))))
+
+(deftest test-xml
+  (let [test-user (first records)
+        user-xml (xml test-user)]
+    (is (= (count (:attrs user-xml)) 3))
+    (is (= (:name test-user) (:name (:attrs user-xml))))
+    (is (= (:public_key test-user) (:public_key (:attrs user-xml))))
+    (is (= (:public_key_algorithm test-user) (:public_key_algorithm (:attrs user-xml))))))

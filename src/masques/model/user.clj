@@ -1,6 +1,7 @@
 (ns masques.model.user
   (:require [clj-record.boot :as clj-record-boot]
-            [clj-crypto.core :as clj-crypto])
+            [clj-crypto.core :as clj-crypto]
+            [clojure.data.xml :as data-xml])
   (:use masques.model.base)
   (:import [java.sql Clob]
            [org.apache.commons.codec.binary Base64]))
@@ -141,3 +142,6 @@
 
 (defn verify [data signature]
   (clj-crypto/verify-signature (current-user-key-pair) data (decode-base64 signature)))
+
+(defn xml [user]
+  (data-xml/element :user (select-keys user [:name :public_key :public_key_algorithm])))
