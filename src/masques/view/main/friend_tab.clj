@@ -4,8 +4,7 @@
 
 (def tab-name (clj-i18n/friend))
 
-(def friend-table-columns [ { :key :handle :text (clj-i18n/handle) }
-                            { :key :name :text (clj-i18n/full-name) } ])
+(def friend-table-columns [ { :key :handle :text (clj-i18n/handle) } ])
 
 (defn create-friend-list-buttons []
   (seesaw-core/horizontal-panel :items 
