@@ -7,7 +7,7 @@
             [masques.model.identity :as identity]
             [masques.model.user :as user])
   (:use masques.model.base)
-  (:import [java.io FileOutputStream OutputStreamWriter]))
+  (:import [java.io FileInputStream FileOutputStream OutputStreamWriter]))
 
 (clj-record.core/init-model
   (:associations (belongs-to identity)
@@ -82,3 +82,12 @@ this function returns nil."
           (with-open [output (OutputStreamWriter. output-stream "UTF-8")]
             (data-xml/emit output-xml output)))))))
 
+(defn read-friend-xml
+  ([file] (read-friend-xml file (identity/current-user-identity)))
+  ([file identity]
+    (when identity
+      (when-let [java-file (io/as-file file)]
+        (when (.exists java-file)
+          (with-open [file-input (FileInputStream. java-file)]
+            (when-let [xml-element (data-xml/parse file-input)]
+              (load-friend-xml xml-element identity))))))))

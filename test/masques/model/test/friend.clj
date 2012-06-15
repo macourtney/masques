@@ -17,6 +17,8 @@
 
 (def test-user (first fixtures-user/records))
 
+(def test-friend-file (io/as-file "./test/support_files/test_friend.xml"))
+
 (fixtures-util/use-fixture-maps :once fixtures-identity/fixture-map)
 
 (deftest test-all-friends
@@ -89,3 +91,13 @@
     (is (.exists test-file))
     (when (.exists test-file)
       (.delete test-file))))
+
+(deftest test-read-friend-xml
+  (is (nil? (read-friend-xml "./test/support_files/fail.xml" test-identity)))
+  (is (nil? (read-friend-xml nil test-identity)))
+  (is (nil? (read-friend-xml test-friend-file nil)))
+  (is (nil? (read-friend-xml nil nil)))
+  (let [friend-id (read-friend-xml test-friend-file test-identity)]
+    (is friend-id)
+    (when friend-id
+      (destroy-record { :id friend-id }))))
