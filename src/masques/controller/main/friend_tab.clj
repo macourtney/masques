@@ -8,8 +8,8 @@
 (defn find-friend-table [main-frame]
   (seesaw-core/select main-frame ["#friend-table"]))
 
-(defn convert-to-table-friend [identity]
-  identity)
+(defn convert-to-table-friend [friend]
+  friend)
 
 (defn reload-table-data [main-frame]
   (when-let [friends (map convert-to-table-friend (friends-model/all-friends))]
@@ -27,13 +27,13 @@
 (defn attach-listener-to-add-button [main-frame]
   ;(action-utils/attach-listener main-frame "#add-button" 
   ;  (fn [e] (add-destination/show main-frame #(reload-table-data main-frame))))
-  )
+  main-frame)
 
 (defn attach-friend-listener [main-frame]
   main-frame)
 
 (defn load-data [main-frame]
-  (load-peer-table (load-destination main-frame)))
+  (load-friend-table main-frame))
 
 (defn attach [main-frame]
   (attach-friend-listener (attach-listener-to-add-button main-frame)))
