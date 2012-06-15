@@ -22,6 +22,23 @@
 
 (fixtures-util/use-fixture-maps :once fixtures-identity/fixture-map)
 
+(defn test-friend-listener [friend]
+  friend)
+
+(deftest test-add-listener
+  (is (= (friend-add-listener-count) 0))
+  (add-friend-add-listener test-friend-listener)
+  (is (= (friend-add-listener-count) 1))
+  (remove-friend-add-listener test-friend-listener)
+  (is (= (friend-add-listener-count) 0)))
+
+(deftest test-delete-listener
+  (is (= (friend-delete-listener-count) 0))
+  (add-friend-delete-listener test-friend-listener)
+  (is (= (friend-delete-listener-count) 1))
+  (remove-friend-delete-listener test-friend-listener)
+  (is (= (friend-delete-listener-count) 0)))
+
 (deftest test-all-friends
   (let [friend-id (insert test-friend)]
     (is friend-id)

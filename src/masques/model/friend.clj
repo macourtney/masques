@@ -9,9 +9,41 @@
   (:use masques.model.base)
   (:import [java.io FileInputStream FileOutputStream OutputStreamWriter]))
 
+(def friend-add-listeners (atom []))
+
+(def friend-delete-listeners (atom []))
+
+(defn add-friend-add-listener [listener]
+  (swap! friend-add-listeners conj listener))
+
+(defn remove-friend-add-listener [listener]
+  (swap! friend-add-listeners remove-listener listener))
+
+(defn friend-add [friend]
+  (doseq [listener @friend-add-listeners]
+    (listener friend)))
+
+(defn friend-add-listener-count []
+  (count @friend-add-listeners))
+
+(defn add-friend-delete-listener [listener]
+  (swap! friend-delete-listeners conj listener))
+
+(defn remove-friend-delete-listener [listener]
+  (swap! friend-delete-listeners remove-listener listener))
+
+(defn friend-delete [friend]
+  (doseq [listener @friend-delete-listeners]
+    (listener friend)))
+
+(defn friend-delete-listener-count []
+  (count @friend-delete-listeners))
+
 (clj-record.core/init-model
   (:associations (belongs-to identity)
-                 (belongs-to friend :fk friend_id :model identity)))
+                 (belongs-to friend :fk friend_id :model identity))
+  (:callbacks (:after-insert friend-add)
+              (:after-destroy friend-delete)))
 
 (defn all-friends
   "Returns all of the friends for the current identity"
