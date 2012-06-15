@@ -53,6 +53,22 @@
           user-xml
           (data-xml/element :destination {} (clj-i2p/as-destination-str destination)))))))
 
+(defn friend-xml-string
+  ([] (friend-xml-string (user/current-user) (clj-i2p/base-64-destination)))
+  ([user destination]
+    (when-let [xml-element (friend-xml user destination)]
+      (data-xml/indent-str xml-element))))
+
+(defn write-friend-xml
+  "Writes the friend xml to the given file. File can be either a java File class or a string."
+  ([file] (write-friend-xml file (user/current-user) (clj-i2p/base-64-destination)))
+  ([file user destination]
+    (when-let [output-xml (friend-xml user destination)]
+      (when-let [java-file (io/as-file file)]
+        (with-open [output-stream (FileOutputStream. java-file)]
+          (with-open [output (OutputStreamWriter. output-stream "UTF-8")]
+            (data-xml/emit output-xml output)))))))
+
 (defn parse-destination-xml
   "Parses the given xml element as a destination element. If the given xml element is not a valid destination element,
 this function returns nil."
@@ -72,16 +88,6 @@ this function returns nil."
             (when-let [friend-id (identity/add-or-update-identity user destination)]
               (add-friend { :id friend-id } identity))))))))
 
-(defn write-friend-xml
-  "Writes the friend xml to the given file. File can be either a java File class or a string."
-  ([file] (write-friend-xml file (user/current-user) (clj-i2p/base-64-destination)))
-  ([file user destination]
-    (when-let [output-xml (friend-xml user destination)]
-      (when-let [java-file (io/as-file file)]
-        (with-open [output-stream (FileOutputStream. java-file)]
-          (with-open [output (OutputStreamWriter. output-stream "UTF-8")]
-            (data-xml/emit output-xml output)))))))
-
 (defn read-friend-xml
   ([file] (read-friend-xml file (identity/current-user-identity)))
   ([file identity]
@@ -91,3 +97,10 @@ this function returns nil."
           (with-open [file-input (FileInputStream. java-file)]
             (when-let [xml-element (data-xml/parse file-input)]
               (load-friend-xml xml-element identity))))))))
+
+(defn read-friend-xml-string
+  ([xml-string] (read-friend-xml-string xml-string (identity/current-user-identity)))
+  ([xml-string identity]
+    (when (and xml-string identity)
+      (when-let [xml-element (data-xml/parse-str xml-string)]
+        (load-friend-xml xml-element identity)))))
