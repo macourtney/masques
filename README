@@ -1,13 +1,34 @@
-# masques
+# Masques
 
-FIXME: write description
+Masques is a P2P social network. Instead of posting your personal data on a website which you don't control and which
+changes their privacy policy on a whim, all of your data stays on your computer, and is only shared with the friends you
+want to share it with. All communication is directly from friend to friend (node to node) and encrypted to avoid
+unwanted eyes viewing your data.
 
 ## Usage
 
-FIXME: write
+Masques is still under development and there is no easy way to install and run it at the moment.
+
+From development:
+
+Make sure you have I2P installed and running on you computer.
+
+Make sure you have java and Leiningen installed.
+
+Check out the code and download the dependencies with "lein deps". To run in development mode use "lein run development".
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) 2012 Matthew Courtney
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
