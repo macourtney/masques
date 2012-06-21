@@ -19,7 +19,10 @@
     (finally
       (unload-records fixture-map))))
 
-(defn build-table-map [table-map fixture-maps]
+(defn build-table-map
+  "Collects the given fixture and all of the fixtures it depends on into a single map keyed off the table the fixture
+updates."
+  [table-map fixture-maps]
   (if-let [fixture-map (first fixture-maps)]
     (let [new-table-map (assoc table-map (:table fixture-map) fixture-map)]
       (recur new-table-map (concat (rest fixture-maps)
@@ -27,8 +30,13 @@
                                                (:required-fixtures fixture-map)))))
     table-map)) 
 
+(defn create-fixture-fn
+  "Converts the given fixture map into a fixture function."
+  [fixture-map]
+  (partial run-fixture fixture-map))
+
 (defn create-fixture [fixture-maps]
-  (clojure-test/join-fixtures (map #(partial run-fixture %1) (vals (build-table-map {} fixture-maps)))))
+  (clojure-test/join-fixtures (map create-fixture-fn (vals (build-table-map {} fixture-maps)))))
 
 (defn use-fixture-maps [fixture-type & fixture-maps]
   (clojure-test/use-fixtures fixture-type (create-fixture fixture-maps)))
