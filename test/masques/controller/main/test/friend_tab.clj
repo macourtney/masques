@@ -6,7 +6,7 @@
   (:use clojure.test
         masques.controller.main.friend-tab))
 
-(test-util/use-combined-login-fixture [friend-fixture/fixture-map ])
+(test-util/use-combined-login-fixture friend-fixture/fixture-map)
 
 ;(defn assert-no-listeners []
 ;  (assert-listener-count 0))

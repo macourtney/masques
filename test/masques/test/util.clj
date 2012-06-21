@@ -25,7 +25,7 @@
                                (fixture-util/create-fixture-fn user-fixture/fixture-map)
                                login-fixture]))
 
-(defn use-combined-login-fixture [fixture-maps]
+(defn use-combined-login-fixture [& fixture-maps]
   (clojure-test/use-fixtures :once (create-combined-login-fixture fixture-maps)))
 
 (defn create-test-window [panel]

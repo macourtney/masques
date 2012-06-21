@@ -9,9 +9,7 @@
   (:use clojure.test
         masques.controller.main.main-frame))
 
-(use-fixtures :once (join-fixtures
-                      [(fixtures-util/create-fixture [identity-fixture/fixture-map user-fixture/fixture-map])
-                       test-util/login-fixture]))
+(test-util/use-combined-login-fixture identity-fixture/fixture-map)
 
 (defn assert-listener-count [test-count]
   (is (= (peer-model/peer-update-listener-count) test-count)) 
