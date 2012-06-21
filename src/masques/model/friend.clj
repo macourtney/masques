@@ -75,6 +75,11 @@
     (when-let [friend-to-remove (friend? friend-identity identity)]
       (destroy-record friend-to-remove))))
 
+(defn friend-name
+  "Returns the name of the given friend."
+  [friend]
+  (:name (find-identity friend)))
+
 (defn friend-xml
   "Returns the xml needed to add the logged in user as a friend to another peer."
   ([] (friend-xml (user/current-user) (clj-i2p/base-64-destination)))

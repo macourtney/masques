@@ -3,19 +3,30 @@
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friends-model]
             [masques.view.main.friend-tab :as friend-tab-view]
-            [seesaw.core :as seesaw-core]))
+            [seesaw.core :as seesaw-core]
+            [seesaw.table :as seesaw-table]))
 
 (defn find-friend-table [main-frame]
   (seesaw-core/select main-frame ["#friend-table"]))
 
 (defn convert-to-table-friend [friend]
-  friend)
+  { :id (:id friend) :name (friends-model/friend-name friend) })
 
 (defn reload-table-data [main-frame]
   (when-let [friends (map convert-to-table-friend (friends-model/all-friends))]
     (seesaw-core/config! (find-friend-table main-frame)
       :model [:columns friend-tab-view/friend-table-columns
               :rows friends])))
+
+(defn friend-count
+  "Returns the number of rows in the friend table."
+  [main-frame]
+  (seesaw-table/row-count (find-friend-table main-frame)))
+
+(defn all-friends
+  "Returns all of the friends from the friend table."
+  [main-frame]
+  (seesaw-table/value-at (find-friend-table main-frame) (range (friend-count main-frame))))
 
 (defn load-friend-table [main-frame]
   (reload-table-data main-frame)

@@ -3,8 +3,8 @@
 
 (def records [
   { :id 1
-    :identity_id 1
-    :friend_id 2 }])
+    :identity_id 2
+    :friend_id 1 }])
 
 (def fixture-table-name :friends)
 
