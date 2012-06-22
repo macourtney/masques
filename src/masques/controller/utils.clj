@@ -66,7 +66,8 @@
   (enable-subwidgets parent-component true))
 
 (defn save-component-property [component key value]
-  (.putClientProperty component key value))
+  (.putClientProperty component key value)
+  value)
 
 (defn retrieve-component-property [component key]
   (.getClientProperty component key))

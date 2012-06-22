@@ -64,8 +64,7 @@
   )
 
 (defn save-listener [main-frame listener-key listener]
-  (controller-utils/save-component-property (friend-panel main-frame) listener-key listener)
-  listener)
+  (controller-utils/save-component-property (friend-panel main-frame) listener-key listener))
 
 (defn remove-listener [main-frame listener-key]
   (controller-utils/remove-component-property (friend-panel main-frame) listener-key))
