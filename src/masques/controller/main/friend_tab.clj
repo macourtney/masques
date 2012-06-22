@@ -9,6 +9,9 @@
 (defn find-friend-table [main-frame]
   (seesaw-core/select main-frame ["#friend-table"]))
 
+(defn find-friend-xml-text [main-frame]
+  (seesaw-core/select main-frame ["#friend-text"]))
+
 (defn convert-to-table-friend [friend]
   { :id (:id friend) :name (friends-model/friend-name friend) })
 
@@ -28,8 +31,16 @@
   [main-frame]
   (seesaw-table/value-at (find-friend-table main-frame) (range (friend-count main-frame))))
 
+(defn friend-xml-text [main-frame]
+  (seesaw-core/text (find-friend-xml-text main-frame)))
+
 (defn load-friend-table [main-frame]
   (reload-table-data main-frame)
+  main-frame)
+
+(defn load-friend-xml-text [main-frame]
+  (.setText (find-friend-xml-text main-frame)
+        (friends-model/friend-xml-string))
   main-frame)
 
 (defn find-add-button [main-frame]
@@ -44,7 +55,7 @@
   main-frame)
 
 (defn load-data [main-frame]
-  (load-friend-table main-frame))
+  (load-friend-table (load-friend-xml-text main-frame)))
 
 (defn attach [main-frame]
   (attach-friend-listener (attach-listener-to-add-button main-frame)))
