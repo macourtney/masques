@@ -17,17 +17,11 @@
 
 (deftest test-show
   ;(assert-no-listeners)
-  (let [frame (test-util/show (friend-tab-view/create))]
+  (let [frame (test-util/assert-show (friend-tab-view/create))]
     (init frame)
-    (Thread/sleep 100)
-    (is frame)
-    (is (.isShowing frame))
-    (Thread/sleep 10000)
+    ;(Thread/sleep 10000)
     (is (= (friend-count frame) 1))
     ;(assert-one-listener-each)
-    (.setVisible frame false)
-    (.dispose frame)
-    (Thread/sleep 100)
-    (is (not (.isShowing frame)))
+    (test-util/assert-close frame)
     ;(assert-no-listeners)
     ))
