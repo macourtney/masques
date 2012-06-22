@@ -15,7 +15,7 @@ Make sure you have I2P installed and running on you computer.
 
 Make sure you have java and Leiningen installed.
 
-Check out the code and download the dependencies with "lein deps". To run in development mode use "lein run development".
+Check out the code and download the dependencies with "lein deps". To run in development mode use "lein run :development".
 
 ## License
 
