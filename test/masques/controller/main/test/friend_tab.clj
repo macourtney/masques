@@ -10,12 +10,8 @@
 (test-util/use-combined-login-fixture friend-fixture/fixture-map)
 
 (defn assert-listener-count [test-count]
-  ;(is (= (peer-model/peer-update-listener-count) test-count)) 
-  ;(is (= (peer-model/peer-delete-listener-count) test-count))
-  ;(is (= (identity-model/identity-add-listener-count) test-count))
-  ;(is (= (identity-model/identity-update-listener-count) test-count))
-  ;(is (= (identity-model/identity-delete-listener-count) test-count))
-  )
+  (is (= (friend-model/friend-add-listener-count) test-count)) 
+  (is (= (friend-model/friend-delete-listener-count) test-count)))
 
 (defn assert-no-listeners []
   (assert-listener-count 0))
@@ -25,8 +21,7 @@
 
 (deftest test-show
   ;(assert-no-listeners)
-  (let [frame (test-util/assert-show (friend-tab-view/create))]
-    (init frame)
+  (let [frame (test-util/assert-show (friend-tab-view/create) init)]
     ;(Thread/sleep 10000)
     (is (= (friend-count frame) 1))
     (is (= (friend-xml-text frame) (friend-model/friend-xml-string)))

@@ -51,5 +51,6 @@
 
 (defn create []
   (seesaw-core/vertical-panel
+    :id :friend-tab-panel
     :border 9
     :items [(create-friend-xml-panel) [:fill-v 9] (create-friend-table-panel)]))

@@ -6,6 +6,12 @@
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table]))
 
+(def friend-add-listener-key "friend-add-listener")
+(def friend-delete-listener-key "friend-delete-listener")
+
+(defn friend-panel [main-frame]
+  (seesaw-core/select main-frame ["#friend-tab-panel"]))
+
 (defn find-friend-table [main-frame]
   (seesaw-core/select main-frame ["#friend-table"]))
 
@@ -51,7 +57,45 @@
   ;  (fn [e] (add-destination/show main-frame #(reload-table-data main-frame))))
   main-frame)
 
+(defn friend-add-listener [main-frame friend]
+  )
+
+(defn friend-delete-listener [main-frame friend]
+  )
+
+(defn save-listener [main-frame listener-key listener]
+  (controller-utils/save-component-property (friend-panel main-frame) listener-key listener)
+  listener)
+
+(defn remove-listener [main-frame listener-key]
+  (controller-utils/remove-component-property (friend-panel main-frame) listener-key))
+
+(defn attach-friend-add-listener [main-frame]
+  (friends-model/add-friend-add-listener
+    (save-listener main-frame friend-add-listener-key #(friend-add-listener main-frame %)))
+  main-frame)
+
+(defn attach-friend-delete-listener [main-frame]
+  (friends-model/add-friend-delete-listener
+    (save-listener main-frame friend-delete-listener-key #(friend-delete-listener main-frame %)))
+  main-frame)
+
+(defn detach-friend-add-listener [main-frame]
+  (friends-model/remove-friend-add-listener (remove-listener main-frame friend-add-listener-key))
+  main-frame)
+
+(defn detach-friend-delete-listener [main-frame]
+  (friends-model/remove-friend-delete-listener (remove-listener main-frame friend-delete-listener-key))
+  main-frame)
+
 (defn attach-friend-listener [main-frame]
+  (seesaw-core/listen main-frame
+                      :window-opened (fn [e] (attach-friend-add-listener
+                                               (attach-friend-delete-listener
+                                                 main-frame)))
+                      :window-closed (fn [e] (detach-friend-add-listener
+                                               (detach-friend-delete-listener
+                                                 main-frame))))
   main-frame)
 
 (defn load-data [main-frame]

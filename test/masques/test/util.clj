@@ -47,9 +47,13 @@
       :title "Test Window"
       :content panel)))
 
-(defn show [panel]
-  (seesaw-core/show!
-    (create-test-window panel)))
+(defn show
+  ([panel] (show panel nil))
+  ([panel init-fn]
+    (let [frame (create-test-window panel)]
+      (when init-fn
+        (init-fn frame))
+      (seesaw-core/show! frame))))
 
 (defn show-and-wait
   ([panel] (show-and-wait panel 5000))
@@ -61,8 +65,8 @@
 
 (defn assert-show
   "Verifies the given frame is showing."
-  [panel]
-  (let [frame (show panel)]
+  [panel init-fn]
+  (let [frame (show panel init-fn)]
     (Thread/sleep 100)
     (clojure-test/is frame)
     (clojure-test/is (.isShowing frame))
