@@ -76,3 +76,18 @@
   (let [value (retrieve-component-property component key)]
     (save-component-property component key nil)
     value))
+
+(defn attach-and-save-listener [component add-listener-fn key listener]
+  (add-listener-fn (save-component-property component key listener))
+  component)
+
+(defn detach-and-remove-listener [component remove-listener-fn key]
+  (remove-listener-fn (retrieve-component-property component key))
+  component)
+
+(defn attach-and-detach-listener [window listener key component-find-fn add-listener-fn remove-listener-fn]
+  (let [component (component-find-fn window)]
+    (seesaw-core/listen window
+                      :window-opened (fn [e] (attach-and-save-listener component add-listener-fn key listener))
+                      :window-closed (fn [e] (detach-and-remove-listener component remove-listener-fn key))))
+  window)
