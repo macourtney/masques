@@ -73,48 +73,28 @@
       (identity-model/get-table-identity (:id identity)))
     (delete-identity-from-table main-frame identity)))
 
-(defn save-listener [main-frame listener-key listener]
-  (controller-utils/save-component-property (find-identity-tab-panel main-frame) listener-key listener)
-  main-frame)
-
-(defn remove-listener [main-frame listener-key]
-  (controller-utils/remove-component-property (find-identity-tab-panel main-frame) listener-key))
-
-(defn attach-identity-add-listener [main-frame]
-  (let [listener (fn [identity] (seesaw-core/invoke-later (add-identity-to-table main-frame identity)))]
-    (identity-model/add-identity-add-listener listener)
-    (save-listener main-frame identity-add-listener-key listener)))
-
-(defn attach-identity-update-listener [main-frame]
-  (let [listener (fn [identity] (seesaw-core/invoke-later (update-identity-id-table main-frame identity)))]
-    (identity-model/add-identity-update-listener listener)
-    (save-listener main-frame identity-update-listener-key listener)))
-
-(defn attach-identity-delete-listener [main-frame]
-  (let [listener (fn [identity] (seesaw-core/invoke-later (delete-identity-from-table main-frame identity)))]
-    (identity-model/add-identity-delete-listener listener)
-    (save-listener main-frame identity-delete-listener-key listener)))
-
-(defn detach-identity-add-listener [main-frame]
-  (identity-model/remove-identity-add-listener (remove-listener main-frame identity-add-listener-key))
-  main-frame)
-
-(defn detach-identity-update-listener [main-frame]
-  (identity-model/remove-identity-update-listener (remove-listener main-frame identity-update-listener-key))
-  main-frame)
-
-(defn detach-identity-delete-listener [main-frame]
-  (identity-model/remove-identity-delete-listener (remove-listener main-frame identity-delete-listener-key))
-  main-frame)
-
 (defn attach-identity-listener [main-frame]
-  (seesaw-core/listen main-frame
-                      :window-opened (fn [e] (attach-identity-delete-listener
-                                               (attach-identity-update-listener
-                                                 (attach-identity-add-listener main-frame))))
-                      :window-closed (fn [e] (detach-identity-delete-listener
-                                               (detach-identity-update-listener
-                                                 (detach-identity-add-listener main-frame)))))
+  (controller-utils/attach-and-detach-listener main-frame
+                                               (fn [identity] (seesaw-core/invoke-later
+                                                                (add-identity-to-table main-frame identity)))
+                                               identity-add-listener-key
+                                               find-identity-tab-panel
+                                               identity-model/add-identity-add-listener
+                                               identity-model/remove-identity-add-listener)
+  (controller-utils/attach-and-detach-listener main-frame
+                                               (fn [identity] (seesaw-core/invoke-later
+                                                                (update-identity-id-table main-frame identity)))
+                                               identity-update-listener-key
+                                               find-identity-tab-panel
+                                               identity-model/add-identity-update-listener
+                                               identity-model/remove-identity-update-listener)
+  (controller-utils/attach-and-detach-listener main-frame
+                                               (fn [identity] (seesaw-core/invoke-later
+                                                                (delete-identity-from-table main-frame identity)))
+                                               identity-delete-listener-key
+                                               find-identity-tab-panel
+                                               identity-model/add-identity-delete-listener
+                                               identity-model/remove-identity-delete-listener)
   main-frame)
 
 (defn find-identity-view-button [main-frame]
