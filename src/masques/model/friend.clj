@@ -78,7 +78,7 @@
 (defn friend-name
   "Returns the name of the given friend."
   [friend]
-  (:name (find-identity friend)))
+  (:name (find-friend friend)))
 
 (defn friend-xml
   "Returns the xml needed to add the logged in user as a friend to another peer."

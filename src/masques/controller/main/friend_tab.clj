@@ -2,6 +2,7 @@
   (:require [masques.controller.actions.utils :as action-utils]
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friends-model]
+            [masques.model.identity :as identity-model]
             [masques.view.main.friend-tab :as friend-tab-view]
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table]))
@@ -37,6 +38,23 @@
   [main-frame]
   (seesaw-table/value-at (find-friend-table main-frame) (range (friend-count main-frame))))
 
+(defn all-friend-pairs
+  "Returns all the friends from the friend table as pairs with the index of the friend in the table."
+  [main-frame]
+  (map #(list %1 %2) (range) (all-friends main-frame)))
+
+(defn find-friend-pair
+  "Returns the friend pair for the given friend if it is in the table."
+  [main-frame friend]
+  (when-let [friend-id (if (map? friend) (:id friend) friend)]
+    (first (filter #(= friend-id (:id (second %))) (all-friend-pairs main-frame)))))
+
+(defn find-friend-index
+  "Returns the index of the given friend."
+  [main-frame friend]
+  (when-let [found-friend-pair (find-friend-pair main-frame friend)]
+    (first found-friend-pair)))
+
 (defn friend-xml-text [main-frame]
   (seesaw-core/text (find-friend-xml-text main-frame)))
 
@@ -58,10 +76,12 @@
   main-frame)
 
 (defn friend-add-listener [main-frame friend]
-  )
+  (let [new-friend (friends-model/get-record (:id friend))]
+    (when (= (:identity_id new-friend) (:id (identity-model/current-user-identity)))
+      (seesaw-table/insert-at! (find-friend-table main-frame) 0 (convert-to-table-friend new-friend)))))
 
 (defn friend-delete-listener [main-frame friend]
-  )
+  (seesaw-table/remove-at! (find-friend-table main-frame) (find-friend-index main-frame friend)))
 
 (defn attach-friend-listener [main-frame]
   (controller-utils/attach-and-detach-listener main-frame #(friend-add-listener main-frame %) friend-add-listener-key
