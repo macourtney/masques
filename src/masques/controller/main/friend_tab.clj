@@ -55,6 +55,21 @@
   (when-let [found-friend-pair (find-friend-pair main-frame friend)]
     (first found-friend-pair)))
 
+(defn find-selected-friend
+  "Returns the selected friend in the friend table."
+  [main-frame]
+  (when-let [friend-table (find-friend-table main-frame)]
+    (let [selected-row (.getSelectedRow friend-table)]
+      (when (>= selected-row 0)
+        (seesaw-table/value-at friend-table selected-row)))))
+
+(defn set-selected-friend
+  "Selects the given friend in the friend table."
+  [main-frame friend]
+  (when-let [friend-index (find-friend-index main-frame friend)]
+    (when (>= friend-index 0)
+      (.setRowSelectionInterval (find-friend-table main-frame) friend-index friend-index))))
+
 (defn friend-xml-text [main-frame]
   (seesaw-core/text (find-friend-xml-text main-frame)))
 
@@ -70,10 +85,27 @@
 (defn find-add-button [main-frame]
   (seesaw-core/select main-frame ["#add-friend-button"]))
 
+(defn find-unfriend-button [main-frame]
+  (seesaw-core/select main-frame ["#unfriend-button"]))
+
+(defn click-unfriend-button
+  "Clicks the unfriend button."
+  [main-frame]
+  (.doClick (find-unfriend-button main-frame)))
+
 (defn attach-listener-to-add-button [main-frame]
   ;(action-utils/attach-listener main-frame "#add-button" 
   ;  (fn [e] (add-destination/show main-frame #(reload-table-data main-frame))))
   main-frame)
+
+(defn unfriend-selected
+  "Unfriends the selected friend in the friend table."
+  [main-frame]
+  (friends-model/destroy-record (find-selected-friend main-frame)))
+
+(defn attach-listener-to-unfriend-button [main-frame]
+  (action-utils/attach-listener main-frame "#unfriend-button" 
+    (fn [e] (unfriend-selected main-frame))))
 
 (defn friend-add-listener [main-frame friend]
   (let [new-friend (friends-model/get-record (:id friend))]
@@ -97,7 +129,7 @@
   (load-friend-table (load-friend-xml-text main-frame)))
 
 (defn attach [main-frame]
-  (attach-friend-listener (attach-listener-to-add-button main-frame)))
+  (attach-friend-listener (attach-listener-to-unfriend-button (attach-listener-to-add-button main-frame))))
 
 (defn init [main-frame]
   (attach (load-data main-frame)))

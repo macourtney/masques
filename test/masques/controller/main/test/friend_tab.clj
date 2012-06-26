@@ -27,10 +27,11 @@
     (is (= (friend-count frame) 1))
     (is (= (friend-xml-text frame) (friend-model/friend-xml-string)))
     (assert-one-listener-each)
-    (let [friend-identity (identity-model/get-record 3)]
-      (friend-model/add-friend friend-identity)
+    (let [friend-identity (identity-model/get-record 3)
+          friend-id (friend-model/add-friend friend-identity)]
       (is (= (friend-count frame) 2))
-      (friend-model/remove-friend friend-identity)
+      (set-selected-friend frame { :id friend-id })
+      (click-unfriend-button frame)
       (is (= (friend-count frame) 1)))
     ;(Thread/sleep 10000)
     (test-util/assert-close frame)
