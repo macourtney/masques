@@ -30,13 +30,22 @@ updates."
                                                (:required-fixtures fixture-map)))))
     table-map)) 
 
+(defn identity-fixture
+  "Simply runs the fixture given to it and does nothing else."
+  [function]
+  (function))
+
 (defn create-fixture-fn
   "Converts the given fixture map into a fixture function."
   [fixture-map]
   (partial run-fixture fixture-map))
 
-(defn create-fixture [fixture-maps]
-  (clojure-test/join-fixtures (map create-fixture-fn (vals (build-table-map {} fixture-maps)))))
+(defn create-fixture
+  "Returns a fixture combining all of the fixtures created from the given fixture maps."
+  [fixture-maps]
+  (if (and fixture-maps (not-empty fixture-maps))
+    (clojure-test/join-fixtures (map create-fixture-fn (vals (build-table-map {} fixture-maps))))
+    identity-fixture))
 
 (defn use-fixture-maps [fixture-type & fixture-maps]
   (clojure-test/use-fixtures fixture-type (create-fixture fixture-maps)))
