@@ -1,5 +1,6 @@
 (ns masques.controller.main.friend-tab
   (:require [masques.controller.actions.utils :as action-utils]
+            [masques.controller.add-friend.view :as add-friend-view]
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friends-model]
             [masques.model.identity :as identity-model]
@@ -94,9 +95,8 @@
   (.doClick (find-unfriend-button main-frame)))
 
 (defn attach-listener-to-add-button [main-frame]
-  ;(action-utils/attach-listener main-frame "#add-button" 
-  ;  (fn [e] (add-destination/show main-frame #(reload-table-data main-frame))))
-  main-frame)
+  (action-utils/attach-listener main-frame "#add-friend-button" 
+    (fn [e] (add-friend-view/show main-frame))))
 
 (defn unfriend-selected
   "Unfriends the selected friend in the friend table."
