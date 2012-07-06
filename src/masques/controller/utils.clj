@@ -5,7 +5,7 @@
             [seesaw.widget-options :as widget-options])
   (:import [java.awt Color]
            [java.awt.event ItemListener]
-           [javax.swing JComponent JLayeredPane JRootPane]))
+           [javax.swing JComponent JFileChooser JLayeredPane JRootPane]))
 
 (def yellow-highlight (Color. (float 1) (float 1) (float 0.6)))
 (def turquoise-highlight (Color. (float 0.7) (float 1) (float 1)))
@@ -91,3 +91,10 @@
                       :window-opened (fn [e] (attach-and-save-listener component add-listener-fn key listener))
                       :window-closed (fn [e] (detach-and-remove-listener component remove-listener-fn key))))
   window)
+
+(defn choose-file
+  "Pops up a file chooser and returns the chosen file if the user picks one, otherwise this function returns nil."
+  [owner]
+  (let [file-chooser (new JFileChooser)]
+    (when (= JFileChooser/APPROVE_OPTION (.showOpenDialog file-chooser owner))
+      (.getSelectedFile file-chooser))))

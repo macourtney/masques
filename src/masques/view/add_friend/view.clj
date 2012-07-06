@@ -45,3 +45,22 @@
       :content (create-content)
       :on-close :dispose
       :visible? false)))
+
+(defn find-paste-button [add-friend-panel]
+  (seesaw-core/select add-friend-panel ["#paste-button"]))
+
+(defn find-friend-text [add-friend-panel]
+  (seesaw-core/select add-friend-panel ["#friend-text"]))
+
+(defn friend-text
+  ([add-friend-panel]
+    (let [friend-text-str (.getText (find-friend-text add-friend-panel))]
+      (when (not-empty friend-text-str)
+        friend-text-str)))
+  ([add-friend-panel text]
+    (.setText (find-friend-text add-friend-panel) text)))
+
+(defn click-paste-button
+  "Clicks the paste button."
+  [main-frame]
+  (.doClick (find-paste-button main-frame)))

@@ -34,9 +34,8 @@
   (java-io/copy (friend-tab-view/friend-xml-text main-frame) file))
 
 (defn save-text-listener [main-frame]
-  (let [file-chooser (new JFileChooser)]
-    (when (= JFileChooser/APPROVE_OPTION (.showOpenDialog file-chooser main-frame))
-      (save-friend-xml main-frame (.getSelectedFile file-chooser)))))
+  (when-let [file (controller-utils/choose-file main-frame)]
+    (save-friend-xml main-frame file)))
 
 (defn attach-listener-to-save-text-button [main-frame]
   (action-utils/attach-listener main-frame "#save-text-button" 
