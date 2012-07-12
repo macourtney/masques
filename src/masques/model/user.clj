@@ -159,3 +159,10 @@ returns nil."
           (when-let [public-key (:publicKey xml-attrs)]
             (when-let [public-key-algorithm (:publicKeyAlgorithm xml-attrs)]
               { :name user-name :public_key public-key :public_key_algorithm public-key-algorithm }))))))
+
+(defn clean-private-data
+  "Cleans all of the private data from the given user. If no user is given, this function returns a clean version of the
+current user."
+  ([] (clean-private-data (current-user)))
+  ([user]
+    (select-keys user [:name :public_key :public_key_algorithm])))

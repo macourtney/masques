@@ -3,7 +3,7 @@
   (:use [clojure.test])
   (:require [clj-i2p.service-protocol :as service-protocol]))
 
-(deftest service-test
+(deftest test-service
   (let [service (create-service)]
     (is (= :masques-service (service-protocol/key service)))
     (is (= "Masques Service" (service-protocol/name service)))
