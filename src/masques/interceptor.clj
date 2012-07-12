@@ -1,5 +1,6 @@
 (ns masques.interceptor
-  (:require [masques.model.record-utils :as record-utils]
+  (:require [clj-i2p.server-interceptors :as server-interceptors]
+            [masques.model.record-utils :as record-utils]
             [masques.model.user :as user-model]))
 
 (defn cleaned-current-user []
@@ -7,3 +8,6 @@
 
 (defn interceptor [function request-map]
   (assoc (function request-map) :user (cleaned-current-user)))
+
+(defn init []
+  (server-interceptors/add-interceptor interceptor))
