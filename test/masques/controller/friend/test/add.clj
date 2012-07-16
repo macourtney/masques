@@ -1,14 +1,14 @@
-(ns masques.controller.add-friend.test.view
+(ns masques.controller.friend.test.add
   (:require [test.init :as test-init])
   (:require [fixtures.identity :as identity-fixture]
             [clojure.java.io :as java-io]
             [masques.model.clipboard :as clipboard-model]
             [masques.model.friend :as friend-model]
             [masques.test.util :as test-util]
-            [masques.view.add-friend.view :as add-friend-view]
+            [masques.view.friend.add :as add-friend-view]
             [seesaw.core :as seesaw-core])
   (:use clojure.test
-        masques.controller.add-friend.view)
+        masques.controller.friend.add)
   (:import [java.io File]))
 
 (test-util/use-combined-login-fixture identity-fixture/fixture-map)

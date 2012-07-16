@@ -1,4 +1,4 @@
-(ns masques.view.add-friend.view
+(ns masques.view.friend.add
   (:require [clj-internationalization.core :as clj-i18n]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))

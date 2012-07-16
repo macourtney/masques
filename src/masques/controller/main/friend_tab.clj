@@ -1,7 +1,7 @@
 (ns masques.controller.main.friend-tab
   (:require [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as action-utils]
-            [masques.controller.add-friend.view :as add-friend-view]
+            [masques.controller.friend.add :as add-friend-view]
             [masques.controller.utils :as controller-utils]
             [masques.model.clipboard :as clipboard-model]
             [masques.model.friend :as friends-model]

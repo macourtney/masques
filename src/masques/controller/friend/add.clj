@@ -1,10 +1,10 @@
-(ns masques.controller.add-friend.view
+(ns masques.controller.friend.add
   (:require [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
             [masques.model.clipboard :as clipboard-model]
             [masques.model.friend :as friend-model]
-            [masques.view.add-friend.view :as add-friend-view]
+            [masques.view.friend.add :as add-friend-view]
             [seesaw.core :as seesaw-core])
   (:import [java.io StringWriter]))
 
