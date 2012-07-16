@@ -24,5 +24,8 @@ address. Otherwise, this function adds the given address to the database."
 (defn save-or-update-current-identity-address
   "If there is already an address associated with the current identity, then this function replaces the address with the
 given address. Otherwise, this function adds the given address to the database for the current identity."
-  [address country province city postal-code]
-  (save-or-update-identity-address (identity/current-user-identity) address country province city postal-code))
+  ([address country province city postal-code]
+    (save-or-update-identity-address (identity/current-user-identity) address country province city postal-code))
+  ([address]
+    (save-or-update-identity-address (identity/current-user-identity) (:address address) (:country address)
+                                     (:province address) (:city address) (:postal-code address))))
