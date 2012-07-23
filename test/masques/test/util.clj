@@ -32,14 +32,30 @@
       (clj-i2p/set-destination nil)
       (clj-i2p/notify-destination-listeners))))
 
-(defn create-combined-login-fixture [other-fixture-maps]
-  (clojure-test/join-fixtures [(fixture-util/create-fixture other-fixture-maps)
-                               (fixture-util/create-fixture-fn user-fixture/fixture-map)
-                               destination-fixture
-                               login-fixture]))
+(defn create-combined-login-fixture [fixtures-or-maps]
+  (let [fixture-maps (filter map? fixtures-or-maps)]
+    (clojure-test/join-fixtures (concat
+                                  (filter fn? fixtures-or-maps)
+                                  [(fixture-util/create-fixture fixture-maps)
+                                   (fixture-util/create-fixture-fn user-fixture/fixture-map)
+                                   destination-fixture
+                                   login-fixture]))))
 
-(defn use-combined-login-fixture [& fixture-maps]
-  (clojure-test/use-fixtures :once (create-combined-login-fixture fixture-maps)))
+(defn use-combined-login-fixture [& fixtures-or-maps]
+  (clojure-test/use-fixtures :once (create-combined-login-fixture fixtures-or-maps)))
+
+(defn mock-network-fixture [mock-network function]
+  (try
+    (clj-i2p/set-mock-network mock-network)
+    (function)
+    (finally
+      (clj-i2p/clear-mock-network))))
+
+(defn create-mock-network-fixture [mock-network]
+  #(mock-network-fixture mock-network %))
+
+(defn use-mock-network-fixture [mock-network]
+  (clojure-test/use-fixtures :once (create-mock-network-fixture mock-network)))
 
 (defn create-test-window [panel]
   (view-utils/center-window

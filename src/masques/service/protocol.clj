@@ -1,17 +1,12 @@
 (ns masques.service.protocol
   (:require [clj-i2p.service :as service]
             [clj-i2p.service-protocol :as service-protocol]
-            [masques.service.actions.profile :as profile]))
-
-(defn handle-request [request-map]
-  (condp = (:action request-map)
-    profile/action (profile/run request-map)
-    { :error (str "Unknown action: " (:action request-map)) }))
+            [masques.service.core :as service-core]))
 
 (deftype MasquesService []
   service-protocol/Service
   (key [service]
-     :masques-service)
+     service-core/service-name)
 
   (name [service]
     "Masques Service")
@@ -23,7 +18,7 @@
     "This is a service which handles all Masques requests.")
 
   (handle [service request-map]
-    (handle-request request-map)))
+    (service-core/handle-request request-map)))
 
 (defn create-service []
   (MasquesService.))

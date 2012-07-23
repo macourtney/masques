@@ -141,3 +141,8 @@ this function returns nil."
     (when (and xml-string identity)
       (when-let [xml-element (data-xml/parse-str xml-string)]
         (load-friend-xml xml-element identity)))))
+
+(defn destination
+  "Returns the destination for the given friend."
+  [friend]
+  (identity/destination-for (find-identity friend)))
