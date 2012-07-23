@@ -4,4 +4,4 @@
             [masques.service.core :as service-core]))
 
 (defn profile [friend]
-  (service-core/send-message (friend-model/destination friend) profile-action/action))
+  (:data (service-core/send-message (friend-model/destination friend) profile-action/action)))

@@ -20,11 +20,12 @@
 (deftest run-test
   (let [current-address (address-model/first-current-identity-address)]
     (is (= (run test-request-map)
-           { :name (:name (name-model/first-current-identity-name))
-             :email_address (:email_address (email-model/first-current-identity-email-address))
-             :phone_number (:phone_number (phone-number-model/first-current-identity-phone-number))
-             :address { :address (:address current-address)
-                        :country (:country current-address)
-                        :province (:province current-address)
-                        :city (:city current-address)
-                        :postal-code (:postal-code current-address) } }))))
+           {:data
+             { :name (:name (name-model/first-current-identity-name))
+               :email_address (:email_address (email-model/first-current-identity-email-address))
+               :phone_number (:phone_number (phone-number-model/first-current-identity-phone-number))
+               :address { :address (:address current-address)
+                          :country (:country current-address)
+                          :province (:province current-address)
+                          :city (:city current-address)
+                          :postal-code (:postal-code current-address) } }}))))

@@ -13,9 +13,20 @@
 (def network-destination (atom nil))
 (def network-data (atom nil))
 
+(def test-profile { :data 
+                    { :name "test" 
+                      :email_address "test@example.com" 
+                      :phone_number "123-456-7890" 
+                      :address { :address "test address" 
+                                 :country "US" 
+                                 :province "VA" 
+                                 :city "Reston" 
+                                 :postal-code "20190" } }})
+
 (defn save-mock-network [destination data]
   (reset! network-destination destination)
-  (reset! network-data data))
+  (reset! network-data data)
+  test-profile)
 
 (test-util/use-combined-login-fixture (test-util/create-mock-network-fixture save-mock-network)
                                       friend-fixture/fixture-map)
@@ -25,7 +36,7 @@
 (deftest profile-test
   (is (nil? @network-destination))
   (is (nil? @network-data))
-  (profile test-friend)
+  (is (= (profile test-friend) (:data test-profile)))
   (is (= (clj-i2p/as-destination-str @network-destination) (:destination (first peer-fixture/records))))
   (is (= @network-data { :service service/service-name
                          :data { :action profile-action/action } 
