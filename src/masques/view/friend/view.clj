@@ -28,3 +28,9 @@
       :content (create-content)
       :on-close :dispose
       :visible? false)))
+
+(defn load [profile main-frame]
+  (profile-data/set-data main-frame profile))
+
+(defn scrape-profile [main-frame]
+  (profile-data/scrape-data main-frame))

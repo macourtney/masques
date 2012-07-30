@@ -15,8 +15,8 @@
 
 (def test-profile { :data 
                     { :name "test" 
-                      :email_address "test@example.com" 
-                      :phone_number "123-456-7890" 
+                      :email "test@example.com" 
+                      :phone-number "123-456-7890" 
                       :address { :address "test address" 
                                  :country "US" 
                                  :province "VA" 

@@ -163,8 +163,11 @@
   (set-city main-frame address)
   (set-postal-code main-frame address))
 
-(defn set-data [main-frame name email phone-number address]
-  (set-full-address (set-phone-number (set-email (set-name main-frame name) email) phone-number) address))
+(defn set-data
+  ([main-frame profile]
+    (set-data main-frame (:name profile) (:email profile) (:phone-number profile) (:address profile)))
+  ([main-frame name email phone-number address]
+    (set-full-address (set-phone-number (set-email (set-name main-frame name) email) phone-number) address)))
 
 (defn scrape-data [main-frame]
   { :name (find-name main-frame)

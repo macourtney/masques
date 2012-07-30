@@ -22,8 +22,8 @@
     (is (= (run test-request-map)
            {:data
              { :name (:name (name-model/first-current-identity-name))
-               :email_address (:email_address (email-model/first-current-identity-email-address))
-               :phone_number (:phone_number (phone-number-model/first-current-identity-phone-number))
+               :email (:email_address (email-model/first-current-identity-email-address))
+               :phone-number (:phone_number (phone-number-model/first-current-identity-phone-number))
                :address { :address (:address current-address)
                           :country (:country current-address)
                           :province (:province current-address)

@@ -1,7 +1,7 @@
 (ns masques.controller.friend.test.view
   (:require [test.init :as test-init])
-  (:require [fixtures.identity :as identity-fixture]
-            [clojure.java.io :as java-io]
+  (:require [clojure.java.io :as java-io]
+            [fixtures.friend :as friend-fixture]
             [masques.model.clipboard :as clipboard-model]
             [masques.model.friend :as friend-model]
             [masques.test.util :as test-util]
@@ -11,12 +11,29 @@
         masques.controller.friend.view)
   (:import [java.io File]))
 
-(test-util/use-combined-login-fixture identity-fixture/fixture-map)
+(def test-profile { :data 
+                    { :name "test" 
+                      :email "test@example.com" 
+                      :phone-number "123-456-7890" 
+                      :address { :address "test address" 
+                                 :country "US" 
+                                 :province "VA" 
+                                 :city "Reston" 
+                                 :postal-code "20190" } }})
+
+(defn save-mock-network [destination data]
+  test-profile)
+
+(test-util/use-combined-login-fixture (test-util/create-mock-network-fixture save-mock-network)
+                                      friend-fixture/fixture-map)
+
+(def test-friend (first friend-fixture/records))
 
 (deftest test-create 
-  (let [frame (show nil)]
+  (let [frame (show nil test-friend)]
     (is frame)
     (is (.isShowing frame))
+    (is (= (scrape-profile frame) (:data test-profile)))
     (.setVisible frame false)
     (.dispose frame)
     (is (not (.isShowing frame)))))
