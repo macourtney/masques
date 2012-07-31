@@ -8,7 +8,7 @@
     (id)
     (string :email_address)
     (belongs-to :identity)))
-  
+
 (defn down
   "Deletes the email_addresses table."
   []
