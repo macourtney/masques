@@ -1,11 +1,15 @@
 (ns masques.controller.friend.view
-  (:require [masques.controller.utils :as controller-utils]
+  (:require [masques.controller.actions.utils :as actions-utils]
+            [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friend-model]
             [masques.service.calls.profile :as profile-call]
             [masques.view.friend.view :as friend-view]))
 
+(defn attach-done-action [friend-panel]
+  (actions-utils/attach-window-close-listener friend-panel "#done-button"))
+
 (defn attach [friend-panel]
-  friend-panel)
+  (attach-done-action friend-panel))
 
 (defn friend-id [friend]
   (if (map? friend)
@@ -24,3 +28,7 @@
 
 (defn scrape-profile [main-frame]
   (friend-view/scrape-profile main-frame))
+
+(defn click-done [main-frame]
+  (when main-frame
+    (.doClick (friend-view/find-done-button main-frame))))

@@ -34,6 +34,5 @@
     (is frame)
     (is (.isShowing frame))
     (is (= (scrape-profile frame) (:data test-profile)))
-    (.setVisible frame false)
-    (.dispose frame)
+    (click-done frame)
     (is (not (.isShowing frame)))))

@@ -34,3 +34,6 @@
 
 (defn scrape-profile [main-frame]
   (profile-data/scrape-data main-frame))
+
+(defn find-done-button [main-frame]
+  (seesaw-core/select main-frame ["#done-button"]))
