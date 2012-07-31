@@ -1,6 +1,8 @@
 (ns fixtures.identity
   (:require [fixtures.peer :as peer-fixture]))
 
+(def fixture-table-name :identities)
+
 (def records [
   { :id 1
     :name "test-identity"
@@ -32,7 +34,5 @@
     :public_key_algorithm "RSA"
     :peer_id 1
     :is_online nil }])
-
-(def fixture-table-name :identities)
 
 (def fixture-map { :table fixture-table-name :records records :required-fixtures [peer-fixture/fixture-map] })

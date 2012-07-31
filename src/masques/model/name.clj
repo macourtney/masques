@@ -25,3 +25,13 @@ Otherwise, this function adds the given name to the database."
 name. Otherwise, this function adds the given name to the database for the current identity."
   [name]
   (save-or-update-identity-name (identity/current-user-identity) name))
+
+(defn find-name [name]
+  (find-record { :name name }))
+
+(defn find-name-identity [name]
+  (cond
+    (string? name) (find-name-identity (find-name name))
+    (map? name) (identity/find-record { :id (:identity_id name) })
+    (integer? name) (find-name-identity (get-record name))
+    :else (throw (RuntimeException. (str "Don't know how to get an identity for type: " (type name))))))

@@ -5,6 +5,7 @@
             [clojure.data.xml :as data-xml]
             [clojure.java.io :as io]
             [masques.model.identity :as identity]
+            [masques.model.name :as name-model]
             [masques.model.user :as user])
   (:use masques.model.base)
   (:import [java.io FileInputStream FileOutputStream OutputStreamWriter]))
@@ -41,7 +42,8 @@
 
 (clj-record.core/init-model
   (:associations (belongs-to identity)
-                 (belongs-to friend :fk friend_id :model identity))
+                 (belongs-to friend :fk friend_id :model identity)
+                 (has-many group-memberships))
   (:callbacks (:after-insert friend-add)
               (:after-destroy friend-delete)))
 
@@ -75,10 +77,7 @@
     (when-let [friend-to-remove (friend? friend-identity identity)]
       (destroy-record friend-to-remove))))
 
-(defn friend-name
-  "Returns the name of the given friend."
-  [friend]
-  (:name (find-friend friend)))
+
 
 (defn friend-xml
   "Returns the xml needed to add the logged in user as a friend to another peer."
@@ -146,3 +145,22 @@ this function returns nil."
   "Returns the destination for the given friend."
   [friend]
   (identity/destination-for (find-identity friend)))
+
+(defn find-friend [friend]
+  (cond
+    (string? friend) (find-record { :identity_id (:id (name-model/find-name-identity friend)) })
+    (map? friend) (if-let [friend-id (:id friend)] (find-friend friend-id) (find-record friend))
+    (integer? friend) (find-record { :id friend })
+    :else (throw (RuntimeException. (str "Don't know how to get a friend for type: " (type friend))))))
+
+(defn friend-name
+  "Returns the name of the given friend."
+  [friend]
+  (when-let [friend (find-friend friend)]
+    (name-model/first-identity-name (find-identity friend))))
+
+(defn friend-id [friend]
+  (cond
+    (integer? friend) friend
+    (map? friend) (if-let [friend-id (:id friend)] friend-id (:id (find-friend friend)))
+    :else (:id (find-friend friend))))

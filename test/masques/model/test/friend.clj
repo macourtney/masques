@@ -2,6 +2,7 @@
   (:require [clojure.data.xml :as data-xml]
             [clojure.java.io :as io]
             [fixtures.identity :as fixtures-identity]
+            [fixtures.name :as fixtures-name]
             [fixtures.user :as fixtures-user]
             [fixtures.util :as fixtures-util]
             [masques.model.user :as user-model]) 
@@ -10,6 +11,8 @@
 
 (def test-identity (first fixtures-identity/records))
 (def test-identity-2 (second fixtures-identity/records))
+
+(def test-name (first fixtures-name/records))
 
 (def test-destination "LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA")
 
@@ -20,7 +23,7 @@
 (def test-friend-file (io/as-file "./test/support_files/test_friend.xml"))
 (def test-friend-string "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<friend>\r\n  <user name=\"test-user\" publicKey=\"\" publicKeyAlgorithm=\"RSA\"/>\r\n  <destination>LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA</destination>\r\n</friend>\r\n")
 
-(fixtures-util/use-fixture-maps :once fixtures-identity/fixture-map)
+(fixtures-util/use-fixture-maps :once fixtures-name/fixture-map)
 
 (defn test-friend-listener [friend]
   friend)
@@ -138,3 +141,54 @@
     (is friend-id)
     (when friend-id
       (destroy-record { :id friend-id }))))
+
+(deftest test-find-friend
+  (let [friend-id (insert test-friend)
+        inserted-friend (assoc test-friend :id friend-id)]
+    (is friend-id)
+    (try
+      (is (= inserted-friend (find-friend (:name test-name))))
+      (is (= inserted-friend (find-friend inserted-friend)))
+      (is (= inserted-friend (find-friend test-friend)))
+      (is (= inserted-friend (find-friend friend-id)))
+      (try
+        (find-friend 1.0)
+        (is false "Expected an exception for an invalid friend.")
+        (catch Throwable t)) ; Do nothing. this is the expected result.
+      (finally
+        (when friend-id
+          (destroy-record { :id friend-id }))))))
+
+(deftest test-friend-name
+  (let [friend-id (insert test-friend)
+        inserted-friend (assoc test-friend :id friend-id)]
+    (is friend-id)
+    (try
+      (is (= test-name (friend-name (:name test-name))))
+      (is (= test-name (friend-name inserted-friend)))
+      (is (= test-name (friend-name test-friend)))
+      (is (= test-name (friend-name friend-id)))
+      (try
+        (friend-name 1.0)
+        (is false "Expected an exception for an invalid friend.")
+        (catch Throwable t)) ; Do nothing. this is the expected result.
+      (finally
+        (when friend-id
+          (destroy-record { :id friend-id }))))))
+
+(deftest test-friend-id
+  (let [friend-record-id (insert test-friend)
+        inserted-friend (assoc test-friend :id friend-record-id)]
+    (is friend-record-id)
+    (try
+      (is (= friend-record-id (friend-id (:name test-name))))
+      (is (= friend-record-id (friend-id inserted-friend)))
+      (is (= friend-record-id (friend-id test-friend)))
+      (is (= friend-record-id (friend-id friend-record-id)))
+      (try
+        (friend-id 1.0)
+        (is false "Expected an exception for an invalid friend.")
+        (catch Throwable t)) ; Do nothing. this is the expected result.
+      (finally
+        (when friend-id
+          (destroy-record { :id friend-record-id }))))))

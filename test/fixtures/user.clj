@@ -1,5 +1,7 @@
 (ns fixtures.user)
 
+(def fixture-table-name :users)
+
 (def records [
   { :id 1
     :name "test-user"
@@ -23,7 +25,5 @@
     :private_key ""
     :private_key_algorithm "RSA"
     :private_key_encryption_algorithm "DES" }])
-
-(def fixture-table-name :users)
 
 (def fixture-map { :table fixture-table-name :records records })
