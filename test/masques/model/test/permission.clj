@@ -1,11 +1,15 @@
 (ns masques.model.test.permission
-  (:require [test.init :as test-init]) 
+  (:require [test.init :as test-init])
+  (:require [fixtures.identity :as identity-fixture]
+            [masques.test.util :as test-util]) 
   (:use clojure.test
         masques.model.permission))
 
 (def test-permission-name "permission1")
 
-(def test-permission { :name test-permission-name })
+(def test-permission { :name test-permission-name :identity_id 2 })
+
+(test-util/use-combined-login-fixture identity-fixture/fixture-map)
 
 (deftest test-find-permission
   (let [permission-id (insert test-permission)
@@ -38,3 +42,17 @@
         (catch Throwable t)) ; Do nothing. this is the expected result.
       (finally
         (destroy-record { :id permission-record-id })))))
+
+(deftest test-find-permission
+  (let [permission-id (insert test-permission)
+        inserted-permission (assoc test-permission :id permission-id)]
+    (is permission-id)
+    (try
+      (is (= (find-permissions [permission-id]) [inserted-permission])) 
+      (is (= (find-permissions [-1]) []))
+      (try
+        (find-permission 1.0)
+        (is false "Expected an exception for an invalid permission.")
+        (catch Throwable t)) ; Do nothing. this is the expected result.
+      (finally
+        (destroy-record { :id permission-id })))))

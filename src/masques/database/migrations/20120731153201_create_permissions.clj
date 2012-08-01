@@ -6,6 +6,7 @@
   []
   (create-table :permissions
     (id)
+    (belongs-to :identity)
     (string :name)))
 
 (defn down

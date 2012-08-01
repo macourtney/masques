@@ -5,6 +5,8 @@
             [clojure.data.xml :as data-xml]
             [clojure.java.io :as io]
             [masques.model.identity :as identity]
+            [masques.model.group :as group]
+            [masques.model.group-membership :as group-membership]
             [masques.model.name :as name-model]
             [masques.model.user :as user])
   (:use masques.model.base)
@@ -76,8 +78,6 @@
   ([friend-identity identity]
     (when-let [friend-to-remove (friend? friend-identity identity)]
       (destroy-record friend-to-remove))))
-
-
 
 (defn friend-xml
   "Returns the xml needed to add the logged in user as a friend to another peer."
@@ -164,3 +164,29 @@ this function returns nil."
     (integer? friend) friend
     (map? friend) (if-let [friend-id (:id friend)] friend-id (:id (find-friend friend)))
     :else (:id (find-friend friend))))
+
+(defn add-friend-to-group
+  "Adds the given friend to the given group."
+  [friend group]
+  (group-membership/add-friend-to-group (friend-id friend) (group/group-id group)))
+
+(defn group-member?
+  "Returns true if the given friend is a member of the given group."
+  [friend group]
+  (group-membership/group-member? (friend-id friend) (group/group-id group)))
+
+(defn group-ids
+  "Returns all of the ids of the groups the given friend is in."
+  [friend]
+  (group-membership/group-ids (friend-id friend)))
+
+(defn groups
+  "Returns all of the groups the given friend is in."
+  [friend]
+  (group/find-groups (group-ids friend)))
+
+(defn remove-friend-from-group
+  "Removes the given friend to the given group. If the friend is not a member of the given group, then this function
+does nothing."
+  [friend group]
+  (group-membership/remove-friend-from-group (friend-id friend) (group/group-id group)))

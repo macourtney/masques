@@ -6,6 +6,7 @@
   []
   (create-table :groups
     (id)
+    (belongs-to :identity)
     (string :name)))
 
 (defn down

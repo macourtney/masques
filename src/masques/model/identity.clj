@@ -152,6 +152,9 @@
   (when-let [user (user/current-user)]
     (find-identity user)))
 
+(defn current-user-identity-id []
+  (:id (current-user-identity)))
+
 (defn shortened-public-key-str [public-key]
   (when public-key
     (if (> (.length public-key) 60)
