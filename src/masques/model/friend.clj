@@ -190,3 +190,13 @@ this function returns nil."
 does nothing."
   [friend group]
   (group-membership/remove-friend-from-group (friend-id friend) (group/group-id group)))
+
+(defn has-read-permission?
+  "Returns true if the given friend has the given read permission."
+  [friend permission]
+  (group/any-group-has-read-permission? (group-ids friend) permission))
+
+(defn has-write-permission?
+  "Returns true if the given friend has the given write permission."
+  [friend permission]
+  (group/any-group-has-write-permission? (group-ids friend) permission))

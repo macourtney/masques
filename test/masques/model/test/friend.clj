@@ -3,11 +3,13 @@
             [clojure.java.io :as io]
             [fixtures.identity :as fixtures-identity]
             [fixtures.group :as fixtures-group]
+            [fixtures.group-permission :as fixtures-group-permission]
             [fixtures.name :as fixtures-name]
+            [fixtures.permission :as fixtures-permission]
             [fixtures.user :as fixtures-user]
-            [fixtures.util :as fixtures-util]
             [masques.model.group-membership :as group-membership-model]
-            [masques.model.user :as user-model]) 
+            [masques.model.user :as user-model]
+            [masques.test.util :as test-util]) 
   (:use clojure.test
         masques.model.friend))
 
@@ -25,7 +27,7 @@
 (def test-friend-file (io/as-file "./test/support_files/test_friend.xml"))
 (def test-friend-string "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<friend>\r\n  <user name=\"test-user\" publicKey=\"\" publicKeyAlgorithm=\"RSA\"/>\r\n  <destination>LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA</destination>\r\n</friend>\r\n")
 
-(fixtures-util/use-fixture-maps :once fixtures-name/fixture-map fixtures-group/fixture-map)
+(test-util/use-combined-login-fixture fixtures-name/fixture-map fixtures-group-permission/fixture-map)
 
 (defn test-friend-listener [friend]
   friend)
@@ -209,6 +211,26 @@
           (is (= (groups inserted-friend) [test-group]))
           (remove-friend-from-group inserted-friend test-group)
           (is (not (group-member? inserted-friend test-group)))
+          (finally
+            (when group-membership-id
+              (group-membership-model/destroy-record { :id group-membership-id })))))
+      (finally
+        (when friend-id
+          (destroy-record { :id friend-record-id }))))))
+
+(deftest test-has-read-permission?
+  (let [friend-record-id (insert test-friend)
+        inserted-friend (assoc test-friend :id friend-record-id)]
+    (is friend-record-id)
+    (try
+      (let [test-group (first fixtures-group/records)
+            group-membership-id (add-friend-to-group inserted-friend test-group)]
+        (try
+          (is group-membership-id)
+          (is (has-read-permission? inserted-friend (first fixtures-permission/records)))
+          (is (has-write-permission? inserted-friend (first fixtures-permission/records)))
+          (is (not (has-read-permission? inserted-friend (second fixtures-permission/records))))
+          (is (not (has-write-permission? inserted-friend (second fixtures-permission/records))))
           (finally
             (when group-membership-id
               (group-membership-model/destroy-record { :id group-membership-id })))))
