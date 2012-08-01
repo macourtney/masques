@@ -1,6 +1,7 @@
 (ns masques.model.test.group
   (:require [test.init :as test-init])
   (:require [fixtures.identity :as identity-fixture]
+            [fixtures.permission :as permission-fixture]
             [masques.test.util :as test-util])
   (:use clojure.test
         masques.model.group))
@@ -9,7 +10,9 @@
 
 (def test-group { :name test-group-name :identity_id 2 })
 
-(test-util/use-combined-login-fixture identity-fixture/fixture-map)
+(def test-permission (first permission-fixture/records))
+
+(test-util/use-combined-login-fixture identity-fixture/fixture-map permission-fixture/fixture-map)
 
 (deftest test-find-group
   (let [group-id (insert test-group)
@@ -50,9 +53,43 @@
     (try
       (is (= (find-groups [group-id]) [inserted-group])) 
       (is (= (find-groups [-1]) []))
-      (try
-        (find-group 1.0)
-        (is false "Expected an exception for an invalid group.")
-        (catch Throwable t)) ; Do nothing. this is the expected result.
+      (finally
+        (destroy-record { :id group-id })))))
+
+(deftest test-read-permissions 
+  (let [group-id (insert test-group)
+        inserted-group (assoc test-group :id group-id)]
+    (is group-id)
+    (try
+      (let [group-permission-id (add-read-permission test-group test-permission)]
+        (is group-permission-id)
+        (is (has-read-permission? test-group test-permission))
+        (is (any-group-has-read-permission? [test-group] test-permission))
+        (is (not (has-write-permission? test-group test-permission)))
+        (is (not (any-group-has-write-permission? [test-group] test-permission)))
+        (remove-read-permission test-group test-permission)
+        (is (not (has-read-permission? test-group test-permission)))
+        (is (not (any-group-has-read-permission? [test-group] test-permission)))
+        (is (not (has-write-permission? test-group test-permission)))
+        (is (not (any-group-has-write-permission? [test-group] test-permission))))
+      (finally
+        (destroy-record { :id group-id })))))
+
+(deftest test-read-permissions 
+  (let [group-id (insert test-group)
+        inserted-group (assoc test-group :id group-id)]
+    (is group-id)
+    (try
+      (let [group-permission-id (add-write-permission test-group test-permission)]
+        (is group-permission-id)
+        (is (not (has-read-permission? test-group test-permission)))
+        (is (not (any-group-has-read-permission? [test-group] test-permission)))
+        (is (has-write-permission? test-group test-permission))
+        (is (any-group-has-write-permission? [test-group] test-permission))
+        (remove-write-permission test-group test-permission)
+        (is (not (has-read-permission? test-group test-permission)))
+        (is (not (any-group-has-read-permission? [test-group] test-permission)))
+        (is (not (has-write-permission? test-group test-permission)))
+        (is (not (any-group-has-write-permission? [test-group] test-permission))))
       (finally
         (destroy-record { :id group-id })))))

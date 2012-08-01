@@ -1,7 +1,9 @@
 (ns masques.model.group
   (:require [clj-record.boot :as clj-record-boot]
             [clojure.string :as string]
-            [masques.model.identity :as identity])
+            [masques.model.identity :as identity]
+            [masques.model.group-permission :as group-permission]
+            [masques.model.permission :as permission])
   (:use masques.model.base))
 
 (clj-record.core/init-model
@@ -27,6 +29,30 @@
 (defn sql-list [value-list]
   (str "(" (string/join "," value-list) ")"))
 
-(defn find-groups [group-ids]
-  (find-by-sql [(str "SELECT * FROM groups WHERE identity_id = ? AND id IN " (sql-list (filter-ids group-ids)))
+(defn find-groups [groups]
+  (find-by-sql [(str "SELECT * FROM groups WHERE identity_id = ? AND id IN " (sql-list (filter-ids (map group-id groups))))
                 (identity/current-user-identity-id)]))
+
+(defn add-read-permission [group permission]
+  (group-permission/add-read-permission-to-group (group-id group) (permission/permission-id permission)))
+
+(defn add-write-permission [group permission]
+  (group-permission/add-write-permission-to-group (group-id group) (permission/permission-id permission)))
+
+(defn has-read-permission? [group permission]
+  (group-permission/has-read-permission? (group-id group) (permission/permission-id permission)))
+
+(defn has-write-permission? [group permission]
+  (group-permission/has-write-permission? (group-id group) (permission/permission-id permission)))
+
+(defn remove-read-permission [group permission]
+  (group-permission/remove-read-permission-from-group (group-id group) (permission/permission-id permission)))
+
+(defn remove-write-permission [group permission]
+  (group-permission/remove-write-permission-from-group (group-id group) (permission/permission-id permission)))
+
+(defn any-group-has-read-permission? [groups permission]
+  (group-permission/any-group-has-read-permission? (map group-id groups) (permission/permission-id permission)))
+
+(defn any-group-has-write-permission? [groups permission]
+  (group-permission/any-group-has-write-permission? (map group-id groups) (permission/permission-id permission)))
