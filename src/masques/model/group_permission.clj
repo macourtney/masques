@@ -3,9 +3,9 @@
             [clojure.string :as string])
   (:use masques.model.base))
 
+(def none-type "none")
 (def read-type "read")
 (def write-type "write")
-(def none-type "none")
 
 (def valid-types #{ read-type write-type none-type })
 
@@ -20,6 +20,9 @@
   (when (and group-id permission-id (valid-type? type))
     (insert { :group_id group-id :permission_id permission-id :type type })))
 
+(defn add-none-permission-to-group [^Integer group-id ^Integer permission-id]
+  (add-permission-to-group group-id permission-id none-type))
+
 (defn add-read-permission-to-group [^Integer group-id ^Integer permission-id]
   (add-permission-to-group group-id permission-id read-type)) 
 
@@ -29,11 +32,20 @@
 (defn find-permissions [^Integer group-id ^Integer permission-id]
   (find-records { :group_id group-id :permission_id permission-id }))
 
+(defn has-none-permission? [^Integer group-id ^Integer permission-id]
+  (find-record { :group_id group-id :permission_id permission-id :type none-type }))
+
 (defn has-read-permission? [^Integer group-id ^Integer permission-id]
-  (find-record { :group_id group-id :permission_id permission-id :type read-type }))
+  (when (not (has-none-permission? group-id permission-id))
+    (find-record { :group_id group-id :permission_id permission-id :type read-type })))
 
 (defn has-write-permission? [^Integer group-id ^Integer permission-id]
-  (find-record { :group_id group-id :permission_id permission-id :type write-type }))
+  (when (not (has-none-permission? group-id permission-id))
+    (find-record { :group_id group-id :permission_id permission-id :type write-type })))
+
+(defn remove-none-permission-from-group [^Integer group-id ^Integer permission-id]
+  (when-let [group-permission (has-none-permission? group-id permission-id)]
+    (destroy-record group-permission)))
 
 (defn remove-read-permission-from-group [^Integer group-id ^Integer permission-id]
   (when-let [group-permission (has-read-permission? group-id permission-id)]
@@ -43,7 +55,7 @@
   (when-let [group-permission (has-write-permission? group-id permission-id)]
     (destroy-record group-permission)))
 
-(defn remove-permission-from-group [^Integer group-id ^Integer permission-id]
+(defn remove-permissions-from-group [^Integer group-id ^Integer permission-id]
   (when-let [group-permissions (find-permissions group-id permission-id)]
     (doseq [group-permission group-permissions]
       (destroy-record group-permission))))
@@ -60,8 +72,13 @@
       [ (str "SELECT * FROM group_permissions WHERE permission_id = ? AND type = ? AND group_id IN " (sql-list (filter-ids group-ids)))
         permission-id type ])))
 
+(defn any-group-has-none-permission? [group-ids ^Integer permission-id]
+  (any-group-has-permission? group-ids permission-id none-type))
+
 (defn any-group-has-read-permission? [group-ids ^Integer permission-id]
-  (any-group-has-permission? group-ids permission-id read-type))
+  (when (not (any-group-has-none-permission? group-ids permission-id))
+    (any-group-has-permission? group-ids permission-id read-type)))
 
 (defn any-group-has-write-permission? [group-ids ^Integer permission-id]
-  (any-group-has-permission? group-ids permission-id write-type))
+  (when (not (any-group-has-none-permission? group-ids permission-id))
+    (any-group-has-permission? group-ids permission-id write-type)))
