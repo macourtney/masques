@@ -6,15 +6,15 @@
                  [clj-internationalization "1.0.0"]
                  [clj-record "1.1.0"]
                  [com.h2database/h2 "1.3.162"]
-                 [drift "1.4.4-SNAPSHOT"]
+                 [drift "1.4.3"]
                  [log4j/log4j "1.2.16"]
                  [org.clojure/clojure "1.2.1"]
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.drift-db/drift-db-h2 "1.0.8-SNAPSHOT"]
+                 [org.drift-db/drift-db-h2 "1.1.2"]
                  [seesaw "1.4.1"]]
-  :dev-dependencies [[drift "1.4.4-SNAPSHOT"]
+  :dev-dependencies [[drift "1.4.3"]
                      [org.clojure/clojure "1.2.1"]]
 
   :resources-path "pkg/resources"
