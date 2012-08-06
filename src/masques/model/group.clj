@@ -6,6 +6,14 @@
             [masques.model.permission :as permission])
   (:use masques.model.base))
 
+(def acquaintances-group-name "Acquaintances")
+(def best-friends-group-name "Best Friends")
+(def enemies-group-name "Enemies")
+(def family-group-name "Family")
+(def friends-group-name "Friends")
+
+(def default-groups [acquaintances-group-name best-friends-group-name enemies-group-name family-group-name friends-group-name])
+
 (clj-record.core/init-model
   (:associations (has-many group-memberships)
                  (has-many group-permissions)))
@@ -33,6 +41,9 @@
   (find-by-sql [(str "SELECT * FROM groups WHERE identity_id = ? AND id IN " (sql-list (filter-ids (map group-id groups))))
                 (identity/current-user-identity-id)]))
 
+(defn find-identity-groups [identity]
+  (find-records { :identity_id (:id identity) }))
+
 (defn add-read-permission [group permission]
   (group-permission/add-read-permission-to-group (group-id group) (permission/permission-id permission)))
 
@@ -56,3 +67,16 @@
 
 (defn any-group-has-write-permission? [groups permission]
   (group-permission/any-group-has-write-permission? (map group-id groups) (permission/permission-id permission)))
+
+(defn add-default-groups [identity]
+  (when (identity/find-user identity)
+    (doseq [default-group default-groups]
+      (insert { :name default-group :identity_id (:id identity) :user_generated 1 }))))
+
+(defn remove-deleted-identity-groups [identity]
+  (doseq [group (find-identity-groups identity)]
+    (destroy-record group)))
+
+(defn init []
+  (identity/add-identity-add-listener add-default-groups)
+  (identity/add-identity-delete-listener remove-deleted-identity-groups))

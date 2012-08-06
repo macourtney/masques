@@ -2,6 +2,7 @@
   (:require [test.init :as test-init])
   (:require [fixtures.identity :as identity-fixture]
             [fixtures.permission :as permission-fixture]
+            [masques.model.identity :as identity-model]
             [masques.test.util :as test-util])
   (:use clojure.test
         masques.model.group))
@@ -93,3 +94,14 @@
         (is (not (any-group-has-write-permission? [test-group] test-permission))))
       (finally
         (destroy-record { :id group-id })))))
+
+(deftest test-default-groups
+  (let [test-identity (identity-model/current-user-identity)]
+    (add-default-groups test-identity)
+    (let [added-groups (find-identity-groups test-identity)]
+      (is (= (count default-groups) (count added-groups)))
+      (let [default-group-set (set default-groups)]
+        (doseq [group added-groups]
+          (is (contains? default-group-set (:name group))))))
+    (remove-deleted-identity-groups test-identity)
+    (is (empty? (find-identity-groups test-identity)))))

@@ -105,6 +105,13 @@
 (defn find-identity-by-destination [destination]
   (find-identity-by-peer (clj-i2p-peer/find-peer destination)))
 
+(defn find-user
+  "Returns the user associated with the given identity if one exists."
+  [identity]
+  (user/find-record { :name (:name identity)
+                      :public_key (:public_key identity)
+                      :public_key_algorithm (:public_key_algorithm identity) }))
+
 (defn add-or-update-identity
   ([user destination] (add-or-update-identity (:name user) (:public_key user) (:public_key_algorithm user) destination))
   ([user-name public-key public-key-algorithm destination]
