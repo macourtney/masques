@@ -1,15 +1,12 @@
 (ns masques.model.test.permission
   (:require [test.init :as test-init])
-  (:require [fixtures.identity :as identity-fixture]
-            [masques.test.util :as test-util]) 
+  (:require [masques.test.util :as test-util]) 
   (:use clojure.test
         masques.model.permission))
 
 (def test-permission-name "permission1")
 
-(def test-permission { :name test-permission-name :identity_id 2 })
-
-(test-util/use-combined-login-fixture identity-fixture/fixture-map)
+(def test-permission { :name test-permission-name })
 
 (deftest test-find-permission
   (let [permission-id (insert test-permission)
