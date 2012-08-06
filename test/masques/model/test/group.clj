@@ -96,12 +96,19 @@
         (destroy-record { :id group-id })))))
 
 (deftest test-default-groups
+  (add-group-delete-listener removed-deleted-group-permissions)
   (let [test-identity (identity-model/current-user-identity)]
     (add-default-groups test-identity)
     (let [added-groups (find-identity-groups test-identity)]
       (is (= (count default-groups) (count added-groups)))
-      (let [default-group-set (set default-groups)]
-        (doseq [group added-groups]
-          (is (contains? default-group-set (:name group))))))
+      (doseq [group added-groups]
+        (is (contains? default-groups (:name group)))
+        (doseq [read-permission (:read (get default-groups (:name group)))]
+          (has-read-permission? group read-permission))
+        (doseq [write-permission (:write (get default-groups (:name group)))]
+          (has-write-permission? group write-permission))
+        (doseq [none-permission (:none (get default-groups (:name group)))]
+          (has-none-permission? group none-permission))))
     (remove-deleted-identity-groups test-identity)
-    (is (empty? (find-identity-groups test-identity)))))
+    (is (empty? (find-identity-groups test-identity))))
+  (remove-group-delete-listener removed-deleted-group-permissions))

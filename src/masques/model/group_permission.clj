@@ -60,6 +60,10 @@
     (doseq [group-permission group-permissions]
       (destroy-record group-permission))))
 
+(defn remove-all-permissions-from-group [^Integer group-id]
+  (doseq [group-permission (find-records { :group_id group-id })]
+    (destroy-record group-permission)))
+
 (defn filter-ids [id-list]
   (filter integer? id-list))
 

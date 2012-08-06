@@ -3,6 +3,15 @@
             [clojure.string :as string])
   (:use masques.model.base))
 
+(def profile-name-permission "profile-name")
+(def profile-email-permission "profile-email")
+(def profile-phone-number-permission "profile-phone-number")
+(def profile-address-permission "profile-address")
+(def profile-country-permission "profile-country")
+(def profile-province-permission "profile-province")
+(def profile-city-permission "profile-city")
+(def profile-postal-code-permission "profile-postal-code")
+
 (clj-record.core/init-model
   (:associations (has-many group-permissions)))
 
