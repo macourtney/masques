@@ -14,13 +14,13 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.drift-db/drift-db-h2 "1.1.2"]
                  [seesaw "1.4.1"]]
-  :dev-dependencies [[drift "1.4.3"]
-                     [org.clojure/clojure "1.2.1"]]
+  
+  :profiles { :dev { :dependencies [[drift "1.4.3"]] } }
 
-  :resources-path "pkg/resources"
+  :resource-paths ["pkg/resources"]
 
   :main masques.main
 
-  ; To run in development mode use: lein run :development [<arg> ...]
-  :run-aliases { :development masques.development-main
-                 :dev masques.development-main })
+  ; To run in development mode use: lein development
+  :aliases { "development" ["run" "-m" "masques.development-main"]
+             "dev" ["run" "-m" "masques.development-main"]})
