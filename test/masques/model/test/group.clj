@@ -9,7 +9,7 @@
 
 (def test-group-name "group1")
 
-(def test-group { :name test-group-name :identity_id 2 :user_generated 1 })
+(def test-group { :name test-group-name :identity_id 1 :user_generated 1 })
 
 (def test-permission (first permission-fixture/records))
 

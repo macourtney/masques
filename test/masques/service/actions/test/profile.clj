@@ -1,18 +1,28 @@
-(ns masques.service.protocol.test.profile
+(ns masques.service.actions.test.profile
   (:require test.init)
   (:use [masques.service.actions.profile])
   (:use [clojure.test])
-  (:require [fixtures.friend :as friend-fixture]
+  (:require [fixtures.address :as address-fixture]
+            [fixtures.email-address :as email-address-fixture]
+            [fixtures.friend :as friend-fixture]
+            [fixtures.group-membership :as group-membership-fixture]
+            [fixtures.group-permission :as group-permission-fixture]
+            [fixtures.name :as name-fixture]
+            [fixtures.phone-number :as phone-number-fixture]
             [fixtures.user :as user-fixture]
             [masques.model.address :as address-model]
             [masques.model.email-address :as email-model]
+            [masques.model.identity :as identity-model] 
             [masques.model.name :as name-model]
             [masques.model.phone-number :as phone-number-model]
             [masques.model.record-utils :as record-utils]
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 
-(test-util/use-combined-login-fixture friend-fixture/fixture-map)
+(test-util/use-combined-login-fixture address-fixture/fixture-map friend-fixture/fixture-map
+                                      group-membership-fixture/fixture-map group-permission-fixture/fixture-map
+                                      name-fixture/fixture-map email-address-fixture/fixture-map
+                                      phone-number-fixture/fixture-map)
 
 (def test-user (record-utils/clean-keys (user-model/clean-private-data (second user-fixture/records))))
 (def test-request-map { :user test-user })
@@ -28,4 +38,4 @@
                           :country (:country current-address)
                           :province (:province current-address)
                           :city (:city current-address)
-                          :postal-code (:postal-code current-address) } }}))))
+                          :postal-code (:postal_code current-address) } }}))))

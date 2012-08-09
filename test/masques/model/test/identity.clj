@@ -84,4 +84,4 @@
   (let [test-identity (first identity-fixture/records)]
     (is (= (find-identity (:name test-identity) (:public_key test-identity) (:public_key_algorithm test-identity))
            test-identity))
-    (is (= (find-identity (first user-fixture/records)) (second identity-fixture/records)))))
+    (is (= (find-identity (first user-fixture/records)) (first identity-fixture/records)))))

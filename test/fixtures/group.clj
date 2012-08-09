@@ -4,16 +4,16 @@
 
 (def records [
   { :id 1
-    :name "group1"
-    :identity_id 2
+    :name "friends"
+    :identity_id 1
     :user_generated 1 }
   { :id 2
-    :name "group2"
-    :identity_id 2
+    :name "enemies"
+    :identity_id 1
     :user_generated 0 }
   { :id 3
     :name "group3"
-    :identity_id 1
+    :identity_id 2
     :user_generated 1 }])
 
 (def fixture-map { :table fixture-table-name :records records })

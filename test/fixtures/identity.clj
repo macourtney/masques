@@ -5,14 +5,14 @@
 
 (def records [
   { :id 1
-    :name "test-identity"
-    :public_key "blah"
+    :name "test-user"
+    :public_key ""
     :public_key_algorithm "RSA"
     :peer_id 1
     :is_online nil }
   { :id 2
-    :name "test-user"
-    :public_key ""
+    :name "test-identity"
+    :public_key "blah"
     :public_key_algorithm "RSA"
     :peer_id 1
     :is_online nil }
