@@ -12,21 +12,27 @@
                             permission/profile-city-permission permission/profile-postal-code-permission])
 
 (def acquaintances-group { :name "Acquaintances" :read [permission/profile-name-permission] })
-(def best-friends-group { :name "Best Friends" :read full-read-permissions })
+(def classmates-group { :name "Classmates" :read full-read-permissions })
+(def coworkers-group { :name "Coworkers" :read full-read-permissions })
 (def enemies-group { :name  "Enemies"
-                          :read [permission/profile-name-permission]
-                          :none [permission/profile-email-permission
-                                 permission/profile-phone-number-permission permission/profile-address-permission
-                                 permission/profile-country-permission permission/profile-province-permission
-                                 permission/profile-city-permission permission/profile-postal-code-permission] })
+                     :read [permission/profile-name-permission]
+                     :none [permission/profile-email-permission
+                            permission/profile-phone-number-permission permission/profile-address-permission
+                            permission/profile-country-permission permission/profile-province-permission
+                            permission/profile-city-permission permission/profile-postal-code-permission] })
 (def family-group { :name "Family" :read full-read-permissions })
+(def followers-group { :name "Followers" :read [permission/profile-name-permission] })
 (def friends-group { :name "Friends" :read full-read-permissions })
+(def public-group { :name "Public" :read [permission/profile-name-permission] })
 
 (def default-groups { (:name acquaintances-group) acquaintances-group
-                      (:name best-friends-group) best-friends-group
+                      (:name classmates-group) classmates-group
+                      (:name coworkers-group) coworkers-group
                       (:name enemies-group) enemies-group
                       (:name family-group) family-group
-                      (:name friends-group) friends-group })
+                      (:name followers-group) followers-group
+                      (:name friends-group) friends-group
+                      (:name public-group) public-group})
 
 (def group-add-listeners (atom []))
 
