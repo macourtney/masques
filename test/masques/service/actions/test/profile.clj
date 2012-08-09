@@ -27,6 +27,9 @@
 (def test-user (record-utils/clean-keys (user-model/clean-private-data (second user-fixture/records))))
 (def test-request-map { :user test-user })
 
+(def test-user2 { :id 1 :name "test-user2" :public-key "fail" :public-key-algorithm "RSA" })
+(def test-request-map2 { :user test-user2 })
+
 (deftest run-test
   (let [current-address (address-model/first-current-identity-address)]
     (is (= (run test-request-map)
@@ -38,4 +41,5 @@
                           :country (:country current-address)
                           :province (:province current-address)
                           :city (:city current-address)
-                          :postal-code (:postal_code current-address) } }}))))
+                          :postal-code (:postal_code current-address) } }})))
+  (is (= (run test-request-map2) {:data { :name nil :email nil :phone-number nil :address nil }})))

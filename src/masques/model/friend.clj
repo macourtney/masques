@@ -151,6 +151,7 @@ this function returns nil."
     (string? friend) (find-record { :identity_id (:id (name-model/find-name-identity friend)) })
     (map? friend) (if-let [friend-id (:id friend)] (find-friend friend-id) (find-record friend))
     (integer? friend) (find-record { :id friend })
+    (nil? friend) nil
     :else (throw (RuntimeException. (str "Don't know how to get a friend for type: " (type friend))))))
 
 (defn friend-name
