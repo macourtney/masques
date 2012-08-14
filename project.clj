@@ -14,7 +14,7 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.drift-db/drift-db-h2 "1.1.2"]
                  [seesaw "1.4.1"]]
-  
+
   :profiles { :dev { :dependencies [[drift "1.4.3"]] } }
 
   :resource-paths ["pkg/resources"]
