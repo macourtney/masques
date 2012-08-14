@@ -11,9 +11,9 @@ Masques is still under development and there is no easy way to install and run i
 
 From development:
 
-Make sure you have I2P installed and running on you computer.
-
 Make sure you have java and Leiningen installed.
+
+Make sure you have I2P installed and running on you computer.
 
 Check out the code and download the dependencies with "lein deps". To run in development mode use "lein development".
 
