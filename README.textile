@@ -1,11 +1,11 @@
-# Masques
+h2. Masques
 
 Masques is a P2P social network. Instead of posting your personal data on a website which you don't control and which
 changes their privacy policy on a whim, all of your data stays on your computer, and is only shared with the friends you
 want to share it with. All communication is directly from friend to friend (node to node) and encrypted to avoid
 unwanted eyes viewing your data.
 
-## Usage
+h3. Usage
 
 Masques is still under development and there is no easy way to install and run it at the moment.
 
@@ -17,7 +17,7 @@ Make sure you have java and Leiningen installed.
 
 Check out the code and download the dependencies with "lein deps". To run in development mode use "lein run :development".
 
-## License
+h3. License
 
 Copyright (C) 2012 Matthew Courtney
 
