@@ -109,8 +109,11 @@
   (find-by-sql [(str "SELECT * FROM groups WHERE identity_id = ? AND id IN " (sql-list (filter-ids (map group-id groups))))
                 (identity/current-user-identity-id)]))
 
-(defn find-identity-groups [identity]
-  (find-records { :identity_id (:id identity) }))
+(defn find-identity-groups
+  "Returns all of the groups for the given identity. If the identity is not given, then this function returns all of the groups for the currently logged in user."
+  ([] (find-identity-groups (identity/current-user-identity)))
+  ([identity]
+    (find-records { :identity_id (:id identity) })))
 
 (defn add-read-permission [group permission]
   (group-permission/add-read-permission-to-group (group-id group) (permission/permission-id permission)))

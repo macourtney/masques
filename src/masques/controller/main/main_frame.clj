@@ -1,6 +1,7 @@
 (ns masques.controller.main.main-frame
   (:require [clojure.tools.logging :as logging]
             [masques.controller.main.friend-tab :as friend-tab]
+            [masques.controller.main.group-tab :as group-tab]
             [masques.controller.main.home-tab :as home-tab]
             [masques.controller.main.identity-tab :as identity-tab]
             [masques.controller.main.main-menu-bar :as main-menu-bar]
@@ -11,10 +12,11 @@
 
 (defn show []
   (controller-utils/show
-    (friend-tab/init
-      (profile-tab/init
-        (identity-tab/init
-          (home-tab/init
-            (peer-tab/init
-              (main-menu-bar/init
-                (view-main-frame/create)))))))))
+    (group-tab/init
+      (friend-tab/init
+        (profile-tab/init
+          (identity-tab/init
+            (home-tab/init
+              (peer-tab/init
+                (main-menu-bar/init
+                  (view-main-frame/create))))))))))

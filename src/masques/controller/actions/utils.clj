@@ -3,16 +3,23 @@
             [masques.controller.utils :as controller-utils]
             [seesaw.core :as seesaw-core]))
 
-(defn attach-listener [parent-component id listener]
-  (seesaw-core/listen (controller-utils/find-component parent-component id)
-    :action listener)
-  parent-component)
+(defn attach-listener
+  "Attaches the given listener to the given component or finds the component using the parent component and the component id."
+  ([component listener]
+    (seesaw-core/listen component :action listener))
+  ([parent-component id listener]
+    (attach-listener (controller-utils/find-component parent-component id) listener)
+    parent-component))
 
 (defn frame-listener [listener e]
   (listener (seesaw-core/to-frame e) e))
 
-(defn attach-frame-listener [parent-component id listener]
-  (attach-listener parent-component id #(frame-listener listener %)))
+(defn attach-frame-listener
+  "Attaches a frame listener to the given component or finds the component using the parent component and the component id."
+  ([component listener]
+    (attach-listener component #(frame-listener listener %)))
+  ([parent-component id listener]
+    (attach-listener parent-component id #(frame-listener listener %))))
 
 (defn close-window
   ([frame e] (close-window frame))
