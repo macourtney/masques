@@ -36,8 +36,7 @@
   (let [fixture-maps (filter map? fixtures-or-maps)]
     (clojure-test/join-fixtures (concat
                                   (filter fn? fixtures-or-maps)
-                                  [(fixture-util/create-fixture fixture-maps)
-                                   (fixture-util/create-fixture-fn user-fixture/fixture-map)
+                                  [(fixture-util/create-fixture (cons user-fixture/fixture-map fixture-maps))
                                    destination-fixture
                                    login-fixture]))))
 

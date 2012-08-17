@@ -1,4 +1,5 @@
-(ns fixtures.user)
+(ns fixtures.user
+  (:require [fixtures.identity :as identity-fixture]))
 
 (def fixture-table-name :users)
 
@@ -26,4 +27,4 @@
     :private_key_algorithm "RSA"
     :private_key_encryption_algorithm "DES" }])
 
-(def fixture-map { :table fixture-table-name :records records })
+(def fixture-map { :table fixture-table-name :records records :required-fixtures [identity-fixture/fixture-map] })

@@ -164,7 +164,7 @@
 (defn add-group
   "Adds the given group to the group list."
   [main-frame group]
-  (.addElement (group-list-model) group))
+  (.addElement (group-list-model main-frame) group))
 
 (defn set-groups
   "Sets the groups list to the given groups."
@@ -176,12 +176,17 @@
 (defn remove-group
   "Adds the given group to the group list."
   [main-frame group]
-  (.removeElement (group-list-model) group))
+  (.removeElement (group-list-model main-frame) group))
 
 (defn selected-group
   "Returns the first group selected in the group list."
   [main-frame]
   (.getSelectedValue (find-group-list main-frame)))
+
+(defn group-count
+  "Returns the number of rows in the member table."
+  [main-frame]
+  (.getSize (group-list-model main-frame)))
 
 (defn click-new-group-button
   "Clicks the new group button."

@@ -4,19 +4,16 @@
             [fixtures.group :as group-fixture]
             ;[masques.model.clipboard :as clipboard-model]
             [masques.model.group :as group-model]
-            ;[masques.model.identity :as identity-model]
+            [masques.model.identity :as identity-model]
+            [masques.model.user :as user-model]
             [masques.test.util :as test-util]
             [masques.view.main.group-tab :as group-tab-view]
             ;[seesaw.core :as seesaw-core]
             )
   (:use clojure.test
-        masques.controller.main.group-tab)
-  ;(:import [java.io File StringWriter])
-  )
+        masques.controller.main.group-tab))
 
 (test-util/use-combined-login-fixture group-fixture/fixture-map)
-
-;(def test-friend-file (File. "test/friend.xml"))
 
 (defn assert-listener-count [test-count]
   (is (= (group-model/group-add-listener-count) test-count)) 
@@ -29,7 +26,7 @@
   (assert-listener-count 1))
 
 (defn assert-initialized [frame]
-;  (is (= (friend-tab-view/friend-count frame) 1))
+  (is (= (group-tab-view/group-count frame) 2))
 ;  (is (= (friend-tab-view/friend-xml-text frame) (friend-model/friend-xml-string)))
   (assert-one-listener-each))
 
