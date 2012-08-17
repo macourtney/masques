@@ -15,6 +15,12 @@
 (defn group-ids [^Integer friend-id]
   (map :group_id (find-records { :friend_id friend-id })))
 
+(defn friend-ids [^Integer group-id]
+  (map :friend_id (find-records { :group_id group-id })))
+
+(defn friends [^Integer group-id]
+  (map find-friend (find-records { :group_id group-id })))
+
 (defn remove-friend-from-group [^Integer friend-id ^Integer group-id]
   (when-let [group-membership (group-member? friend-id group-id)]
     (destroy-record group-membership)))

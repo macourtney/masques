@@ -4,6 +4,7 @@
             [clj-record.boot :as clj-record-boot]
             [clojure.data.xml :as data-xml]
             [clojure.java.io :as io]
+            [clojure.string :as string]
             [masques.model.identity :as identity]
             [masques.model.group :as group]
             [masques.model.group-membership :as group-membership]
@@ -191,6 +192,15 @@ this function returns nil."
 does nothing."
   [friend group]
   (group-membership/remove-friend-from-group (friend-id friend) (group/group-id group)))
+
+(defn group-friends
+  "Returns all of the friends in the given group."
+  [group]
+  (group-membership/friends (group/group-id group))
+  ;(find-by-sql [(str "SELECT * FROM friends WHERE id IN ("
+  ;                   (string/join (filter integer? (group-membership/friend-ids (group/group-id group))))
+  ;                   ")")])
+  )
 
 (defn has-read-permission?
   "Returns true if the given friend has the given read permission."

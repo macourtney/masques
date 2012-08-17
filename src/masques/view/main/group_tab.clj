@@ -5,7 +5,8 @@
             [masques.model.group :as group-model]
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table])
-  (:import [javax.swing DefaultListModel]))
+  (:import [javax.swing DefaultListModel]
+           [javax.swing.event ListSelectionListener]))
 
 (def tab-name (clj-i18n/group))
 
@@ -98,12 +99,16 @@
 (defn convert-to-table-friend [friend]
   { :id (:id friend) :name (or (:name friend) (friend-model/friend-name friend)) })
 
-(defn reset-member-table [main-frame friends]
+(defn reset-member-table
+  "Resets the member table to only include the given friends."
+  [main-frame friends]
   (seesaw-core/config! (find-member-table main-frame)
       :model [:columns member-table-columns
               :rows (map convert-to-table-friend friends)]))
 
-(defn add-member [main-frame friend]
+(defn add-member
+  "Adds the given friend to the member table."
+  [main-frame friend]
   (seesaw-table/insert-at! (find-member-table main-frame) 0 (convert-to-table-friend friend)))
 
 (defn member-count
@@ -183,10 +188,23 @@
   [main-frame]
   (.getSelectedValue (find-group-list main-frame)))
 
+(defn set-selected-group-index
+  "Sets the selected group to the given index."
+  [main-frame index]
+  (when (>= index 0)
+    (.setSelectedIndex (find-group-list main-frame) index)))
+
 (defn group-count
   "Returns the number of rows in the member table."
   [main-frame]
   (.getSize (group-list-model main-frame)))
+
+(defn add-group-list-selection-listener [main-frame listener]
+  (.addListSelectionListener (find-group-list main-frame)
+    (reify ListSelectionListener
+      (valueChanged [this list-selection-event]
+                    (listener list-selection-event))))
+  main-frame)
 
 (defn click-new-group-button
   "Clicks the new group button."

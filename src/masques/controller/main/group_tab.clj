@@ -2,6 +2,7 @@
   (:require [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as action-utils]
             [masques.controller.utils :as controller-utils]
+            [masques.model.friend :as friend-model]
             [masques.model.group :as group-model]
             [masques.model.identity :as identity-model]
             [masques.view.main.group-tab :as group-tab-view])
@@ -10,9 +11,9 @@
 (def new-group-listener-key "new-group-listener")
 (def delete-group-listener-key "delete-group-listener")
 
-;(defn reload-table-data [main-frame]
-;  (when-let [friends (group-model/find-identity-groups)]
-;    (group-tab-view/reset-member-table main-frame friends)))
+(defn reload-member-table-data [main-frame]
+  (when-let [selected-group (group-tab-view/selected-group main-frame)]
+    (group-tab-view/reset-member-table main-frame (friend-model/group-friends selected-group))))
 
 (defn reload-group-list [main-frame]
   (when-let [groups (group-model/find-identity-groups)]
@@ -22,9 +23,11 @@
   (reload-group-list main-frame)
   main-frame)
 
-;(defn attach-listener-to-copy-text-button [main-frame]
-;  (action-utils/attach-listener main-frame "#copy-text-button" 
-;    (fn [e] (save-text-to-clipboard main-frame))))
+(defn group-selection-listener [main-frame list-selection-event]
+  (reload-member-table-data main-frame))
+
+(defn attach-group-selection-listner [main-frame]
+  (group-tab-view/add-group-list-selection-listener main-frame #(group-selection-listener main-frame %)))
 
 ;(defn save-friend-xml [main-frame file]
 ;  (java-io/copy (group-tab-view/friend-xml-text main-frame) file))
@@ -68,9 +71,10 @@
   (load-group-list main-frame))
 
 (defn attach [main-frame]
-  (attach-group-listener
-    (attach-listener-to-delete-group-button
-      main-frame)))
+  (attach-group-selection-listner
+    (attach-group-listener
+      (attach-listener-to-delete-group-button
+        main-frame))))
 
 (defn init [main-frame]
-  (attach (load-data main-frame)))
+  (load-data (attach main-frame)))
