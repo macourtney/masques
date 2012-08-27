@@ -1,7 +1,7 @@
 (ns masques.controller.main.peer-tab
   (:require [clj-i2p.core :as clj-i2p]
             [clj-i2p.peer-service.peer :as peer-service]
-            [clj-internationalization.core :as clj-i18n]
+            [clj-internationalization.term :as term]
             [masques.controller.actions.utils :as action-utils]
             [masques.controller.add-destination.add-destination :as add-destination]
             [masques.controller.utils :as controller-utils]
@@ -37,7 +37,7 @@
 
 (defn convert-to-table-peer [peer]
   (when peer
-    (assoc peer :notified (when (peer-service/notified? peer) (clj-i18n/yes)))))
+    (assoc peer :notified (when (peer-service/notified? peer) (term/yes)))))
 
 (defn reload-table-data [main-frame]
   (when-let [peers (map convert-to-table-peer (peer-service/all-peers))]

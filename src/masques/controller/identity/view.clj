@@ -1,5 +1,5 @@
 (ns masques.controller.identity.view
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [clojure.tools.logging :as logging]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
@@ -71,10 +71,10 @@
 
 (defn load-is-online [parent-component identity]
   (seesaw-core/config! (find-is-online-label parent-component)
-    :text (if (identity-model/is-online? identity) (clj-i18n/yes) (clj-i18n/no))))
+    :text (if (identity-model/is-online? identity) (term/yes) (term/no))))
 
 (defn set-table-status [parent-component status-text]
-  (seesaw-core/config! (find-status-label parent-component) :text (clj-i18n/status-parens status-text)))
+  (seesaw-core/config! (find-status-label parent-component) :text (term/status-parens status-text)))
 
 (defn set-complete-table-status [parent-component]
   (seesaw-core/config! (find-status-label parent-component) :text ""))

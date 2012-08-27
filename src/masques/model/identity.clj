@@ -4,7 +4,7 @@
             [clj-i2p.core :as clj-i2p-core]
             [clj-i2p.peer-service.peer :as clj-i2p-peer]
             [clj-record.boot :as clj-record-boot]
-            [clj-internationalization.core :as clj-i18n]
+            [clj-internationalization.term :as term]
             [clojure.tools.logging :as logging]
             [masques.model.peer :as peer]
             [masques.model.user :as user])
@@ -182,7 +182,7 @@
     (merge (select-keys identity [:id :name :public_key_algorithm]) 
       { :destination destination
         :public_key (shortened-public-key identity)
-        :is_online (when (is-online? identity) (clj-i18n/yes)) })))
+        :is_online (when (is-online? identity) (term/yes)) })))
 
 (defn all-online-identities []
   (find-records ["is_online = 1"]))

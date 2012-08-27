@@ -1,13 +1,13 @@
 (ns masques.view.main.profile-tab
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.view.subviews.profile-data :as profile-data]
             [seesaw.core :as seesaw-core]))
 
-(def tab-name (clj-i18n/profile))
+(def tab-name (term/profile))
 
 (defn create-button []
   (seesaw-core/border-panel
-    :west (seesaw-core/button :id :update-button :text (clj-i18n/update))))
+    :west (seesaw-core/button :id :update-button :text (term/update))))
 
 (defn create []
   (seesaw-core/border-panel

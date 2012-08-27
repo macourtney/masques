@@ -1,28 +1,28 @@
 (ns masques.view.main.identity-tab
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [seesaw.core :as seesaw-core]))
 
-(def tab-name (clj-i18n/identity))
+(def tab-name (term/identity))
 
-(def identity-table-columns [ { :key :name :text (clj-i18n/name) }
-                              { :key :public_key :text (clj-i18n/public-key) }
-                              { :key :public_key_algorithm :text (clj-i18n/algorithm) }
-                              { :key :destination :text (clj-i18n/destination) }
-                              { :key :is_online :text (clj-i18n/is-online) }])
+(def identity-table-columns [ { :key :name :text (term/name) }
+                              { :key :public_key :text (term/public-key) }
+                              { :key :public_key_algorithm :text (term/algorithm) }
+                              { :key :destination :text (term/destination) }
+                              { :key :is_online :text (term/is-online) }])
 
 (defn create-show-only-online-identities-checkbox []
-  (seesaw-core/checkbox :id :show-only-online-identites-checkbox :text (clj-i18n/show-only-online-identities)
+  (seesaw-core/checkbox :id :show-only-online-identites-checkbox :text (term/show-only-online-identities)
     :selected? true))
 
 (defn create-identities-table-title []
   (seesaw-core/horizontal-panel
-    :items [ (clj-i18n/identities)
+    :items [ (term/identities)
              [:fill-h 3]
              (create-show-only-online-identities-checkbox)]))
 
 (defn create-identity-table-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :view-identity-button :text (clj-i18n/view) :enabled? false) ]))
+    [ (seesaw-core/button :id :view-identity-button :text (term/view) :enabled? false) ]))
 
 (defn create-title-panel []
   (seesaw-core/border-panel
@@ -43,7 +43,7 @@
 
 (defn create-my-identity-panel []
   (seesaw-core/horizontal-panel
-    :items [ (seesaw-core/border-panel :size [67 :by 15] :east (seesaw-core/label :text (clj-i18n/my-identity)))
+    :items [ (seesaw-core/border-panel :size [67 :by 15] :east (seesaw-core/label :text (term/my-identity)))
              [:fill-h 3]
              (seesaw-core/border-panel :size [300 :by 20]
                :west (seesaw-core/text :id :my-identity :text "data" :editable? false))]))

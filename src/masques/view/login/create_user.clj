@@ -1,12 +1,12 @@
 (ns masques.view.login.create-user
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing JPasswordField]))
 
 (defn create-user-name-panel []
   (seesaw-core/horizontal-panel :items
-    [ (clj-i18n/user-name)
+    [ (term/user-name)
       [:fill-h 3]
       (seesaw-core/text :id :user-name-text :preferred-size [150 :by 25])]))
 
@@ -18,22 +18,22 @@
 
 (defn create-password-panel1 []
   (seesaw-core/horizontal-panel :items
-    [ (clj-i18n/enter-password)
+    [ (term/enter-password)
       [:fill-h 3]
       (password-field :id :password-field1 :preferred-size [120 :by 25])]))
 
 (defn create-password-panel2 []
   (seesaw-core/horizontal-panel :items
-    [ (clj-i18n/reenter-password)
+    [ (term/reenter-password)
       [:fill-h 3]
       (password-field :id :password-field2 :preferred-size [120 :by 25])]))
 
 (defn create-button-panel []
   (seesaw-core/border-panel :east
     (seesaw-core/horizontal-panel :items
-      [(seesaw-core/button :id :register-button :text (clj-i18n/register))
+      [(seesaw-core/button :id :register-button :text (term/register))
        [:fill-h 3]
-       (seesaw-core/button :id :cancel-button :text (clj-i18n/cancel))])))
+       (seesaw-core/button :id :cancel-button :text (term/cancel))])))
 
 (defn create-content []
   (seesaw-core/vertical-panel
@@ -44,6 +44,6 @@
 (defn create [login-frame]
   (view-utils/center-window-on login-frame
     (seesaw-core/frame
-      :title (clj-i18n/masques-create-user)
+      :title (term/masques-create-user)
       :content (create-content)
       :visible? false)))

@@ -1,22 +1,22 @@
 (ns masques.view.main.friend-tab
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.model.friend :as friends-model]
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table]))
 
-(def tab-name (clj-i18n/friend))
+(def tab-name (term/friend))
 
-(def friend-table-columns [ { :key :name :text (clj-i18n/handle) } ])
+(def friend-table-columns [ { :key :name :text (term/handle) } ])
 
 (defn create-friend-list-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :add-friend-button :text (clj-i18n/add))
+    [ (seesaw-core/button :id :add-friend-button :text (term/add))
       [:fill-h 3]
-      (seesaw-core/button :id :unfriend-button :text (clj-i18n/unfriend))]))
+      (seesaw-core/button :id :unfriend-button :text (term/unfriend))]))
 
 (defn create-friend-list-header-panel []
   (seesaw-core/border-panel
-    :west (clj-i18n/friends)
+    :west (term/friends)
     :east (create-friend-list-buttons)))
 
 (defn create-friend-list-table []
@@ -32,13 +32,13 @@
 
 (defn create-friend-xml-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :save-text-button :text (clj-i18n/save))
+    [ (seesaw-core/button :id :save-text-button :text (term/save))
       [:fill-h 3]
-      (seesaw-core/button :id :copy-text-button :text (clj-i18n/copy)) ]))
+      (seesaw-core/button :id :copy-text-button :text (term/copy)) ]))
 
 (defn create-friend-xml-header-panel []
   (seesaw-core/border-panel
-    :west (clj-i18n/friend-text)
+    :west (term/friend-text)
     :east (create-friend-xml-buttons)))
 
 (defn create-friend-xml-text []

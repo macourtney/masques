@@ -1,5 +1,5 @@
 (ns masques.view.main.group-tab
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.controller.actions.utils :as action-utils]
             [masques.model.friend :as friend-model]
             [masques.model.group :as group-model]
@@ -8,19 +8,19 @@
   (:import [javax.swing DefaultListModel]
            [javax.swing.event ListSelectionListener]))
 
-(def tab-name (clj-i18n/group))
+(def tab-name (term/group))
 
-(def member-table-columns [ { :key :name :text (clj-i18n/handle) } ])
+(def member-table-columns [ { :key :name :text (term/handle) } ])
 
 (defn create-member-list-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :add-member-button :text (clj-i18n/add))
+    [ (seesaw-core/button :id :add-member-button :text (term/add))
       [:fill-h 3]
-      (seesaw-core/button :id :remove-member-button :text (clj-i18n/remove))]))
+      (seesaw-core/button :id :remove-member-button :text (term/remove))]))
 
 (defn create-member-list-header-panel []
   (seesaw-core/border-panel
-    :west (clj-i18n/group-members)
+    :west (term/group-members)
     :east (create-member-list-buttons)))
 
 (defn create-member-list-table []
@@ -36,13 +36,13 @@
 
 (defn create-group-list-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :new-group-button :text (clj-i18n/new))
+    [ (seesaw-core/button :id :new-group-button :text (term/new))
       [:fill-h 3]
-      (seesaw-core/button :id :delete-group-button :text (clj-i18n/delete)) ]))
+      (seesaw-core/button :id :delete-group-button :text (term/delete)) ]))
 
 (defn create-group-list-header-panel []
   (seesaw-core/border-panel
-    :west (clj-i18n/groups)
+    :west (term/groups)
     :east (create-group-list-buttons)))
 
 (defn group-list-cell-renderer

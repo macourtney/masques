@@ -1,13 +1,13 @@
 (ns masques.view.main.peer-tab
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [seesaw.core :as seesaw-core]))
 
-(def tab-name (clj-i18n/peer))
+(def tab-name (term/peer))
 
-(def peer-table-columns [ { :key :destination :text (clj-i18n/destination) }
-                          { :key :created_at :text (clj-i18n/created-on) }
-                          { :key :updated_at :text (clj-i18n/last-updated-at) }
-                          { :key :notified :text (clj-i18n/notified) }])
+(def peer-table-columns [ { :key :destination :text (term/destination) }
+                          { :key :created_at :text (term/created-on) }
+                          { :key :updated_at :text (term/last-updated-at) }
+                          { :key :notified :text (term/notified) }])
 
 (defn create-destination-text-area []
   (let [text-area (seesaw-core/text
@@ -24,15 +24,15 @@
 (defn create-destination-panel []
   (seesaw-core/vertical-panel 
     :id :north-panel 
-    :items [(clj-i18n/destination-address) [:fill-v 3] (create-destination-text)]))
+    :items [(term/destination-address) [:fill-v 3] (create-destination-text)]))
 
 (defn create-peer-list-buttons []
   (seesaw-core/horizontal-panel :items 
-    [ (seesaw-core/button :id :add-button :text (clj-i18n/add)) ]))
+    [ (seesaw-core/button :id :add-button :text (term/add)) ]))
 
 (defn create-peer-list-header-panel []
   (seesaw-core/border-panel
-    :west (clj-i18n/peers)
+    :west (term/peers)
     :east (create-peer-list-buttons)))
 
 (defn create-peer-list-table []

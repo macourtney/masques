@@ -1,5 +1,5 @@
 (ns masques.view.friend.view
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.view.subviews.profile-data :as profile-data]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
@@ -12,7 +12,7 @@
       :border 5
       :hgap 5
       :east (seesaw-core/horizontal-panel :items 
-              [ (seesaw-core/button :id :done-button :text (clj-i18n/done)) ])))
+              [ (seesaw-core/button :id :done-button :text (term/done)) ])))
 
 (defn create-content []
   (seesaw-core/border-panel
@@ -24,7 +24,7 @@
 (defn create [main-frame]
   (view-utils/center-window-on main-frame
     (seesaw-core/frame
-      :title (clj-i18n/view-friend)
+      :title (term/view-friend)
       :content (create-content)
       :on-close :dispose
       :visible? false)))

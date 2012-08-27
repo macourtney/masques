@@ -1,5 +1,5 @@
 (ns masques.view.friend.add
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
@@ -14,7 +14,7 @@
 (defn create-center-panel []
   (seesaw-core/border-panel
       :vgap 3
-      :north (clj-i18n/friend)
+      :north (term/friend)
       :center (create-friend-text)))
 
 (defn create-button-panel []
@@ -22,14 +22,14 @@
       :border 5
       :hgap 5
       :west (seesaw-core/horizontal-panel :items 
-              [ (seesaw-core/button :id :import-button :text (clj-i18n/import))
+              [ (seesaw-core/button :id :import-button :text (term/import))
                 [:fill-h 3]
-                (seesaw-core/button :id :paste-button :text (clj-i18n/paste))
+                (seesaw-core/button :id :paste-button :text (term/paste))
                 [:fill-h 3] ])
       :east (seesaw-core/horizontal-panel :items 
-              [ (seesaw-core/button :id :add-button :text (clj-i18n/add))
+              [ (seesaw-core/button :id :add-button :text (term/add))
                 [:fill-h 3]
-                (seesaw-core/button :id :cancel-button :text (clj-i18n/cancel)) ])))
+                (seesaw-core/button :id :cancel-button :text (term/cancel)) ])))
 
 (defn create-content []
   (seesaw-core/border-panel
@@ -41,7 +41,7 @@
 (defn create [main-frame]
   (view-utils/center-window-on main-frame
     (seesaw-core/frame
-      :title (clj-i18n/add-friend)
+      :title (term/add-friend)
       :content (create-content)
       :on-close :dispose
       :visible? false)))

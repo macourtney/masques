@@ -1,5 +1,5 @@
 (ns masques.view.subviews.profile-data
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [seesaw.core :as seesaw-core]))
 
 (defn create-label-value-pair-panel [text text-key]
@@ -11,13 +11,13 @@
                     (seesaw-core/text :id text-key :text "data" :preferred-size [200 :by 20])])))
 
 (defn create-name-panel []
-  (create-label-value-pair-panel (clj-i18n/name) :name-text))
+  (create-label-value-pair-panel (term/name) :name-text))
 
 (defn create-email-panel []
-  (create-label-value-pair-panel (clj-i18n/email) :email-text))
+  (create-label-value-pair-panel (term/email) :email-text))
 
 (defn create-phone-number-panel []
-  (create-label-value-pair-panel (clj-i18n/phone-number) :phone-number-text))
+  (create-label-value-pair-panel (term/phone-number) :phone-number-text))
 
 (defn create-address-text-area []
   (doto (seesaw-core/text
@@ -31,25 +31,25 @@
 
 (defn create-address-panel []
   (seesaw-core/border-panel
-    :north (clj-i18n/address)
+    :north (term/address)
     :west (create-address-text)))
 
 (defn create-country-state-city-zip-panel []
   (seesaw-core/border-panel
     :west (seesaw-core/horizontal-panel
-            :items [(seesaw-core/label :text (clj-i18n/country))
+            :items [(seesaw-core/label :text (term/country))
                     [:fill-h 3]
                     (seesaw-core/text :id :country-text :text "data" :preferred-size [100 :by 20])
                     [:fill-h 3]
-                    (seesaw-core/label :text (clj-i18n/province-or-state))
+                    (seesaw-core/label :text (term/province-or-state))
                     [:fill-h 3]
                     (seesaw-core/text :id :province-text :text "data" :preferred-size [100 :by 20])
                     [:fill-h 3]
-                    (seesaw-core/label :text (clj-i18n/city))
+                    (seesaw-core/label :text (term/city))
                     [:fill-h 3]
                     (seesaw-core/text :id :city-text :text "data" :preferred-size [100 :by 20])
                     [:fill-h 3]
-                    (seesaw-core/label :text (clj-i18n/postal-code))
+                    (seesaw-core/label :text (term/postal-code))
                     [:fill-h 3]
                     (seesaw-core/text :id :postal-code-text :text "data" :preferred-size [100 :by 20])])))
 

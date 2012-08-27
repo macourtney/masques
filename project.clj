@@ -3,7 +3,7 @@
   :dependencies [[clojure-tools "1.1.0-SNAPSHOT"]
                  [clj-crypto "1.0.1-SNAPSHOT"]
                  [clj-i2p "1.0.0-SNAPSHOT"]
-                 [clj-internationalization "1.0.0"]
+                 [clj-internationalization "1.0.1-SNAPSHOT"]
                  [clj-record "1.1.0"]
                  [com.h2database/h2 "1.3.162"]
                  [drift "1.4.3"]

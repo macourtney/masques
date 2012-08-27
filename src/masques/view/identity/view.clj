@@ -1,5 +1,5 @@
 (ns masques.view.identity.view
-  (:require [clj-internationalization.core :as clj-i18n]
+  (:require [clj-internationalization.term :as term]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
@@ -11,16 +11,16 @@
                  :west (seesaw-core/label :id label-key :text "data" :font { :style :plain }))]))
 
 (defn create-name-panel []
-  (create-label-value-pair-panel (clj-i18n/name) :name-label))
+  (create-label-value-pair-panel (term/name) :name-label))
 
 (defn create-public-key-panel []
-  (create-label-value-pair-panel (clj-i18n/public-key) :public-key-label))
+  (create-label-value-pair-panel (term/public-key) :public-key-label))
 
 (defn create-algorithm-panel []
-  (create-label-value-pair-panel (clj-i18n/algorithm) :public-key-algorithm-label))
+  (create-label-value-pair-panel (term/algorithm) :public-key-algorithm-label))
 
 (defn create-is-online-panel []
-  (create-label-value-pair-panel (clj-i18n/is-online) :is-online-label))
+  (create-label-value-pair-panel (term/is-online) :is-online-label))
 
 (defn create-data-panel []
   (seesaw-core/vertical-panel
@@ -43,7 +43,7 @@
       :border 5
       :hgap 5
       :east (seesaw-core/horizontal-panel :items 
-              [ (seesaw-core/button :id :cancel-button :text (clj-i18n/done)) ])))
+              [ (seesaw-core/button :id :cancel-button :text (term/done)) ])))
 
 (defn create-content []
   (seesaw-core/border-panel
@@ -55,7 +55,7 @@
 (defn create [main-frame]
   (view-utils/center-window-on main-frame
     (seesaw-core/frame
-      :title (clj-i18n/identity)
+      :title (term/identity)
       :content (create-content)
       :on-close :dispose
       :visible? false)))
