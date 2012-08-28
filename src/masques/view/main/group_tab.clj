@@ -161,6 +161,18 @@
   [main-frame]
   (seesaw-core/get-model* (find-group-list main-frame)))
 
+(defn groups
+  "Returns a sequence of groups from the list."
+  [main-frame]
+  (let [group-model (group-list-model main-frame)]
+    (doall (map #(.getElementAt group-model %) (range (.getSize group-model))))))
+
+(defn group-index
+  "Returns the index of the given group in the group list."
+  [main-frame group]
+  (some #(when (= (:id (second %1)) (:id group)) (first %1))
+        (map #(list %1 %2) (range) (groups main-frame))))
+
 (defn clear-groups
   "Removes all groups from the group list."
   [main-frame]
@@ -193,6 +205,11 @@
   [main-frame index]
   (when (>= index 0)
     (.setSelectedIndex (find-group-list main-frame) index)))
+
+(defn set-selected-group
+  "Selects the given group in the group list."
+  [main-frame group]
+  (set-selected-group-index main-frame (group-index main-frame group)))
 
 (defn group-count
   "Returns the number of rows in the member table."

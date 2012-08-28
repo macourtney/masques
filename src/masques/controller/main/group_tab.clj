@@ -1,6 +1,7 @@
 (ns masques.controller.main.group-tab
   (:require [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as action-utils]
+            [masques.controller.group.add :as group-add-controller]
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friend-model]
             [masques.model.group :as group-model]
@@ -40,9 +41,9 @@
 ;  (action-utils/attach-listener main-frame "#save-text-button" 
 ;    (fn [e] (save-text-listener main-frame))))
 
-;(defn attach-listener-to-add-button [main-frame]
-;  (action-utils/attach-listener main-frame "#add-friend-button" 
-;    (fn [e] (add-friend-view/show main-frame))))
+(defn attach-listener-to-add-button [main-frame]
+  (action-utils/attach-listener main-frame "#new-group-button" 
+    (fn [e] (group-add-controller/show main-frame))))
 
 (defn delete-selected-group
   "Deletes the selected group."
@@ -50,7 +51,7 @@
   (group-model/destroy-record (group-tab-view/selected-group main-frame)))
 
 (defn attach-listener-to-delete-group-button [main-frame]
-  (group-tab-view/attach-listener-to-delete-group-button main-frame delete-selected-group))
+  (group-tab-view/attach-listener-to-delete-group-button main-frame #(delete-selected-group main-frame %)))
 
 (defn group-add-listener [main-frame group]
   (let [new-group (group-model/get-record (:id group))]
@@ -71,10 +72,11 @@
   (load-group-list main-frame))
 
 (defn attach [main-frame]
-  (attach-group-selection-listner
-    (attach-group-listener
-      (attach-listener-to-delete-group-button
-        main-frame))))
+  (attach-listener-to-add-button
+    (attach-group-selection-listner
+      (attach-group-listener
+        (attach-listener-to-delete-group-button
+          main-frame)))))
 
 (defn init [main-frame]
   (load-data (attach main-frame)))

@@ -162,6 +162,13 @@
     (doseq [default-group (vals default-groups)]
       (add-default-group identity default-group))))
 
+(defn add-group
+  "Adds a new group with the given name."
+  ([group-name] (add-group group-name (identity/current-user-identity)))
+  ([group-name identity]
+    (when (and identity group-name (not-empty group-name) )
+      (insert { :name group-name :identity_id (:id identity) :user_generated 1 }))))
+
 (defn remove-deleted-identity-groups [identity]
   (doseq [group (find-identity-groups identity)]
     (destroy-record group)))

@@ -30,13 +30,13 @@
 ;  (is (= (friend-tab-view/friend-xml-text frame) (friend-model/friend-xml-string)))
   (assert-one-listener-each))
 
-;(defn assert-add-remove-friend [frame]
-;  (let [friend-identity (identity-model/get-record 3)
-;        friend-id (friend-model/add-friend friend-identity)]
-;    (is (= (friend-tab-view/friend-count frame) 2))
-;    (friend-tab-view/set-selected-friend frame { :id friend-id })
-;    (friend-tab-view/click-unfriend-button frame)
-;    (is (= (friend-tab-view/friend-count frame) 1))))
+(defn assert-add-remove-group [frame]
+  (is (= (group-tab-view/group-count frame) 2))
+  (let [group-id (group-model/add-group "test-group")]
+    (is (= (group-tab-view/group-count frame) 3))
+    (group-tab-view/set-selected-group frame { :id group-id })
+    (group-tab-view/click-delete-group-button frame)
+    (is (= (group-tab-view/group-count frame) 2))))
 
 ;(defn assert-copy [frame]
 ;  (friend-tab-view/click-copy-text-button frame)
@@ -61,7 +61,7 @@
     ;(Thread/sleep 10000)
     (assert-initialized frame)
     (assert-group-selection frame)
-    ;(assert-add-remove-friend frame)
+    (assert-add-remove-group frame)
     ;(assert-copy frame)
     ;(assert-save-file frame)
     ;(Thread/sleep 10000)
