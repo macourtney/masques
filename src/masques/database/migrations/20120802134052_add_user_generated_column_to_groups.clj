@@ -1,4 +1,5 @@
 (ns masques.database.migrations.20120802134052-add-user-generated-column-to-groups
+  (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
 (defn up

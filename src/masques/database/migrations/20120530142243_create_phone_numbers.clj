@@ -1,4 +1,5 @@
 (ns masques.database.migrations.20120530142243-create-phone-numbers
+  (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
 (defn up

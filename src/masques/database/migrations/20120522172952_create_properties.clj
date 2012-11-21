@@ -1,4 +1,5 @@
 (ns masques.database.migrations.20120522172952-create-properties
+  (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
 (defn up

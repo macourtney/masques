@@ -1,4 +1,5 @@
 (ns masques.database.migrations.20120530142259-create-email-addresses
+  (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
 (defn up

@@ -1,4 +1,5 @@
 (ns masques.database.migrations.20120522173019-create-peers
+  (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
 (defn up
