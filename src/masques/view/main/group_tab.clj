@@ -47,8 +47,8 @@
 
 (defn group-list-cell-renderer
   "A cell renderer for the group list. This function simply converts the group given in the arg list to a label containing the name of the group."
-  [cell-renderer arg-map]
-  (seesaw-core/label :text (:name (:value arg-map))))
+  [renderer arg-map]
+  (seesaw-core/config! renderer :text (:name (:value arg-map))))
 
 (defn create-group-list []
   (seesaw-core/scrollable
