@@ -10,6 +10,7 @@
 .project
 /bin
 /data
+/logs
 /log
 /.lein-deps-sum
 /target
