@@ -7,7 +7,7 @@ echo path is $PATH
 ####
 
 # Class file to run
-mainclass="darkexchange.main"
+mainclass="masques.main"
 
 # jar directory containing dependent jars
 jars="lib"

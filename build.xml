@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Masques" default="dist">
+
+  <property environment="env" />
+  <property name="project.basedir" value="${basedir}" />
+  <property name="target.dir" value="${project.basedir}/target" />
+  <property name="dist.dir" value="${target.dir}/masques" />
+  <property name="dist.lib.dir" value="${dist.dir}/lib" />
+  <property name="lib.dir" value="${project.basedir}/lib" />
+  <property name="src.dir" value="${project.basedir}/src" />
+  <property name="package.dir" value="${project.basedir}/pkg" />
+  <property name="version" value="1.0.0-SNAPSHOT" />
+  <property name="masques.jar" value="${target.dir}/masques-${version}.jar" />
+
+  <target name="copy-libs" depends="">
+    <copy todir="${dist.lib.dir}">
+      <fileset dir="${lib.dir}" />
+    </copy>
+  </target>
+
+  <target name="copy-jar" depends="">
+    <copy todir="${dist.lib.dir}" file="${masques.jar}" />
+  </target>
+
+  <target name="copy-resources" depends="">
+    <copy todir="${dist.dir}">
+      <fileset dir="${package.dir}" />
+    </copy>
+  </target>
+
+  <target name="dist" depends="copy-libs, copy-jar, copy-resources">
+    
+  </target>
+
+  <!-- TODO AS:
+       Have the installer build in a single dir that we can blow away -->
+  <target name="clean">
+    <delete dir="${target.dir}" />
+  </target>
+</project>
