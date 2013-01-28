@@ -50,7 +50,11 @@
 
 (defn create-user [create-user-frame user-name password]
   (when (and user-name password)
-    (future (create-user-cleanup create-user-frame (user-model/create-user user-name password)))))
+    (future
+      (try
+        (create-user-cleanup create-user-frame (user-model/create-user user-name password))
+        (catch Throwable t
+          (logging/error t "An error occured while creating the user."))))))
 
 (defn create-user-action [e]
   (let [create-user-frame (seesaw-core/to-frame e)]

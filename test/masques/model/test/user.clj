@@ -1,5 +1,6 @@
 (ns masques.model.test.user
   (:require [clj-crypto.core :as clj-crypto]
+            [clj-crypto.symmetric-algorithm :as symmetric-algorithm]
             [clojure.data.xml :as data-xml]
             [fixtures.util :as fixtures-util])
   (:use clojure.test
@@ -84,7 +85,7 @@
         key-bytes (:bytes (:private-key key-pair-map))
         private-key-str (encrypt-private-key test-password key-bytes)
         decrypted-bytes (private-key-bytes { :password test-password :private_key private-key-str
-                                             :private_key_encryption_algorithm clj-crypto/default-symmetrical-algorithm })]
+                                             :private_key_encryption_algorithm symmetric-algorithm/default-symmetrical-algorithm })]
     (is (= (count key-bytes) (count decrypted-bytes))) 
     (is (test-bytes key-bytes decrypted-bytes))))
 

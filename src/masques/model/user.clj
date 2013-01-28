@@ -1,6 +1,7 @@
 (ns masques.model.user
   (:require [clj-record.boot :as clj-record-boot]
             [clj-crypto.core :as clj-crypto]
+            [clj-crypto.symmetric-algorithm :as symmetric-algorithm]
             [clojure.data.xml :as data-xml])
   (:use masques.model.base)
   (:import [java.sql Clob]
@@ -47,8 +48,8 @@
 
 (defn encrypt-private-key [password key-bytes]
   (Base64/encodeBase64String
-    (clj-crypto/password-encrypt (char-array-to-string password) (Base64/encodeBase64String key-bytes)
-      clj-crypto/default-symmetrical-algorithm)))
+    (symmetric-algorithm/password-encrypt (char-array-to-string password) (Base64/encodeBase64String key-bytes)
+      symmetric-algorithm/default-symmetrical-algorithm)))
 
 (defn generate-keys [user]
   (let [key-pair (clj-crypto/generate-key-pair)
@@ -57,7 +58,7 @@
                   :public_key_algorithm (:algorithm (:public-key key-pair-map))
                   :private_key (encrypt-private-key (:password user) (:bytes (:private-key key-pair-map)))
                   :private_key_algorithm (:algorithm (:private-key key-pair-map))
-                  :private_key_encryption_algorithm clj-crypto/default-symmetrical-algorithm })))
+                  :private_key_encryption_algorithm symmetric-algorithm/default-symmetrical-algorithm })))
 
 (defn generate-fields [user]
   (select-keys (generate-keys (encrypt-password user))
@@ -125,7 +126,7 @@
 
 (defn private-key-bytes [user]
   (decode-base64
-    (clj-crypto/password-decrypt (char-array-to-string (:password user)) (decode-base64 (:private_key user))
+    (symmetric-algorithm/password-decrypt (char-array-to-string (:password user)) (decode-base64 (:private_key user))
       (:private_key_encryption_algorithm user))))
 
 (defn private-key-map [user]
