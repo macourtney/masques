@@ -1,21 +1,18 @@
 h2. Masques
 
-Masques is a P2P social network. Instead of posting your personal data on a website which you don't control and which
-changes their privacy policy on a whim, all of your data stays on your computer, and is only shared with the friends you
-want to share it with. All communication is directly from friend to friend (node to node) and encrypted to avoid
-unwanted eyes viewing your data.
+Enjoy social networking. Keep your privacy.
 
-h3. Usage
+You want to share personal information with your friends, not the world. Why are you using a public website?
 
-Masques is still under development and there is no easy way to install and run it at the moment.
+Masques is designed to provide an alternative to posting your personal information on a website with an always changing, yet always confusing, privacy policy.
 
-From development:
+Masques runs on your computer. All of your media stays on your computer, not some corporation's server. When you want to share, your files and messages are sent directly from your computer to your friend's computer, securely and privately. Masques uses I2P, or the "invisible internet," to transfer your information directly to your friends without ever sending anything to a centralized server.
 
-Make sure you have java and Leiningen installed.
+Best of all, the "privacy policy" is more than just a policy: your privacy is protected with math, not legal documents, which are often changed or simply violated. Because of the many layers of encryption, and because we publish our source code for the world to see, you know you can trust Masques to protect privacy. Not even the Masques developers can invade the privacy of your social network.
 
-Make sure you have I2P installed and running on you computer.
+With Masques, you can be sure your personal information, and entire social network, is safe from digital thieves, data mining companies, and intrusive government surveillance.
 
-Check out the code and download the dependencies with "lein deps". To run in development mode use "lein development".
+You can learn more about Masques on our website: "Find Masques":http://findmasques.org/
 
 h3. License
 
