@@ -171,6 +171,9 @@
 (defn shortened-public-key [identity]
   (shortened-public-key-str (:public_key identity)))
 
+(defn name [identity]
+  (:name identity))
+
 (defn identity-text [identity]
   (str (:name identity) " (" (shortened-public-key identity) ")"))
 

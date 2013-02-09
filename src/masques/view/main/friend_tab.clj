@@ -1,6 +1,7 @@
 (ns masques.view.main.friend-tab
   (:require [clj-internationalization.term :as term]
             [masques.model.friend :as friends-model]
+            [masques.model.identity :as identity-model]
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table]))
 
@@ -79,7 +80,7 @@
   (seesaw-core/select main-frame ["#save-text-button"]))
 
 (defn convert-to-table-friend [friend]
-  { :id (:id friend) :name (or (:name friend) (friends-model/friend-name friend)) })
+  { :id (:id friend) :name (friends-model/friend-name friend) })
 
 (defn reset-friend-list [main-frame friends]
   (seesaw-core/config! (find-friend-table main-frame)

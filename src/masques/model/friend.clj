@@ -159,7 +159,10 @@ this function returns nil."
   "Returns the name of the given friend."
   [friend]
   (when-let [friend (find-friend friend)]
-    (name-model/first-identity-name (find-identity friend))))
+    (when-let [friend-identity (identity/find-record { :id (:friend_id friend) })]
+      (or
+        (name-model/first-identity-name friend-identity)
+        (identity/name friend-identity)))))
 
 (defn friend-id [friend]
   (cond
