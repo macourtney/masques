@@ -17,6 +17,7 @@
 (def test-identity-2 (second fixtures-identity/records))
 
 (def test-name (first fixtures-name/records))
+(def test-name-2 (second fixtures-name/records))
 
 (def test-destination "LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA")
 
@@ -170,10 +171,10 @@
         inserted-friend (assoc test-friend :id friend-id)]
     (is friend-id)
     (try
-      (is (= test-name (friend-name (:name test-name))))
-      (is (= test-name (friend-name inserted-friend)))
-      (is (= test-name (friend-name test-friend)))
-      (is (= test-name (friend-name friend-id)))
+      (is (= test-name-2 (friend-name (:name test-name))))
+      (is (= test-name-2 (friend-name inserted-friend)))
+      (is (= test-name-2 (friend-name test-friend)))
+      (is (= test-name-2 (friend-name friend-id)))
       (try
         (friend-name 1.0)
         (is false "Expected an exception for an invalid friend.")
