@@ -9,8 +9,12 @@
   <property name="lib.dir" value="${project.basedir}/lib" />
   <property name="src.dir" value="${project.basedir}/src" />
   <property name="package.dir" value="${project.basedir}/pkg" />
+
   <property name="version" value="1.0.0-SNAPSHOT" />
   <property name="masques.jar" value="${target.dir}/masques-${version}.jar" />
+
+  <property name="installer.jar" value="${target.dir}/masques_installer.jar" />
+  <property name="installer.exe" value="${target.dir}/install.exe" />
 
   <target name="copy-libs" depends="">
     <copy todir="${dist.lib.dir}">
@@ -28,12 +32,49 @@
     </copy>
   </target>
 
-  <target name="dist" depends="copy-libs, copy-jar, copy-resources">
+  <target name="izpack-setup">
+    <fail message="Install IzPack 4.3.5 (and Python) and set the environment variable IZPACK_HOME"
+          unless="env.IZPACK_HOME" />
+    <property name="izpack.dir" location="${env.IZPACK_HOME}" />
+    <property name="izpack.2exe"
+        value="${izpack.dir}/utils/wrappers/izpack2exe/izpack2exe.py" />
+    <property name="izpack.conf" value="${target.dir}/masques.xml" />
+    <property name="izpack.log" value="${target.dir}/izpack2exe.log" />
+    <property name="izpack.7zip"
+        value="${izpack.dir}/utils/wrappers/izpack2exe/7za.exe" />
+    <taskdef name="IzPack"
+        classpath="${izpack.dir}/lib/compiler.jar"
+        classname="com.izforge.izpack.ant.IzPackTask" />
+  </target>
+
+  <target name="izpack-copy-files" depends="izpack-setup">
+    <copy file="${project.basedir}/install/wrapper.jar" todir="${lib.dir}" />
+    <copy file="${project.basedir}/masques.xml" todir="${target.dir}" />
+
+    <replace file="${izpack.conf}" token="@versionID@" value="${version}"/>
+  </target>
+
+  <target name="izpack" depends="izpack-setup,izpack-copy-files">
+    <IzPack input="${izpack.conf}"
+        output="${installer.jar}" installerType="standard"
+        basedir="${project.basedir}" IzPackDir="${izpack.dir}" />
+
+    <exec executable="python" failonerror="true" logError="true" output="${izpack.log}">
+      <arg value="${izpack.2exe}" />
+      <arg value="--with-7z=${izpack.7zip}" />
+      <arg value="--no-upx" />
+      <arg value="--file=${installer.jar}" />
+      <arg value="--output=${installer.exe}" />
+    </exec>
+
+    <!-- <copy file="${src.installerdir}/install_64.bat" todir="${dist.64dir}" />
+    <copy file="${installer.jar}" todir="${dist.64dir}" />  -->
+  </target>
+  
+  <target name="dist" depends="copy-libs, copy-jar, copy-resources, izpack">
     
   </target>
 
-  <!-- TODO AS:
-       Have the installer build in a single dir that we can blow away -->
   <target name="clean">
     <delete dir="${target.dir}" />
   </target>

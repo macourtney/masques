@@ -1,0 +1,20 @@
+<shortcuts>
+  <skipIfNotSupported/>
+  <programGroup defaultName="Masques"
+                location="startMenu"/>
+
+  <shortcut
+    name="Masques"
+    target="$INSTALL_PATH\masques.bat"
+    commandLine=""
+    workingDirectory="$INSTALL_PATH"
+    description="Runs Masques"
+    iconFile="$INSTALL_PATH\resources\masques.jpg"
+    initialState="normal"
+    programGroup="yes"
+    desktop="yes"
+    startMenu="no"
+    startup="no">
+    <createForPack name="Base"/>
+  </shortcut>
+</shortcuts>

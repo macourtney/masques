@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!-- 
+	ATTENTION!!! do not edit with an editor which do not handle UTF-8 in a right manner!!
+	Storing with a wrong editor can crash this file!
+    Registry definition file for IzPack Installation.
+-->
+
+<registry>
+    <pack name="Base">
+        <value name="DisplayIcon" 
+            keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$APP_NAME $APP_VER"  
+            root="HKLM" 
+            string="$INSTALL_PATH\resources\masques.jpg"/>
+    </pack>
+</registry>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+    <!--
+        The info section.
+        The meaning of the tags should be natural ...
+    -->
+    <info>
+        <appname>Masques</appname>
+
+        <appversion>@versionID@</appversion>
+        <authors>
+            <author name="Matthew Courtney" email="macourtney@gmail.com"/>
+        </authors>
+        <url>http://findmasques.org</url>
+        <run-privileged/>
+    </info>
+
+    <variables>
+        <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
+        <!-- This automatically checks the "Create Desktop Shortcuts" button. Default value is "False". -->
+    </variables>
+
+    <!--
+        The gui preferences indication.
+        Sets the installer window to 640x480. It will not be able to change the size.
+    -->
+    <guiprefs width="640" height="480" resizable="yes"/>
+
+    <!--
+        The locale section.
+        Asks here to include the English.
+    -->
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <!--
+        The resources section.
+        The ids must be these ones if you want to use the LicencePanel and/or the InfoPanel.
+    -->
+    <resources>
+        <res id="LicencePanel.licence" src="install/gpl.txt"/>
+        <res id="Installer.image" src="install/masques.jpg" />
+        <res id="shortcutSpec.xml" src="install/default_shortcut_specification.xml"/>
+        <res id="RegistrySpec.xml" src="install/RegistrySpec.xml"/>
+        <res id="TargetPanel.dir" src="install/TargetDir.txt" />
+    </resources>
+
+    <native type="izpack" name="ShellLink.dll"/>
+    <native type="izpack" name="ShellLink_x64.dll" />
+
+    <native type="3rdparty" name="COIOSHelper.dll" stage="both">
+        <os family="windows"/>
+    </native>
+    <native type="3rdparty" name="COIOSHelper_x64.dll" stage="both">
+        <os family="windows"/>
+    </native>
+
+    <!-- The listeners section for CustomActions -->
+    <listeners>
+        <listener installer="RegistryInstallerListener" uninstaller="RegistryUninstallerListener">
+            <os family="windows"/>
+        </listener>
+    </listeners>
+
+    <!--
+        The panels section.
+        We indicate here which panels we want to use. The order will be respected.
+    -->
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="ShortcutPanel"/>
+        <panel classname="SimpleFinishPanel"/>
+    </panels>
+
+    <!--
+        The packs section.
+        We specify here our packs.
+    -->
+    <packs>
+        <pack name="Base" required="yes">
+            <description>The base Masques files</description>
+            <file src="target/masques-@versionID@.jar" targetdir="$INSTALL_PATH/lib"/>
+            <fileset dir="lib" targetdir="$INSTALL_PATH/lib"/>
+            <fileset dir="pkg" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+
+</installation>
