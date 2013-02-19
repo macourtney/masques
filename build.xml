@@ -13,8 +13,9 @@
   <property name="version" value="1.0.0-SNAPSHOT" />
   <property name="masques.jar" value="${target.dir}/masques-${version}.jar" />
 
-  <property name="installer.jar" value="${target.dir}/masques_installer.jar" />
-  <property name="installer.exe" value="${target.dir}/install.exe" />
+  <property name="target.installer.dir" value="${target.dir}/installer" />
+  <property name="installer.jar" value="${target.installer.dir}/masques_installer.jar" />
+  <property name="installer.exe" value="${target.installer.dir}/install.exe" />
 
   <target name="copy-libs" depends="">
     <copy todir="${dist.lib.dir}">
@@ -55,6 +56,8 @@
   </target>
 
   <target name="izpack" depends="izpack-setup,izpack-copy-files">
+    <mkdir dir="${target.installer.dir}"/>
+
     <IzPack input="${izpack.conf}"
         output="${installer.jar}" installerType="standard"
         basedir="${project.basedir}" IzPackDir="${izpack.dir}" />
