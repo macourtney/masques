@@ -26,7 +26,7 @@
         The gui preferences indication.
         Sets the installer window to 640x480. It will not be able to change the size.
     -->
-    <guiprefs width="640" height="480" resizable="yes"/>
+    <guiprefs width="1080" height="580" resizable="yes"/>
 
     <!--
         The locale section.
@@ -42,7 +42,7 @@
     -->
     <resources>
         <res id="LicencePanel.licence" src="install/gpl.txt"/>
-        <res id="Installer.image" src="install/masques.jpg" />
+        <res id="Installer.image" src="install/masques_black.jpg" />
         <res id="shortcutSpec.xml" src="install/default_shortcut_specification.xml"/>
         <res id="RegistrySpec.xml" src="install/RegistrySpec.xml"/>
         <res id="TargetPanel.dir" src="install/TargetDir.txt" />
