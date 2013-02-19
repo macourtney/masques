@@ -1,4 +1,5 @@
 (ns config.environments.production
+  (:require [clojure.java.io :as java-io])
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
            [org.apache.log4j.varia LevelRangeFilter]))
 

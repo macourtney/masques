@@ -3,8 +3,8 @@ REM Masques Launch script
 @echo off
 setlocal
 
-set CLASSPATH=resources
-set CLASSPATH=%CLASSPATH%;lib/*
+set CLASSPATH=%~dp0\resources
+set CLASSPATH=%CLASSPATH%;%~dp0\lib\*
 
 @echo on
 
