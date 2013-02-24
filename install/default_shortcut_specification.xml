@@ -9,7 +9,7 @@
     commandLine=""
     workingDirectory="$INSTALL_PATH"
     description="Runs Masques"
-    iconFile="$INSTALL_PATH\resources\masques.jpg"
+    iconFile="$INSTALL_PATH\resources\masques.ico"
     initialState="normal"
     programGroup="yes"
     desktop="yes"
