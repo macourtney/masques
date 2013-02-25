@@ -8,7 +8,7 @@
   (create-table :share
     (id)
     (timestamp :created_at)
-    (string :uuid)
+    (text :uuid)
     (int :message_id)
     (int :content_id)
     (int :group_id)
