@@ -1,4 +1,4 @@
-(ns masques.database.migrations.20120523155913-create-users
+(ns masques.database.migrations.20130224211500-create-share
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,6 +7,7 @@
   []
   (create-table :share
     (id)
+    (timestamp :created_at)
     (string :uuid)
     (int :message_id)
     (int :content_id)
@@ -16,7 +17,6 @@
     (string :identity_to_algorithm)
     (text :identity_from)
     (string :identity_from_algorithm)
-    (timestamp :created_at)
     (timestamp :shown_in_stream_at)
     (timestamp :transferred_at)))
   
