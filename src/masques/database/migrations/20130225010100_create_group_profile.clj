@@ -8,8 +8,8 @@
   (create-table :group_profile
     (id)
     (timestamp :added_at)
-    (int :profile_id)
-    (int :group_id)))
+    (integer :profile_id)
+    (integer :group_id)))
   
 (defn down
   "Drops the group_profile table in the database."
