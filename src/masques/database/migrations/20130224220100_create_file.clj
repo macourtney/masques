@@ -10,10 +10,10 @@
     (timestamp :created_at)
     (string :name)
     (string :path)
-    (int :album_id)
+    (integer :album_id)
     (string :mime_type)
     (text :comments)
-    (int :size)
+    (integer :size)
   
 (defn down
   "Drops the file table in the database."
