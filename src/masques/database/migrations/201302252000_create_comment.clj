@@ -9,6 +9,7 @@
     (id)
     (timestamp :created_at)
     (integer :share_id)
+    (integer :comment_id) "Optional"
     (text :body)))
   
 (defn down

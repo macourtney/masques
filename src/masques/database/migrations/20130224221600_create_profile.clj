@@ -17,7 +17,7 @@
     (text :identity)
     (string :identity_algorithm)
     (text :private_key)
-    (string :private_key_algorithm)
+    (string :private_key_algorithm)))
   
 (defn down
   "Drops the profile table in the database."

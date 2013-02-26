@@ -13,7 +13,7 @@
     (integer :album_id)
     (string :mime_type)
     (text :comments)
-    (integer :size)
+    (integer :size)))
   
 (defn down
   "Drops the file table in the database."
