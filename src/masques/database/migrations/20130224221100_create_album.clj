@@ -10,7 +10,7 @@
     (timestamp :created_at)
     (string :name)
     (integer :size_of_all_files)
-    (text :comments)
+    (text :comments)))
   
 (defn down
   "Drops the album table in the database."
