@@ -9,7 +9,7 @@
     (id)
     (timestamp :created_at)
     (string :name)
-    (int :size_of_all_files)
+    (integer :size_of_all_files)
     (text :comments)
   
 (defn down

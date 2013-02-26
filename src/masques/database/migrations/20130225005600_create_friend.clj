@@ -9,7 +9,7 @@
     (id)
     (timestamp :created_at)
     (string :request_status)
-    (int :profile_id)
+    (integer :profile_id)
     (timestamp :friend_requested_at)
     (timestamp :friend_request_approved_at)))
   
