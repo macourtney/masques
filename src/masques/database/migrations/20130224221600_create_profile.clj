@@ -1,4 +1,4 @@
-(ns masques.database.migrations.20130224221600_create_profile
+(ns masques.database.migrations.20130224221600-create-profile
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,7 +7,7 @@
   []
   (create-table :profile
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (string :alias)
     (string :alias_nick)
     (string :time_zone)

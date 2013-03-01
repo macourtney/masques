@@ -7,7 +7,7 @@
   []
   (create-table :message
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (string :subject)
     (text :body)))
   

@@ -1,4 +1,4 @@
-(ns masques.database.migrations.20130224221100_create_album
+(ns masques.database.migrations.20130224221100-create-album
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,7 +7,7 @@
   []
   (create-table :album
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (string :name)
     (integer :size_of_all_files)
     (text :comments)))

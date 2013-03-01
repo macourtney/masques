@@ -1,4 +1,4 @@
-(ns masques.database.migrations.20130225005600_create_friend
+(ns masques.database.migrations.20130225005600-create-friend
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,11 +7,11 @@
   []
   (create-table :friend
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (string :request_status)
     (integer :profile_id)
-    (timestamp :friend_requested_at)
-    (timestamp :friend_request_approved_at)))
+    (date-time :friend_requested_at)
+    (date-time :friend_request_approved_at)))
   
 (defn down
   "Drops the friend table in the database."

@@ -1,4 +1,4 @@
-(ns masques.database.migrations.20130225010100_create_group_profile
+(ns masques.database.migrations.20130225010100-create-group-profile
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,7 +7,7 @@
   []
   (create-table :group_profile
     (id)
-    (timestamp :added_at)
+    (date-time :added_at)
     (integer :profile_id)
     (integer :group_id)))
   

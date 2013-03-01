@@ -7,7 +7,7 @@
   []
   (create-table :file
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (string :name)
     (string :path)
     (integer :album_id)

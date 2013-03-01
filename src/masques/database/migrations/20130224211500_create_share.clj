@@ -7,8 +7,8 @@
   []
   (create-table :share
     (id)
-    (timestamp :created_at)
-    (uuid :uuid)
+    (date-time :created_at)
+    ;(uuid :uuid)
     (integer :message_id)
     (integer :content_id)
     (integer :group_id)
@@ -17,8 +17,8 @@
     (string :identity_to_algorithm)
     (text :identity_from)
     (string :identity_from_algorithm)
-    (timestamp :shown_in_stream_at)
-    (timestamp :transferred_at)))
+    (date-time :shown_in_stream_at)
+    (date-time :transferred_at)))
   
 (defn down
   "Drops the share table in the database."

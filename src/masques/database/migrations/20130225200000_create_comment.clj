@@ -1,4 +1,4 @@
-(ns masques.database.migrations.201302252000_create_comment
+(ns masques.database.migrations.20130225200000-create-comment
   (:refer-clojure :exclude [boolean])
   (:use drift-db.core))
 
@@ -7,9 +7,9 @@
   []
   (create-table :comment
     (id)
-    (timestamp :created_at)
+    (date-time :created_at)
     (integer :share_id)
-    (integer :comment_id) "Optional"
+    (integer :comment_id) ;"Optional"
     (text :body)))
   
 (defn down
