@@ -14,3 +14,7 @@
 (defn read-data-directory []
   (when (operating-system/windows?)
     (registry-editor/read-string registry-editor/hkey-local-machine masques-win-system-key masques-win-data-directory)))
+
+(defn delete-data-directory []
+  (when (operating-system/windows?)
+    (registry-editor/delete-key registry-editor/hkey-local-machine masques-win-system-key)))

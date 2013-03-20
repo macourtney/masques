@@ -1,8 +1,11 @@
 (ns masques.model.registry-editor
-  (:require [masques.model.operating-system :as operating-system]))
+  (:require [clojure.string :as string]
+            [masques.model.operating-system :as operating-system])
+  (:import [java.util.prefs Preferences]))
 
-(def hkey-current-user 0x80000001)
-(def hkey-local-machine 0x80000002)
+(def hkey-current-user (inc Integer/MIN_VALUE))
+(def hkey-local-machine (inc (inc Integer/MIN_VALUE)))
+
 (def reg-success 0)
 (def reg-not-found 2)
 (def reg-access-denied 5)
@@ -46,7 +49,7 @@
     (.printStackTrace exception)))
 
 (defn to-c-str [^String string]
-  (byte-array (concat string [0])))
+  (byte-array (map #(byte (Character/getNumericValue %)) (concat string [0]))))
 
 (defn root [^Integer hkey]
   (condp = hkey
@@ -59,9 +62,9 @@
     (read-string (root hkey) hkey key value-name))
 
   ([^Preferences root ^Integer hkey ^String key ^String value-name]
-    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) read-key]))]
+    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) key-read]))]
       (if (= reg-success (second handles))
-        (let [result (.invoke reg-query-value-ex root (into-array [(first handles) (to-c-str value)]))]
+        (let [result (.invoke reg-query-value-ex root (into-array [(first handles) (to-c-str value-name)]))]
           (.invoke reg-close-key root (into-array [(first handles)]))
           (when result
             (string/trim (String. result))))
@@ -72,7 +75,7 @@
     (read-string-values (root hkey) hkey key))
 
   ([^Preferences root ^Integer hkey ^String key]
-    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) read-key]))]
+    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) key-read]))]
       (when (= reg-success (second handles))
         (let [info (.invoke reg-query-info-key root (into-array [(first handles)]))
               count (first info)
@@ -93,14 +96,14 @@
     (read-string-sub-keys (root hkey) hkey key))
 
   ([^Preferences root ^Integer hkey ^String key]
-    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) read-key]))]
+    (let [handles (.invoke reg-open-key root (into-array [hkey (to-c-str key) key-read]))]
       (when (= reg-success (second handles))
         (let [info (.invoke reg-query-info-key root (into-array [(first handles)]))
               count (first info)
               max-length (nth info 3)
               results (map
                         (fn [index]
-                          (trim (String. (.invoke reg-enum-key-ex root (into-array [(first handles) index (inc max-length)])))))
+                          (string/trim (String. (.invoke reg-enum-key-ex root (into-array [(first handles) index (inc max-length)])))))
                         (range 0 count))]
           (.invoke reg-close-key root (into-array [(first handles)]))
           results)))))
@@ -114,7 +117,10 @@
         (IllegalArgumentException. (str "rc=" (second return) "  key=" key)))))
 
   ([^Preferences root ^Integer hkey ^String key]
-    (.invoke reg-create-key-ex (into-array [hkey (to-c-str key)]))))
+    (println "Parameters Types:" (seq (.getParameterTypes reg-create-key-ex)))
+    (let [parameters (into-array Object [(int hkey) (to-c-str key)])]
+      (println "Parameters:" (seq (map class parameters)))
+      (.invoke reg-create-key-ex root parameters))))
 
 (defn write-string-value
   ([^Integer hkey ^String key ^String value-name ^String value]
