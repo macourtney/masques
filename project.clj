@@ -6,6 +6,7 @@
                  [clj-i2p "1.0.0-SNAPSHOT"]
                  [clj-internationalization "1.0.1-SNAPSHOT"]
                  [clj-record "1.1.0"]
+                 [com.github.sarxos/windows-registry-util "0.2"]
                  [com.h2database/h2 "1.3.162"]
                  [drift "1.4.6-SNAPSHOT"]
                  [log4j/log4j "1.2.16"]
