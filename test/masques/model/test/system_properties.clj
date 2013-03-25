@@ -1,4 +1,4 @@
-(ns masques.model.test.system-properties 
+(ns masques.model.test.system-properties
   (:use clojure.test
         masques.model.system-properties))
 
