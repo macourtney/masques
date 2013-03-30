@@ -8,6 +8,7 @@
                  [clj-record "1.1.0"]
                  [com.h2database/h2 "1.3.162"]
                  [drift "1.4.6-SNAPSHOT"]
+                 [korma "0.3.0-beta7"]
                  [log4j/log4j "1.2.16"]
                  [org.clojure/clojure "1.4.0"]
                  [org.clojure/data.xml "0.0.4"]
