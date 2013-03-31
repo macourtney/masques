@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [comment group])
   (:require test.init)
   (:require [drift-db.core :as drift-db]
-            [korma.db :as korma-db])
+            [korma.db :as korma-db]
+            [masques.model.log :as log])
   (:use clojure.test
         korma.core))
 
@@ -15,7 +16,7 @@
 (defentity friend (table :FRIEND))
 (defentity grouping (table :GROUPING))
 (defentity grouping-profile (table :GROUPING_PROFILE))
-(defentity log (table :LOG))
+; (defentity log (table :LOG))
 (defentity message (table :MESSAGE))
 (defentity profile (table :PROFILE))
 (defentity property (table :PROPERTY))
@@ -27,8 +28,8 @@
    [file :NAME]
    [friend :CREATED_AT]
    [grouping :NAME]
-   [grouping-profile :ADDED_AT]
-   [log :CREATED_AT]
+   [grouping-profile :CREATED_AT]
+   ; [log :CREATED_AT]
    [message :CREATED_AT]
    [profile :ALIAS]
    [property :NAME]
@@ -60,13 +61,15 @@
 
 (defn h2-test-records []
   (doseq [table (h2-data-for-test-records)]
-    (h2-test-record (nth table 0) (nth table 1))))
+    (h2-test-record (first table) (second table))))
 
 (defn h2-schema []
   (doseq [table (h2-table-names)]
     (println (str "\n===== " table " =====\n" (h2-columns table)))))
 
 (deftest test-schema
+  ; (log/save (log/save {:MESSAGE "first!"}))
   (h2-test-records) 
   (println (h2-schema))
-   (println (h2-table-names))) 
+  (println (h2-table-names))
+)
