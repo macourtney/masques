@@ -5,6 +5,8 @@
             [config.environment :as environment]
             [drift-db-h2.flavor :as h2]))
 
+(def data-directory (atom "data/db/"))
+
 (defn dbname [environment]
   (cond
      ;; The name of the production database to use.
@@ -25,12 +27,11 @@
     ;; Calculates the database to use.
     (dbname environment)
 
-    "data/db/"))
-            
+    @data-directory))
+
 (defn
   load-config []
   (let [environment (environment/environment-name)]
     (if-let [flavor (create-flavor (keyword environment))]
       flavor
       (throw (new RuntimeException (str "Unknown environment: " environment ". Please check your conjure.environment system property."))))))
-      
