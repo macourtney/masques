@@ -11,15 +11,9 @@
 (def db (deref masques-core/db))
 (korma-db/defdb mydb (drift-db/db-map))
 
-; Random helpers.
-(defn as-boolean [value]
-  (and value (not (= value 0))))
-
-(defn remove-listener [listeners listener-to-remove]
-  (remove #(= listener-to-remove %) listeners))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Clob stuff.
+; Clob helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn clob-string [clob]
@@ -46,10 +40,9 @@
 (defn clean-clob[record field-name field-data]
     (assoc record field-name (load-clob field-data)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Turn h2 field names (:KEYWORDS_THAT_LOOK_LIKE_THIS) into
-; clojure-style names (:keywords-that-look-like-this)
+; Turn h2 field names (:KEYWORDS_THAT_LOOK_LIKE_THIS) into clojure-style
+; names (:keywords-that-look-like-this) and back again.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn remove-colon [has-colon]
@@ -102,6 +95,45 @@
 (defn clean-up-for-h2 [record]
   (let [clean-data (reduce clean-field-data record (keys record))]
     (reduce h2-field-name clean-data (keys clean-data))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Entities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn prepare-album [record]
+  record)
+
+(defentity album
+  (prepare prepare-album)
+  (transform clean-up-for-clojure)
+  (table :ALBUM))
+
+(defn prepare-file [record]
+  record)
+
+(defentity file
+  (prepare prepare-file)
+  (transform clean-up-for-clojure)
+  (table :FILE))
+
+(defn prepare-log [record]
+  record)
+
+(defentity log
+  (prepare prepare-log)
+  (transform clean-up-for-clojure)
+  (table :LOG))
+
+; Random helpers.
+(defn as-boolean [value]
+  (and value (not (= value 0))))
+
+(defn remove-listener [listeners listener-to-remove]
+  (remove #(= listener-to-remove %) listeners))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; SQL/ORM helpers.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn find-by-id [entity id]
   (clean-up-for-clojure (first (select entity (where {:ID id})))))

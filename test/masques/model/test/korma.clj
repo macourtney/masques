@@ -3,6 +3,9 @@
   (:require test.init)
   (:require [drift-db.core :as drift-db]
             [korma.db :as korma-db]
+            [masques.model.base :as model]
+            [masques.model.file :as file-model]
+            [masques.model.album :as album-model]
             [masques.model.log :as log])
   (:use clojure.test
         korma.core))
@@ -11,8 +14,8 @@
 
 (korma-db/defdb mydb database-map)
 
-(defentity album (table :ALBUM))
-(defentity file (table :FILE))
+; (defentity album (table :ALBUM))
+; (defentity file (table :FILE))
 (defentity friend (table :FRIEND))
 (defentity grouping (table :GROUPING))
 (defentity grouping-profile (table :GROUPING_PROFILE))
@@ -24,8 +27,8 @@
 (defentity user (table :USER))
 
 (defn h2-data-for-test-records []
-  [[album :NAME]
-   [file :NAME]
+  [; [album :NAME]
+   ; [file :NAME]
    [friend :CREATED_AT]
    [grouping :NAME]
    [grouping-profile :CREATED_AT]
@@ -68,8 +71,13 @@
     (println (str "\n===== " table " =====\n" (h2-columns table)))))
 
 (deftest test-schema
+  (println (file-model/save {:NAME "this file" :ALBUM_ID 1}))
+  (println (file-model/save {:NAME "that file" :ALBUM_ID 1}))
   ; (log/save (log/save {:MESSAGE "first!"}))
-  (h2-test-records) 
-  (println (h2-schema))
-  (println (h2-table-names))
+  (println (album-model/save {:name "my album"}))
+  (println (album-model/with-files 1))
+  #_(h2-test-records) 
+  #_(println (h2-schema))
+  #_(println (h2-table-names))
+  #_(println model/album)
 )
