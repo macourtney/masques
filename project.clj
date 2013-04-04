@@ -6,6 +6,7 @@
                  [clj-i2p "1.0.0-SNAPSHOT"]
                  [clj-internationalization "1.0.1-SNAPSHOT"]
                  [clj-record "1.1.0"]
+                 [clj-time "0.5.0"]
                  [com.h2database/h2 "1.3.162"]
                  [drift "1.4.6-SNAPSHOT"]
                  [korma "0.3.0-beta7"]
