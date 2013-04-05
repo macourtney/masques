@@ -6,7 +6,7 @@
   (let [frame (show)]
     (is frame)
     (is (.isShowing frame))
-    (Thread/sleep 1000)
+    (Thread/sleep 10000)
     (.setVisible frame false)
     (.dispose frame)
     (is (not (.isShowing frame)))))
