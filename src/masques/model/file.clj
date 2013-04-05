@@ -4,3 +4,6 @@
 
 (defn save [record]
   (insert-or-update file record))
+
+(defn by-album [album-id]
+  (into [] (select file (where {:ALBUM_ID album-id}))))

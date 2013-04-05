@@ -52,8 +52,7 @@
   (clj-time-coerce/to-date-time h2-date-time))
 
 (defn clean-date-time-field [record field-name field-data]
-  (conj record { field-name (h2-to-date-time field-data) })
-  record)
+  (conj record { field-name (h2-to-date-time field-data) }))
 
 (defn set-created-at [record]
   (conj record {:CREATED_AT (str (clj-time/now))}))
@@ -128,44 +127,46 @@
 ; Entities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; album
-(defn prepare-album [record]
+; ALBUM
+(defn prepare-album-for-h2 [record]
   (set-created-at record))
-(defn clean-up-album-for-clojure [record]
+(defn transform-album-for-clojure [record]
   (let [clean (clean-up-for-clojure record)]
-    ; (println "Clean: " clean)
-    ; (println "Dirty: " record)
-    ; (println "Created at: " (:created-at clean))
-    ; (println "Type: " (type (:created-at clean)))
-    ; (println "Timestamp?: " (instance? java.sql.Timestamp (:created-at clean)))
     clean))
-
 (defentity album
-  (prepare prepare-album)
-  (transform clean-up-album-for-clojure)
+  (transform transform-album-for-clojure)
+  (prepare prepare-album-for-h2)
   (table :ALBUM))
 
-; file
-(defn prepare-file [record]
+; FILE
+(defn prepare-file-for-h2 [record]
   (set-created-at record))
 (defentity file
-  (prepare prepare-file)
+  (prepare prepare-file-for-h2)
   (transform clean-up-for-clojure)
   (table :FILE))
 
-; friend
-(defn prepare-friend [record]
-  record)
+; FRIEND
+(defn prepare-friend-for-h2 [record]
+  (set-created-at record))
 (defentity friend 
-  (prepare prepare-friend)
+  (prepare prepare-friend-for-h2)
   (transform clean-up-for-clojure)
   (table :FRIEND))
 
-; log
-(defn prepare-log [record]
+; GROUPING
+(defn prepare-grouping-for-h2 [record]
+  (set-created-at record))
+(defentity grouping 
+  (transform clean-up-for-clojure)
+  (prepare prepare-grouping-for-h2)
+  (table :GROUPING))
+
+; LOG
+(defn prepare-log-for-h2 [record]
   record)
 (defentity log
-  (prepare prepare-log)
+  (prepare prepare-log-for-h2)
   (transform clean-up-for-clojure)
   (table :LOG))
 
