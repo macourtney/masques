@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130224221600-create-profile
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

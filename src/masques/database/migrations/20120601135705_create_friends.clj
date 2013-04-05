@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20120601135705-create-friends
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

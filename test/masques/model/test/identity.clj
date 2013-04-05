@@ -1,4 +1,5 @@
 (ns masques.model.test.identity
+  (:refer-clojure :exclude [name])
   (:require [fixtures.identity :as identity-fixture]
             [fixtures.peer :as peer-fixture]
             [fixtures.user :as user-fixture] 

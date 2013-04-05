@@ -1,4 +1,5 @@
 (ns masques.view.subviews.test.profile-data
+  (:refer-clojure :exclude [name])
   (:use clojure.test
         masques.view.subviews.profile-data))
 

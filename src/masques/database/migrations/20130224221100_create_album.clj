@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130224221100-create-album
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

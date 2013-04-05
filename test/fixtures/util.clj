@@ -1,5 +1,5 @@
 (ns fixtures.util
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:require [clojure.test :as clojure-test] 
             [test.init :as test-init])
   (:use drift-db.core))

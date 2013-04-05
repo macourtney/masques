@@ -1,4 +1,5 @@
 (ns masques.service.actions.profile
+  (:refer-clojure :exclude [name])
   (:require [masques.model.address :as address-model]
             [masques.model.email-address :as email-model]
             [masques.model.friend :as friend-model] 

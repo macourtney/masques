@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20120806155239-drop-permissions-identity-column
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

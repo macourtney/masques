@@ -1,4 +1,5 @@
 (ns masques.controller.friend.test.view
+  (:refer-clojure :exclude [key load])
   (:require [test.init :as test-init])
   (:require [clojure.java.io :as java-io]
             [fixtures.friend :as friend-fixture]

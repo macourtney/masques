@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20120731153932-create-group-permissions
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

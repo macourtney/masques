@@ -1,4 +1,5 @@
 (ns masques.controller.friend.view
+  (:refer-clojure :exclude [load])
   (:require [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friend-model]

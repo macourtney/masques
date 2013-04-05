@@ -1,4 +1,5 @@
 (ns masques.model.identity
+  (:refer-clojure :exclude [name])
   (:require [clj-crypto.core :as clj-crypto]
             [clj-i2p.client :as client]
             [clj-i2p.core :as clj-i2p-core]

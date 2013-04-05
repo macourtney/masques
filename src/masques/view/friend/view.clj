@@ -1,4 +1,5 @@
 (ns masques.view.friend.view
+  (:refer-clojure :exclude [load])
   (:require [clj-internationalization.term :as term]
             [masques.view.subviews.profile-data :as profile-data]
             [masques.view.utils :as view-utils]

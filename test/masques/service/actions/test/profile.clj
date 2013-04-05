@@ -1,4 +1,5 @@
 (ns masques.service.actions.test.profile
+  (:refer-clojure :exclude [name])
   (:require test.init)
   (:use [masques.service.actions.profile])
   (:use [clojure.test])
