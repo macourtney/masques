@@ -7,6 +7,12 @@
 
 (def data-directory (atom "data/db/"))
 
+(defn data-dir []
+  @data-directory)
+
+(defn update-data-directory [new-data-dir]
+  (reset! data-directory new-data-dir))
+
 (defn dbname [environment]
   (cond
      ;; The name of the production database to use.

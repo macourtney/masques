@@ -8,3 +8,6 @@
 
 (defn center-window [window]
   (center-window-on nil window))
+
+(defn find-component [parent-component id]
+  (seesaw-core/select parent-component [id]))

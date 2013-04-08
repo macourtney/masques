@@ -64,3 +64,9 @@
       :title (term/choose-data-directory)
       :content (create-content)
       :visible? false)))
+
+(defn data-directory-text [parent-component]
+  (view-utils/find-component parent-component :#data-directory-text))
+
+(defn choose-button [parent-component]
+  (view-utils/find-component parent-component :#save-button))
