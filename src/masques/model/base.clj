@@ -2,13 +2,13 @@
   (:use korma.core)
   (:require [clj-time.core :as clj-time]
             [clj-time.coerce :as clj-time-coerce]
-            [clj-time.format :as clj-time-format]
             [clojure.string :as string]
             [clojure.tools.logging :as logging]
             [drift-db.core :as drift-db]
             [masques.core :as masques-core]
             [korma.db :as korma-db] )
-  (:import [java.sql Clob]))
+  (:import [java.sql Clob])
+  (:import [java.util.UUID]))
 
 ; Database connections. db is for non-korma stuff.
 (def db (deref masques-core/db))
@@ -46,8 +46,6 @@
 ; Data sanitation: Date/time helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def time-offset -5)
-
 (defn h2-to-date-time [h2-date-time]
   (clj-time-coerce/to-date-time h2-date-time))
 
@@ -58,19 +56,25 @@
   (conj record {:CREATED_AT (str (clj-time/now))}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Data sanitation: etc.
+; Etc.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn as-boolean [value]
   (and value (not (= value 0))))
+
+(defn uuid [] 
+  (str (java.util.UUID/randomUUID)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
 ; keywords (:that-look-like-this) and back again.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn remove-colon [has-colon]
-  (string/replace (string/lower-case has-colon) ":" ""))
+(defn lower-case [the-string]
+  (string/lower-case the-string))
+
+(defn remove-colon [the-string]
+  (string/replace the-string ":" ""))
 
 (defn replace-underscores-with-hyphens [has-underscores]
   (string/replace has-underscores "_" "-"))
@@ -79,7 +83,8 @@
   (string/replace has-hyphens "-" "_"))
 
 (defn clojure-keyword [h2-keyword]
-  (let [no-colon (remove-colon (str h2-keyword))
+  (let [lower-string (str h2-keyword)
+        no-colon (remove-colon lower-string)
         no-underscores (replace-underscores-with-hyphens no-colon)
         lower-cased (string/lower-case no-underscores)]
     (keyword lower-cased)))
@@ -93,12 +98,12 @@
 (defn remove-item [item record]
   (dissoc (into {} record) item))
 
-; Removes empty fields, fixes Clob data.
 (defn clean-field-data [record field-name]
+  "Prepares H2 data, from the database, for the rest of our clojure application."
   (let [field-data (get record field-name)]
     (cond
-      (nil? field-data)
-        (remove-item field-name record)
+      ; (nil? field-data)
+        ; (remove-item field-name record)
       (instance? Clob field-data)
         (clean-clob record field-name field-data)
       (instance? java.sql.Timestamp field-data)
@@ -108,12 +113,12 @@
 (defn clojure-field-name [record field-name]
   (let [field-data (get record field-name)
         ready-map (remove-item field-name record)]
-    (assoc ready-map (clojure-keyword field-name)  field-data)))
+    (assoc ready-map (clojure-keyword field-name) field-data)))
 
 (defn h2-field-name [record field-name]
   (let [field-data (get record field-name)
         ready-map (remove-item field-name record)]
-    (assoc ready-map (h2-keyword field-name)  field-data)))
+    (assoc ready-map (h2-keyword field-name) field-data)))
 
 (defn clean-up-for-clojure [record]
   (let [clean-data (reduce clean-field-data record (keys record))]
@@ -122,6 +127,31 @@
 (defn clean-up-for-h2 [record]
   (let [clean-data (reduce clean-field-data record (keys record))]
     (reduce h2-field-name clean-data (keys clean-data))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; SQL/ORM helpers.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn find-by-id [entity id]
+  (clean-up-for-clojure (first (select entity (where {:ID id})))))
+
+(defn insert-record [entity record]
+  (println (str "before insert: " record))
+  (let [id (vals (insert entity (values record)))]
+    (println "the insert just happened")
+    (println "after insert: " (find-by-id entity id))
+    (find-by-id entity id)))
+
+(defn update-record [entity record]
+  (update entity
+    (set-fields record)
+    (where {:ID (:id record)})))
+
+(defn insert-or-update [entity record]
+  (let [h2-record (clean-up-for-h2 record)]
+    (if (:ID h2-record)
+      (update-record entity h2-record)
+      (insert-record entity h2-record))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Entities
@@ -134,8 +164,8 @@
   (let [clean (clean-up-for-clojure record)]
     clean))
 (defentity album
-  (transform transform-album-for-clojure)
   (prepare prepare-album-for-h2)
+  (transform transform-album-for-clojure)
   (table :ALBUM))
 
 ; FILE
@@ -162,6 +192,14 @@
   (prepare prepare-grouping-for-h2)
   (table :GROUPING))
 
+; GROUPING_PROFILE
+(defn prepare-grouping-profile-for-h2 [record]
+  (set-created-at record))
+(defentity grouping-profile
+  (transform clean-up-for-clojure)
+  (prepare prepare-grouping-profile-for-h2)
+  (table :GROUPING_PROFILE))
+
 ; LOG
 (defn prepare-log-for-h2 [record]
   record)
@@ -170,30 +208,13 @@
   (transform clean-up-for-clojure)
   (table :LOG))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; SQL/ORM helpers.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn find-by-id [entity id]
-  (clean-up-for-clojure (first (select entity (where {:ID id})))))
-
-(defn insert-record [entity record]
-  (println (str "before insert: " record))
-  (let [id (vals (insert entity (values record)))]
-    (println "the insert just happened")
-    (println (str "after insert: " (find-by-id entity id)))
-    (find-by-id entity id)))
-
-(defn update-record [entity record]
-  (update entity
-    (set-fields record)
-    (where {:ID (:id record)})))
-
-(defn insert-or-update [entity record]
-  (let [h2-record (clean-up-for-h2 record)]
-    (if (:ID h2-record)
-      (update-record entity h2-record)
-      (insert-record entity h2-record))))
+; PROFILE
+(defn prepare-profile-for-h2 [record]
+  (set-created-at record))
+(defentity profile
+  (transform clean-up-for-clojure)
+  (prepare prepare-profile-for-h2)
+  (table :PROFILE))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Other randomness, used in models.
@@ -201,3 +222,4 @@
 
 (defn remove-listener [listeners listener-to-remove]
   (remove #(= listener-to-remove %) listeners))
+
