@@ -65,6 +65,9 @@
 (defn uuid [] 
   (str (java.util.UUID/randomUUID)))
 
+(defn set-uuid [record]
+  (conj record { :UUID (uuid) } ))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
 ; keywords (:that-look-like-this) and back again.
@@ -215,6 +218,14 @@
   (transform clean-up-for-clojure)
   (prepare prepare-profile-for-h2)
   (table :PROFILE))
+
+; SHARE
+(defn prepare-share-for-h2 [record]
+  (set-uuid (set-created-at record)))
+(defentity share
+  (transform clean-up-for-clojure)
+  (prepare prepare-share-for-h2)
+  (table :SHARE))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Other randomness, used in models.

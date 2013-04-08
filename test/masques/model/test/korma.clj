@@ -6,9 +6,12 @@
             [masques.model.base :as model]
             [masques.model.file :as file-model]
             [masques.model.album :as album-model]
+            [masques.model.share :as share-model]
             [masques.model.log :as log])
   (:use clojure.test
         korma.core))
+
+; [masques.model.friend :as friend-model]
 
 (def database-map (drift-db/db-map))
 
@@ -16,27 +19,27 @@
 
 ; (defentity album (table :ALBUM))
 ; (defentity file (table :FILE))
-(defentity friend (table :FRIEND))
+; (defentity friend (table :FRIEND))
 (defentity grouping (table :GROUPING))
 (defentity grouping-profile (table :GROUPING_PROFILE))
 ; (defentity log (table :LOG))
 (defentity message (table :MESSAGE))
 (defentity profile (table :PROFILE))
 (defentity property (table :PROPERTY))
-(defentity share (table :SHARE))
+; (defentity share (table :SHARE))
 (defentity user (table :USER))
 
 (defn h2-data-for-test-records []
   [; [album :NAME]
    ; [file :NAME]
-   [friend :CREATED_AT]
+   ; [friend :CREATED_AT]
    [grouping :NAME]
    [grouping-profile :CREATED_AT]
    ; [log :CREATED_AT]
    [message :CREATED_AT]
    [profile :ALIAS]
    [property :NAME]
-   [share :CREATED_AT]
+   ; [share :CREATED_AT]
    [user :NAME]])
 
 (defn h2-insert [entity data]
@@ -71,13 +74,17 @@
     (println (str "\n===== " table " =====\n" (h2-columns table)))))
 
 (deftest test-schema
-  (println (file-model/save {:NAME "this file" :ALBUM_ID 1}))
-  (println (file-model/save {:NAME "that file" :ALBUM_ID 1}))
-  ; (log/save (log/save {:MESSAGE "first!"}))
-  (println (album-model/save {:name "my album"}))
-  (println (album-model/with-files 1))
-  #_(h2-test-records) 
-  #_(println (h2-schema))
-  #_(println (h2-table-names))
-  #_(println model/album)
+  ; (println (file-model/save {:NAME "this file" :ALBUM_ID 1}))
+  ; (println (file-model/save {:NAME "that file" :ALBUM_ID 1}))
+  ; (println (album-model/save {:NAME "my album"}))
+  ; (println (album-model/with-files 1))
+  ; #_(h2-test-records) 
+  (println (h2-schema))
+  (println (model/set-uuid {:something "some value"}))
+
+  (let [share-record { :message-id 42 } ]
+    (share-model/save share-record))
+
+  ; #_(println (h2-table-names))
+  ; #_(println model/album)
 )
