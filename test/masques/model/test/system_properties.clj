@@ -5,7 +5,7 @@
 (deftest test-edit-datadir
   (let [old-data-dir (read-data-directory)
         test-dir "testDir"]
-    ;(delete-data-directory)
+    (delete-data-directory)
     (is (not (read-data-directory)))
     (set-data-directory test-dir)
     (is (= (read-data-directory) test-dir))

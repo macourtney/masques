@@ -8,7 +8,7 @@
 
 (defn create-header []
   (seesaw-core/border-panel
-    :west (JLabel. (ImageIcon. (ClassLoader/getSystemResource "masques.png")))
+    :west (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_light_backgrounds_small.png")))
     :east (seesaw-core/label :text (term/file-storage) :foreground "#380B61" :font { :size 48 })))
 
 (defn create-directory-chooser-panel []

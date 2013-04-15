@@ -11,9 +11,6 @@
   (let [old-saved-data-dir (system-properties/read-data-directory)
         old-data-dir (db-config/data-dir)
         frame (show no-op)]
-    
-    (is (ImageIcon. (ClassLoader/getSystemResource "masques.png")))
-    
     (system-properties/set-data-directory "test_data_dir")
     (is (nil? (show no-op)))
     (system-properties/delete-data-directory)
