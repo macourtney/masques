@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130330114000-drop-peers-add-destination-to-profile
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
   
 (defn up

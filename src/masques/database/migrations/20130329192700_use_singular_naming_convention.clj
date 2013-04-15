@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130329192700-use-singular-naming-convention
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

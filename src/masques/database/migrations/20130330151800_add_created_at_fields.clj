@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130330151800-add-created-at-fields
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

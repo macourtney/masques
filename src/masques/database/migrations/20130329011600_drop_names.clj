@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130329011600-drop-names
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn down

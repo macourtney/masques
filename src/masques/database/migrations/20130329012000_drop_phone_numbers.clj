@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130329012000-drop-phone-numbers
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up

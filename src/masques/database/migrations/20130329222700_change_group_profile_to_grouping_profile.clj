@@ -1,5 +1,5 @@
 (ns masques.database.migrations.20130329222700-change-group-profile-to-grouping-profile
-  (:refer-clojure :exclude [boolean])
+  (:refer-clojure :exclude [boolean byte-array])
   (:use drift-db.core))
 
 (defn up
