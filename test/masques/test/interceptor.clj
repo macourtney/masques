@@ -8,8 +8,8 @@
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 
-(test-util/use-combined-login-fixture friend-fixture/fixture-map)
+;(test-util/use-combined-login-fixture friend-fixture/fixture-map)
 
-(deftest test-interceptor
-  (is (= (interceptor identity {})
-         { :user (record-utils/clean-keys (user-model/clean-private-data (first user-fixture/records)))})))
+;(deftest test-interceptor
+;  (is (= (interceptor identity {})
+;         { :user (record-utils/clean-keys (user-model/clean-private-data (first user-fixture/records)))})))

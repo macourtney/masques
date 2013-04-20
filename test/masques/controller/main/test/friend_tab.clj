@@ -11,7 +11,7 @@
         masques.controller.main.friend-tab)
   (:import [java.io File StringWriter]))
 
-(test-util/use-combined-login-fixture friend-fixture/fixture-map)
+;(test-util/use-combined-login-fixture friend-fixture/fixture-map)
 
 (def test-friend-file (File. "test/friend.xml"))
 
@@ -51,14 +51,14 @@
     (is (= (.toString string-writer) (friend-tab-view/friend-xml-text frame))))
   (java-io/delete-file test-friend-file))
 
-(deftest test-show
-  (assert-no-listeners)
-  (let [frame (test-util/assert-show (friend-tab-view/create) init)]
-    ;(Thread/sleep 10000)
-    (assert-initialized frame)
-    (assert-add-remove-friend frame)
-    (assert-copy frame)
-    (assert-save-file frame)
-    ;(Thread/sleep 10000)
-    (test-util/assert-close frame)
-    (assert-no-listeners)))
+;(deftest test-show
+;  (assert-no-listeners)
+;  (let [frame (test-util/assert-show (friend-tab-view/create) init)]
+;    ;(Thread/sleep 10000)
+;    (assert-initialized frame)
+;    (assert-add-remove-friend frame)
+;    (assert-copy frame)
+;    (assert-save-file frame)
+;    ;(Thread/sleep 10000)
+;    (test-util/assert-close frame)
+;    (assert-no-listeners)))

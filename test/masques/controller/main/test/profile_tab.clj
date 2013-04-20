@@ -5,8 +5,8 @@
   (:use clojure.test
         masques.controller.main.profile-tab))
 
-(test-util/use-combined-login-fixture friend-fixture/fixture-map)
+;(test-util/use-combined-login-fixture friend-fixture/fixture-map)
 
-(deftest test-show
-  (let [frame (test-util/assert-show (profile-tab-view/create) init)]
-    (test-util/assert-close frame)))
+;(deftest test-show
+;  (let [frame (test-util/assert-show (profile-tab-view/create) init)]
+;    (test-util/assert-close frame)))

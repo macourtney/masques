@@ -4,10 +4,10 @@
   (:use clojure.test
         masques.controller.login.login))
 
-(deftest test-show
-  (let [frame (show)]
-    (is frame)
-    (is (.isShowing frame))
-    (.setVisible frame false)
-    (.dispose frame)
-    (is (not (.isShowing frame)))))
+;(deftest test-show
+;  (let [frame (show)]
+;    (is frame)
+;    (is (.isShowing frame))
+;    (.setVisible frame false)
+;    (.dispose frame)
+;    (is (not (.isShowing frame)))))

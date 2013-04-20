@@ -25,15 +25,15 @@
 (defn save-mock-network [destination data]
   test-profile)
 
-(test-util/use-combined-login-fixture (test-util/create-mock-network-fixture save-mock-network)
-                                      friend-fixture/fixture-map)
+;(test-util/use-combined-login-fixture (test-util/create-mock-network-fixture save-mock-network)
+;                                      friend-fixture/fixture-map)
 
 (def test-friend (first friend-fixture/records))
 
-(deftest test-create 
-  (let [frame (show nil test-friend)]
-    (is frame)
-    (is (.isShowing frame))
-    (is (= (scrape-profile frame) (:data test-profile)))
-    (click-done frame)
-    (is (not (.isShowing frame)))))
+;(deftest test-create 
+;  (let [frame (show nil test-friend)]
+;    (is frame)
+;    (is (.isShowing frame))
+;    (is (= (scrape-profile frame) (:data test-profile)))
+;    (click-done frame)
+;    (is (not (.isShowing frame)))))

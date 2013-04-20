@@ -20,10 +20,10 @@
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 
-(test-util/use-combined-login-fixture address-fixture/fixture-map friend-fixture/fixture-map
-                                      group-membership-fixture/fixture-map group-permission-fixture/fixture-map
-                                      name-fixture/fixture-map email-address-fixture/fixture-map
-                                      phone-number-fixture/fixture-map)
+;(test-util/use-combined-login-fixture address-fixture/fixture-map friend-fixture/fixture-map
+;                                      group-membership-fixture/fixture-map group-permission-fixture/fixture-map
+;                                      name-fixture/fixture-map email-address-fixture/fixture-map
+;                                      phone-number-fixture/fixture-map)
 
 (def test-user (record-utils/clean-keys (user-model/clean-private-data (second user-fixture/records))))
 (def test-request-map { :user test-user })
@@ -31,16 +31,16 @@
 (def test-user2 { :id 1 :name "test-user2" :public-key "fail" :public-key-algorithm "RSA" })
 (def test-request-map2 { :user test-user2 })
 
-(deftest run-test
-  (let [current-address (address-model/first-current-identity-address)]
-    (is (= (run test-request-map)
-           {:data
-             { :name (:name (name-model/first-current-identity-name))
-               :email (:email_address (email-model/first-current-identity-email-address))
-               :phone-number (:phone_number (phone-number-model/first-current-identity-phone-number))
-               :address { :address (:address current-address)
-                          :country (:country current-address)
-                          :province (:province current-address)
-                          :city (:city current-address)
-                          :postal-code (:postal_code current-address) } }})))
-  (is (= (run test-request-map2) {:data { :name nil :email nil :phone-number nil :address nil }})))
+;(deftest run-test
+;  (let [current-address (address-model/first-current-identity-address)]
+;    (is (= (run test-request-map)
+;           {:data
+;             { :name (:name (name-model/first-current-identity-name))
+;               :email (:email_address (email-model/first-current-identity-email-address))
+;               :phone-number (:phone_number (phone-number-model/first-current-identity-phone-number))
+;               :address { :address (:address current-address)
+;                          :country (:country current-address)
+;                          :province (:province current-address)
+;                          :city (:city current-address)
+;                          :postal-code (:postal_code current-address) } }})))
+;  (is (= (run test-request-map2) {:data { :name nil :email nil :phone-number nil :address nil }})))

@@ -11,7 +11,7 @@
         masques.controller.friend.add)
   (:import [java.io File]))
 
-(test-util/use-combined-login-fixture identity-fixture/fixture-map)
+;(test-util/use-combined-login-fixture identity-fixture/fixture-map)
 
 (def test-friend-xml
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -22,21 +22,21 @@
 
 (def test-friend-file (File. "test/friend.xml"))
 
-(deftest test-create
-  (is (= (count (friend-model/all-friends)) 0)) 
-  (let [frame (show nil)]
-    (is frame)
-    (is (.isShowing frame))
-    (.doClick (seesaw-core/select frame ["#add-button"]))
-    (is (.isShowing frame))
-    (is (= (count (friend-model/all-friends)) 0))
-    (add-friend-view/friend-text frame test-friend-xml)
-    (.doClick (seesaw-core/select frame ["#add-button"]))
-    (let [all-friends (friend-model/all-friends)]
-      (is (= (count all-friends) 1))
-      (doseq [friend all-friends]
-        (friend-model/destroy-record friend)))
-    (is (not (.isShowing frame)))))
+;(deftest test-create
+;  (is (= (count (friend-model/all-friends)) 0)) 
+;  (let [frame (show nil)]
+;    (is frame)
+;    (is (.isShowing frame))
+;    (.doClick (seesaw-core/select frame ["#add-button"]))
+;    (is (.isShowing frame))
+;    (is (= (count (friend-model/all-friends)) 0))
+;    (add-friend-view/friend-text frame test-friend-xml)
+;    (.doClick (seesaw-core/select frame ["#add-button"]))
+;    (let [all-friends (friend-model/all-friends)]
+;      (is (= (count all-friends) 1))
+;      (doseq [friend all-friends]
+;        (friend-model/destroy-record friend)))
+;    (is (not (.isShowing frame)))))
 
 (deftest test-paste
   (clipboard-model/save-to-clipboard! test-friend-xml)

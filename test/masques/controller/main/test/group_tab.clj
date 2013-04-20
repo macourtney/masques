@@ -13,7 +13,7 @@
   (:use clojure.test
         masques.controller.main.group-tab))
 
-(test-util/use-combined-login-fixture group-membership-fixture/fixture-map)
+;(test-util/use-combined-login-fixture group-membership-fixture/fixture-map)
 
 (defn assert-listener-count [test-count]
   (is (= (group-model/group-add-listener-count) test-count)) 
@@ -55,15 +55,15 @@
   (group-tab-view/set-selected-group-index frame 0)
   (is (= (group-tab-view/member-count frame) 1)))
 
-(deftest test-show
-  (assert-no-listeners)
-  (let [frame (test-util/assert-show (group-tab-view/create) init)]
-    ;(Thread/sleep 10000)
-    (assert-initialized frame)
-    (assert-group-selection frame)
-    (assert-add-remove-group frame)
-    ;(assert-copy frame)
-    ;(assert-save-file frame)
-    ;(Thread/sleep 10000)
-    (test-util/assert-close frame)
-    (assert-no-listeners)))
+;(deftest test-show
+;  (assert-no-listeners)
+;  (let [frame (test-util/assert-show (group-tab-view/create) init)]
+;    ;(Thread/sleep 10000)
+;    (assert-initialized frame)
+;    (assert-group-selection frame)
+;    (assert-add-remove-group frame)
+;    ;(assert-copy frame)
+;    ;(assert-save-file frame)
+;    ;(Thread/sleep 10000)
+;    (test-util/assert-close frame)
+;    (assert-no-listeners)))

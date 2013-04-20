@@ -57,46 +57,46 @@
     (is (:permission_id test-group-permission) test-permission-id)
     (is (:type test-group-permission) permission-type)))
 
-(deftest test-add-and-remove-read-permission-from-group
-  (let [test-group-id (:id test-group)
-        test-permission-id (:id test-permission)
-        group-permission-id (add-read-permission-to-group test-group-id test-permission-id)]
-    (is group-permission-id)
-    (try
-      (test-group-permission group-permission-id test-group-id test-permission-id read-type)
-      (test-permission-types test-group-id test-permission-id read-type)
-      (remove-read-permission-from-group test-group-id test-permission-id)
-      (test-permission-types test-group-id test-permission-id nil)
-      (finally
-        (destroy-record { :id group-permission-id })))))
+;(deftest test-add-and-remove-read-permission-from-group
+;  (let [test-group-id (:id test-group)
+;        test-permission-id (:id test-permission)
+;        group-permission-id (add-read-permission-to-group test-group-id test-permission-id)]
+;    (is group-permission-id)
+;    (try
+;      (test-group-permission group-permission-id test-group-id test-permission-id read-type)
+;      (test-permission-types test-group-id test-permission-id read-type)
+;      (remove-read-permission-from-group test-group-id test-permission-id)
+;      (test-permission-types test-group-id test-permission-id nil)
+;      (finally
+;        (destroy-record { :id group-permission-id })))))
 
-(deftest test-add-and-remove-write-permission-from-group
-  (let [test-group-id (:id test-group)
-        test-permission-id (:id test-permission)
-        group-permission-id (add-write-permission-to-group test-group-id test-permission-id)]
-    (is group-permission-id)
-    (try
-      (test-group-permission group-permission-id test-group-id test-permission-id write-type)
-      (test-permission-types test-group-id test-permission-id write-type)
-      (remove-write-permission-from-group test-group-id test-permission-id)
-      (test-permission-types test-group-id test-permission-id nil)
-      (finally
-        (destroy-record { :id group-permission-id })))))
+;(deftest test-add-and-remove-write-permission-from-group
+;  (let [test-group-id (:id test-group)
+;        test-permission-id (:id test-permission)
+;        group-permission-id (add-write-permission-to-group test-group-id test-permission-id)]
+;    (is group-permission-id)
+;    (try
+;      (test-group-permission group-permission-id test-group-id test-permission-id write-type)
+;      (test-permission-types test-group-id test-permission-id write-type)
+;      (remove-write-permission-from-group test-group-id test-permission-id)
+;      (test-permission-types test-group-id test-permission-id nil)
+;      (finally
+;        (destroy-record { :id group-permission-id })))))
 
-(deftest test-add-and-remove-none-permission-from-group
-  (let [test-group-id (:id test-group)
-        test-permission-id (:id test-permission)
-        group-permission-id (add-none-permission-to-group test-group-id test-permission-id)
-        group-permission-id2 (add-read-permission-to-group test-group-id test-permission-id)]
-    (is group-permission-id)
-    (is group-permission-id2)
-    (try
-      (test-group-permission group-permission-id test-group-id test-permission-id none-type)
-      (test-permission-types test-group-id test-permission-id none-type)
-      (remove-none-permission-from-group test-group-id test-permission-id)
-      (test-permission-types test-group-id test-permission-id read-type)
-      (remove-read-permission-from-group test-group-id test-permission-id)
-      (test-permission-types test-group-id test-permission-id nil)
-      (finally
-        (destroy-record { :id group-permission-id })
-        (destroy-record { :id group-permission-id2 })))))
+;(deftest test-add-and-remove-none-permission-from-group
+;  (let [test-group-id (:id test-group)
+;        test-permission-id (:id test-permission)
+;        group-permission-id (add-none-permission-to-group test-group-id test-permission-id)
+;        group-permission-id2 (add-read-permission-to-group test-group-id test-permission-id)]
+;    (is group-permission-id)
+;    (is group-permission-id2)
+;    (try
+;      (test-group-permission group-permission-id test-group-id test-permission-id none-type)
+;      (test-permission-types test-group-id test-permission-id none-type)
+;      (remove-none-permission-from-group test-group-id test-permission-id)
+;      (test-permission-types test-group-id test-permission-id read-type)
+;      (remove-read-permission-from-group test-group-id test-permission-id)
+;      (test-permission-types test-group-id test-permission-id nil)
+;      (finally
+;        (destroy-record { :id group-permission-id })
+;        (destroy-record { :id group-permission-id2 })))))
