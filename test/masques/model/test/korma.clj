@@ -7,6 +7,7 @@
             [masques.model.file :as file-model]
             [masques.model.album :as album-model]
             [masques.model.share :as share-model]
+            [masques.model.message :as message-model]
             [masques.model.log :as log])
   (:use clojure.test
         korma.core))
@@ -23,7 +24,7 @@
 (defentity grouping (table :GROUPING))
 (defentity grouping-profile (table :GROUPING_PROFILE))
 ; (defentity log (table :LOG))
-(defentity message (table :MESSAGE))
+; (defentity message (table :MESSAGE))
 (defentity profile (table :PROFILE))
 (defentity property (table :PROPERTY))
 ; (defentity share (table :SHARE))
@@ -36,7 +37,7 @@
    [grouping :NAME]
    [grouping-profile :CREATED_AT]
    ; [log :CREATED_AT]
-   [message :CREATED_AT]
+   ; [message :CREATED_AT]
    [profile :ALIAS]
    [property :NAME]
    ; [share :CREATED_AT]
