@@ -42,11 +42,13 @@
 (defn save-masques-properties [^Properties masques-properties]
   (when masques-properties
     (with-open [properties-file-stream (FileOutputStream. (unix-config-properties))]
-      (.store masques-properties properties-file-stream))))
+      (.store masques-properties properties-file-stream ""))))
 
 (defn unix-set-data-directory [^String data-directory]
   (let [properties-file (masques-properties)]
-    (.setProperty properties-file masques-unix-data-directory data-directory)
+    (if data-directory
+      (.put properties-file masques-unix-data-directory data-directory)
+      (.remove properties-file masques-unix-data-directory))
     (save-masques-properties properties-file)))
 
 (defn unix-read-data-directory []
@@ -60,7 +62,7 @@
 
 (defn unix-delete-data-directory []
   (let [properties-file (masques-properties)]
-    (.setProperty properties-file masques-unix-data-directory nil)
+    (.remove properties-file masques-unix-data-directory)
     (save-masques-properties properties-file)))
 
 (defn win-delete-data-directory []
