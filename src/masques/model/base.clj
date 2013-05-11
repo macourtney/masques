@@ -88,24 +88,11 @@
 (defn replace-hyphens-with-underscores [has-hyphens]
   (string/replace has-hyphens "-" "_"))
 
-(defn h2-keyword-to-clojure [h2-keyword]
+(defn clojure-keyword [h2-keyword]
   (keyword (lower-case (replace-underscores-with-hyphens (remove-colon (str h2-keyword))))))
 
-(defn clojure-keyword-to-h2 [clojure-keyword]
-  (keyword (upper-case (replace-hyphens-with-underscores (remove-colon (str clojure-keyword))))))
-
-(defn clojure-keyword [h2-keyword]
-  (let [lower-string (str h2-keyword)
-        no-colon (remove-colon lower-string)
-        no-underscores (replace-underscores-with-hyphens no-colon)
-        lower-cased (string/lower-case no-underscores)]
-    (keyword lower-cased)))
-
 (defn h2-keyword [clojure-keyword]
-  (let [no-colon (str (remove-colon clojure-keyword))
-        no-hyphens (replace-hyphens-with-underscores no-colon)
-        upper-cased (string/upper-case no-hyphens)]
-    (keyword upper-cased)))
+  (keyword (upper-case (replace-hyphens-with-underscores (remove-colon (str clojure-keyword))))))
 
 (defn remove-item [item record]
   (dissoc (into {} record) item))
@@ -123,14 +110,10 @@
       :else record)))
 
 (defn clojure-field-name [record field-name]
-  (let [field-data (get record field-name)
-        ready-map (remove-item field-name record)]
-    (assoc ready-map (clojure-keyword field-name) field-data)))
+  (assoc (remove-item field-name record) (clojure-keyword field-name) (get record field-name)))
 
 (defn h2-field-name [record field-name]
-  (let [field-data (get record field-name)
-        ready-map (remove-item field-name record)]
-    (assoc ready-map (h2-keyword field-name) field-data)))
+  (assoc (remove-item field-name record) (h2-keyword field-name) (get record field-name)))
 
 (defn clean-up-for-clojure [record]
   (let [clean-data (reduce clean-field-data record (keys record))]
