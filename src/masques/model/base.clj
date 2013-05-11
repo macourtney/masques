@@ -49,8 +49,11 @@
 (defn clean-date-time-field [record field-name field-data]
   (conj record {field-name (h2-to-date-time field-data)}))
 
+(defn created-at-is-set [record]
+  (or (:created-at record) (:CREATED_AT record)))
+
 (defn set-created-at [record]
-  (conj record {:CREATED_AT (str (clj-time/now))}))
+  (if (created-at-is-set record) record (conj record {:CREATED_AT (str (clj-time/now))})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; UUID helpers.
@@ -59,8 +62,11 @@
 (defn uuid [] 
   (str (java.util.UUID/randomUUID)))
 
+(defn uuid-is-set [record]
+  (or (:uuid record) (:UUID record)))
+
 (defn set-uuid [record]
-  (conj record {:UUID (uuid)}))
+  (if (uuid-is-set record) record (conj record {:UUID (uuid)})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
@@ -81,6 +87,12 @@
 
 (defn replace-hyphens-with-underscores [has-hyphens]
   (string/replace has-hyphens "-" "_"))
+
+(defn h2-keyword-to-clojure [h2-keyword]
+  (keyword (lower-case (replace-underscores-with-hyphens (remove-colon (str h2-keyword))))))
+
+(defn clojure-keyword-to-h2 [clojure-keyword]
+  (keyword (upper-case (replace-hyphens-with-underscores (remove-colon (str clojure-keyword))))))
 
 (defn clojure-keyword [h2-keyword]
   (let [lower-string (str h2-keyword)
@@ -210,7 +222,7 @@
 
 ; MESSAGE
 (defn prepare-message-for-h2 [record]
-  record)
+  (set-created-at record))
 (defentity message
   (prepare prepare-message-for-h2)
   (transform clean-up-for-clojure)
