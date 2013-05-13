@@ -26,9 +26,6 @@
         (catch Exception e
           (logging/error (str "An error occured while reading a clob: " e)))))))
 
-(defn load-clob [clob]
-  (clob-string clob))
-
 (defn get-clob [record clob-key]
   (when-let [clob (clob-key record)]
     (when (instance? Clob clob)
@@ -36,11 +33,11 @@
 
 (defn clean-clob-key [record clob-key]
   (if-let [clob (get-clob record clob-key)]
-    (assoc record clob-key (load-clob clob))
+    (assoc record clob-key (clob-string clob))
     record))
 
 (defn clean-clob [record field-name field-data]
-    (assoc record field-name (load-clob field-data)))
+    (assoc record field-name (clob-string field-data)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Data sanitation: Date/time helpers.
@@ -50,23 +47,20 @@
   (clj-time-coerce/to-date-time h2-date-time))
 
 (defn clean-date-time-field [record field-name field-data]
-  (conj record { field-name (h2-to-date-time field-data) }))
+  (conj record {field-name (h2-to-date-time field-data)}))
 
 (defn set-created-at [record]
   (conj record {:CREATED_AT (str (clj-time/now))}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Etc.
+; UUID helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn as-boolean [value]
-  (and value (not (= value 0))))
 
 (defn uuid [] 
   (str (java.util.UUID/randomUUID)))
 
 (defn set-uuid [record]
-  (conj record { :UUID (uuid) } ))
+  (conj record {:UUID (uuid)}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
@@ -75,6 +69,9 @@
 
 (defn lower-case [the-string]
   (string/lower-case the-string))
+
+(defn upper-case [the-string]
+  (string/upper-case the-string))
 
 (defn remove-colon [the-string]
   (string/replace the-string ":" ""))
@@ -211,6 +208,14 @@
   (transform clean-up-for-clojure)
   (table :LOG))
 
+; MESSAGE
+(defn prepare-message-for-h2 [record]
+  record)
+(defentity message
+  (prepare prepare-message-for-h2)
+  (transform clean-up-for-clojure)
+  (table :MESSAGE))
+
 ; PROFILE
 (defn prepare-profile-for-h2 [record]
   (set-created-at record))
@@ -233,4 +238,7 @@
 
 (defn remove-listener [listeners listener-to-remove]
   (remove #(= listener-to-remove %) listeners))
+
+(defn as-boolean [value]
+  (and value (not (= value 0))))
 
