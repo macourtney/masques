@@ -2,7 +2,7 @@
   (:require [test.init :as test-init])
   (:require [fixtures.identity :as identity-fixture]
             [clojure.java.io :as java-io]
-            [masques.model.group :as group-model]
+            ;[masques.model.group :as group-model]
             [masques.test.util :as test-util]
             [masques.view.group.add :as add-group-view]
             [seesaw.core :as seesaw-core])

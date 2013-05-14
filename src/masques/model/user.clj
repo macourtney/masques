@@ -14,17 +14,17 @@
 (defn add-user-add-listener [user-add-listener]
   (swap! user-add-listeners conj user-add-listener))
 
-(defn clob-clean-up 
-  ([user key] 
-    (let [clob (get user key)]
-      (if (instance? Clob clob)
-        (assoc user key (load-clob clob))
-        user)))
-  ([user key & keys]
-    (reduce #(clob-clean-up %1 %2) user (conj keys key))))
+;(defn clob-clean-up 
+;  ([user key] 
+;    (let [clob (get user key)]
+;      (if (instance? Clob clob)
+;        (assoc user key (load-clob clob))
+;        user)))
+;  ([user key & keys]
+;    (reduce #(clob-clean-up %1 %2) user (conj keys key))))
 
 (defn user-clean-up [user]
-  (clob-clean-up user :public_key :private_key))
+  (clean-clob-key (clean-clob-key user :public_key) :private_key))
 
 (defn password-str [password]
   (if (string? password)

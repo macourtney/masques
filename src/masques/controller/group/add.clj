@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
-            [masques.model.group :as group-model]
+            ;[masques.model.group :as group-model]
             [masques.view.group.add :as add-group-view]
             [seesaw.core :as seesaw-core])
   (:import [java.io StringWriter]))
@@ -14,7 +14,7 @@
   (controller-utils/disable-widget add-group-panel)
   (if-let [group-text-str (add-group-view/group-text add-group-panel)]
     (do
-      (group-model/add-group group-text-str)
+      ;(group-model/add-group group-text-str)
       (actions-utils/close-window add-group-panel))
     (controller-utils/enable-widget add-group-panel)))
 
