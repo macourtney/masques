@@ -3,7 +3,7 @@
   (:require ;[clojure.java.io :as java-io]
             [fixtures.group-membership :as group-membership-fixture]
             ;[masques.model.clipboard :as clipboard-model]
-            [masques.model.group :as group-model]
+            ;[masques.model.group :as group-model]
             [masques.model.identity :as identity-model]
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]
@@ -15,28 +15,30 @@
 
 ;(test-util/use-combined-login-fixture group-membership-fixture/fixture-map)
 
-(defn assert-listener-count [test-count]
-  (is (= (group-model/group-add-listener-count) test-count)) 
-  (is (= (group-model/group-delete-listener-count) test-count)))
+;(defn assert-listener-count [test-count]
+;  (is (= (group-model/group-add-listener-count) test-count)) 
+;  (is (= (group-model/group-delete-listener-count) test-count)))
 
-(defn assert-no-listeners []
-  (assert-listener-count 0))
+;(defn assert-no-listeners []
+;  (assert-listener-count 0))
 
-(defn assert-one-listener-each []
-  (assert-listener-count 1))
+;(defn assert-one-listener-each []
+;  (assert-listener-count 1))
 
 (defn assert-initialized [frame]
   (is (= (group-tab-view/group-count frame) 2))
 ;  (is (= (friend-tab-view/friend-xml-text frame) (friend-model/friend-xml-string)))
-  (assert-one-listener-each))
+  ;(assert-one-listener-each)
+  )
 
 (defn assert-add-remove-group [frame]
   (is (= (group-tab-view/group-count frame) 2))
-  (let [group-id (group-model/add-group "test-group")]
-    (is (= (group-tab-view/group-count frame) 3))
-    (group-tab-view/set-selected-group frame { :id group-id })
-    (group-tab-view/click-delete-group-button frame)
-    (is (= (group-tab-view/group-count frame) 2))))
+  ;(let [group-id (group-model/add-group "test-group")]
+  ;  (is (= (group-tab-view/group-count frame) 3))
+  ;  (group-tab-view/set-selected-group frame { :id group-id })
+  ;  (group-tab-view/click-delete-group-button frame)
+  ;  (is (= (group-tab-view/group-count frame) 2)))
+    )
 
 ;(defn assert-copy [frame]
 ;  (friend-tab-view/click-copy-text-button frame)
