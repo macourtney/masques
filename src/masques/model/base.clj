@@ -71,7 +71,8 @@
   (string/lower-case the-string))
 
 (defn upper-case [the-string]
-  (string/upper-case the-string))
+  (when the-string
+    (string/upper-case the-string)))
 
 (defn remove-colon [the-string]
   (string/replace the-string ":" ""))
@@ -133,7 +134,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn find-by-id [entity id]
-  (clean-up-for-clojure (first (select entity (where {:ID id})))))
+  (when id
+    (clean-up-for-clojure (first (select entity (where {:ID id}))))))
 
 (defn insert-record [entity record]
   (println (str "before insert: " record))
