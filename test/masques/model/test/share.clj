@@ -14,6 +14,10 @@
   :message-id (:id message-record)
 }))
 
+(def friend-request (save {
+  :content-type "friend"
+}))
+
 (deftest test-add-share
   (is share-record)
   (is (:id share-record))
@@ -26,3 +30,9 @@
   (let [share-record (get-and-build (:id share-record))]
     (is (map? share-record))
     (is (map? (:message share-record)))))
+
+(deftest test-receive-share
+  (let [message-share (get-and-build (:id share-record))
+        friend-share (get-and-build (:id friend-request))]
+    (is (receive share-record))
+    (is (receive friend-share))))

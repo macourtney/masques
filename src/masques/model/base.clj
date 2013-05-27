@@ -15,6 +15,13 @@
 (korma-db/defdb mydb (drift-db/db-map))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Map helpers.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn remove-item [item record]
+  (dissoc (into {} record) item))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Data sanitation: Clob helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -36,24 +43,35 @@
     (assoc record clob-key (clob-string clob))
     record))
 
-(defn clean-clob [record field-name field-data]
-    (assoc record field-name (clob-string field-data)))
+(defn clean-clob-for-clojure [record field-name field-data]
+  (assoc record field-name (clob-string field-data)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Data sanitation: Date/time helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn h2-to-date-time [h2-date-time]
+(defn h2-to-clojure-date-time [h2-date-time]
   (clj-time-coerce/to-date-time h2-date-time))
 
-(defn clean-date-time-field [record field-name field-data]
-  (conj record {field-name (h2-to-date-time field-data)}))
+(defn clojure-to-h2-date-time [clojure-date-time]
+  (clj-time-coerce/to-sql-date clojure-date-time))
+
+(defn clean-date-time-for-clojure [record field-name field-data]
+  (conj record {field-name (h2-to-clojure-date-time field-data)}))
+
+(defn clean-date-time-for-h2 [record field-name field-data]
+  (conj record {field-name (clojure-to-h2-date-time field-data)}))
 
 (defn created-at-is-set [record]
   (or (:created-at record) (:CREATED_AT record)))
 
+(defn unset-created-at [record]
+  (if (:created-at record) (dissoc record :created-at) (dissoc record :CREATED_AT)))
+
 (defn set-created-at [record]
-  (if (created-at-is-set record) record (conj record {:CREATED_AT (str (clj-time/now))})))
+  (if (created-at-is-set record)
+    (unset-created-at record)
+    (conj record {:CREATED_AT (str (clj-time/now))})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; UUID helpers.
@@ -65,8 +83,11 @@
 (defn uuid-is-set [record]
   (or (:uuid record) (:UUID record)))
 
+(defn unset-uuid [record]
+  (if (:uuid record) (dissoc record :uuid) (dissoc record :UUID)))
+
 (defn set-uuid [record]
-  (if (uuid-is-set record) record (conj record {:UUID (uuid)})))
+  (if (uuid-is-set record) (unset-uuid record) (conj record {:UUID (uuid)})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
@@ -94,9 +115,6 @@
 (defn h2-keyword [clojure-keyword]
   (keyword (upper-case (replace-hyphens-with-underscores (remove-colon (str clojure-keyword))))))
 
-(defn remove-item [item record]
-  (dissoc (into {} record) item))
-
 (defn clean-field-data [record field-name]
   "Prepares H2 data, from the database, for the rest of our clojure application."
   (let [field-data (get record field-name)]
@@ -104,9 +122,17 @@
       ; (nil? field-data)
         ; (remove-item field-name record)
       (instance? Clob field-data)
-        (clean-clob record field-name field-data)
+        (clean-clob-for-clojure record field-name field-data)
       (instance? java.sql.Timestamp field-data)
-        (clean-date-time-field record field-name field-data)
+        (clean-date-time-for-clojure record field-name field-data)
+      :else record)))
+
+(defn clean-field-data-for-h2 [record field-name]
+  "Prepares clojure data, from the application, for the database."
+  (let [field-data (get field-name record)]
+    (cond
+      (instance? org.joda.time.DateTime (:created-at record))
+        (clean-date-time-for-h2 record field-name field-data)
       :else record)))
 
 (defn clojure-field-name [record field-name]
@@ -131,16 +157,19 @@
   (clean-up-for-clojure (first (select entity (where {:ID id})))))
 
 (defn insert-record [entity record]
-  (println (str "before insert: " record))
+  (println (str "\nbefore insert: " record))
   (let [id (vals (insert entity (values record)))]
-    (println "the insert just happened")
-    (println "after insert: " (find-by-id entity id))
+    (println "\nthe insert just happened")
+    (println "\nafter insert: " (find-by-id entity id))
     (find-by-id entity id)))
 
 (defn update-record [entity record]
+  (println (str "\nbefore update: " record))
   (update entity
     (set-fields record)
-    (where {:ID (:id record)})))
+    (where {:ID (:ID record)}))
+  (println (str "\nafter update: " (find-by-id entity (:ID record))))
+  (find-by-id entity (:ID record)))
 
 (defn insert-or-update [entity record]
   (let [h2-record (clean-up-for-h2 record)]
@@ -171,13 +200,13 @@
   (transform clean-up-for-clojure)
   (table :FILE))
 
-; FRIEND
-(defn prepare-friend-for-h2 [record]
+; FRIEND_REQUEST
+(defn prepare-friend-request-for-h2 [record]
   (set-created-at record))
-(defentity friend 
-  (prepare prepare-friend-for-h2)
+(defentity friend-request 
+  (prepare prepare-friend-request-for-h2)
   (transform clean-up-for-clojure)
-  (table :FRIEND))
+  (table :FRIEND_REQUEST))
 
 ; GROUPING
 (defn prepare-grouping-for-h2 [record]
