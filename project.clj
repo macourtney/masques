@@ -9,7 +9,7 @@
                  [clj-time "0.5.0"]
                  [com.github.sarxos/windows-registry-util "0.2"]
                  [com.h2database/h2 "1.3.162"]
-                 [drift "1.4.6-SNAPSHOT"]
+                 [drift "1.5.0"]
                  [korma "0.3.0-beta7"]
                  [log4j/log4j "1.2.16"]
                  [org.clojure/clojure "1.4.0"]
