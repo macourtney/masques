@@ -4,7 +4,7 @@
             [masques.controller.group.add :as group-add-controller]
             [masques.controller.utils :as controller-utils]
             [masques.model.friend :as friend-model]
-            [masques.model.group :as group-model]
+            ;[masques.model.group :as group-model]
             [masques.model.identity :as identity-model]
             [masques.view.main.group-tab :as group-tab-view])
   (:import [javax.swing JFileChooser]))
@@ -13,12 +13,14 @@
 (def delete-group-listener-key "delete-group-listener")
 
 (defn reload-member-table-data [main-frame]
-  (when-let [selected-group (group-tab-view/selected-group main-frame)]
-    (group-tab-view/reset-member-table main-frame (friend-model/group-friends selected-group))))
+  ;(when-let [selected-group (group-tab-view/selected-group main-frame)]
+    ;(group-tab-view/reset-member-table main-frame (friend-model/group-friends selected-group)))
+    )
 
 (defn reload-group-list [main-frame]
-  (when-let [groups (group-model/find-identity-groups)]
-    (group-tab-view/set-groups main-frame groups)))
+  ;(when-let [groups (group-model/find-identity-groups)]
+  ;  (group-tab-view/set-groups main-frame groups))
+    )
 
 (defn load-group-list [main-frame]
   (reload-group-list main-frame)
@@ -48,24 +50,31 @@
 (defn delete-selected-group
   "Deletes the selected group."
   [main-frame e]
-  (group-model/destroy-record (group-tab-view/selected-group main-frame)))
+  ;(group-model/destroy-record (group-tab-view/selected-group main-frame))
+  )
 
 (defn attach-listener-to-delete-group-button [main-frame]
   (group-tab-view/attach-listener-to-delete-group-button main-frame #(delete-selected-group main-frame %)))
 
 (defn group-add-listener [main-frame group]
-  (let [new-group (group-model/get-record (:id group))]
-    (when (= (:identity_id new-group) (:id (identity-model/current-user-identity)))
-      (group-tab-view/add-group main-frame new-group))))
+  ;(let [new-group (group-model/get-record (:id group))]
+  ;  (when (= (:identity_id new-group) (:id (identity-model/current-user-identity)))
+  ;    (group-tab-view/add-group main-frame new-group)))
+      )
 
 (defn attach-group-listener [main-frame]
   (controller-utils/attach-and-detach-listener main-frame #(group-add-listener main-frame %) new-group-listener-key
-                                               group-tab-view/group-panel group-model/add-group-add-listener
-                                               group-model/remove-group-add-listener)
+                                               group-tab-view/group-panel
+                                               nil nil
+                                               ;group-model/add-group-add-listener
+                                               ;group-model/remove-group-add-listener
+                                               )
   (controller-utils/attach-and-detach-listener main-frame #(group-tab-view/remove-group main-frame %)
                                                delete-group-listener-key group-tab-view/group-panel
-                                               group-model/add-group-delete-listener
-                                               group-model/remove-group-delete-listener)
+                                               nil nil
+                                               ;group-model/add-group-delete-listener
+                                               ;group-model/remove-group-delete-listener
+                                               )
   main-frame)
 
 (defn load-data [main-frame]

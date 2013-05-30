@@ -2,7 +2,6 @@
   (:require [clj-internationalization.term :as term]
             [masques.controller.actions.utils :as action-utils]
             [masques.model.friend :as friend-model]
-            [masques.model.group :as group-model]
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table])
   (:import [javax.swing DefaultListModel]

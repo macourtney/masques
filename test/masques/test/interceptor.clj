@@ -4,7 +4,7 @@
   (:use [clojure.test])
   (:require [fixtures.friend :as friend-fixture]
             [fixtures.user :as user-fixture]
-            [masques.model.record-utils :as record-utils]
+            ;[masques.model.record-utils :as record-utils]
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 

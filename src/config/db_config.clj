@@ -1,9 +1,11 @@
 ;; This file is used to configure the database and connection.
 
 (ns config.db-config
-  (:require [clojure.tools.logging :as logging]
+  (:require [clj-i2p.core :as clj-i2p]
+            [clojure.tools.logging :as logging]
             [config.environment :as environment]
-            [drift-db-h2.flavor :as h2]))
+            [drift-db-h2.flavor :as h2])
+  (:import [java.io File]))
 
 (def data-directory (atom "data/db/"))
 
@@ -11,7 +13,8 @@
   @data-directory)
 
 (defn update-data-directory [new-data-dir]
-  (reset! data-directory new-data-dir))
+  (reset! data-directory new-data-dir)
+  (clj-i2p/set-private-key-file-directory (File. new-data-dir)))
 
 (defn dbname [environment]
   (cond

@@ -11,12 +11,12 @@
             [fixtures.name :as name-fixture]
             [fixtures.phone-number :as phone-number-fixture]
             [fixtures.user :as user-fixture]
-            [masques.model.address :as address-model]
-            [masques.model.email-address :as email-model]
+            ;[masques.model.address :as address-model]
+            ;[masques.model.email-address :as email-model]
             [masques.model.identity :as identity-model] 
-            [masques.model.name :as name-model]
-            [masques.model.phone-number :as phone-number-model]
-            [masques.model.record-utils :as record-utils]
+            ;[masques.model.name :as name-model]
+            ;[masques.model.phone-number :as phone-number-model]
+            ;[masques.model.record-utils :as record-utils]
             [masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 
@@ -25,8 +25,8 @@
 ;                                      name-fixture/fixture-map email-address-fixture/fixture-map
 ;                                      phone-number-fixture/fixture-map)
 
-(def test-user (record-utils/clean-keys (user-model/clean-private-data (second user-fixture/records))))
-(def test-request-map { :user test-user })
+;(def test-user (record-utils/clean-keys (user-model/clean-private-data (second user-fixture/records))))
+;(def test-request-map { :user test-user })
 
 (def test-user2 { :id 1 :name "test-user2" :public-key "fail" :public-key-algorithm "RSA" })
 (def test-request-map2 { :user test-user2 })

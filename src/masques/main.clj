@@ -1,6 +1,5 @@
 (ns masques.main
-  (:require [masques.core :as core]
-            [masques.controller.data-directory.choose :as data-directory-choose])
+  (:require [masques.core :as core])
   (:gen-class))
 
 (defn create-choose-action [args]
@@ -12,4 +11,6 @@
 
 (defn -main
   [& args]
-  (data-directory-choose/show (create-choose-action)))
+  (let [data-directory-choose-ns 'masques.controller.data-directory.choose]
+    (require data-directory-choose-ns)
+    ((ns-resolve (find-ns data-directory-choose-ns) 'show) (create-choose-action))))

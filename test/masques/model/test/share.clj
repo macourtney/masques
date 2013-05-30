@@ -34,5 +34,4 @@
 (deftest test-receive-share
   (let [message-share (get-and-build (:id share-record))
         friend-share (get-and-build (:id friend-request))]
-    (is (receive share-record))
-    (is (receive friend-share))))
+    (is (receive share-record))))

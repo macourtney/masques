@@ -6,9 +6,9 @@
             [clojure.java.io :as io]
             [clojure.string :as string]
             [masques.model.identity :as identity]
-            [masques.model.group :as group]
-            [masques.model.group-membership :as group-membership]
-            [masques.model.name :as name-model]
+            ;[masques.model.group :as group]
+            ;[masques.model.group-membership :as group-membership]
+            ;[masques.model.name :as name-model]
             [masques.model.user :as user])
   (:use masques.model.base)
   (:import [java.io FileInputStream FileOutputStream OutputStreamWriter]))
@@ -46,7 +46,8 @@
 (clj-record.core/init-model
   (:associations (belongs-to identity)
                  (belongs-to friend :fk friend_id :model identity)
-                 (has-many group-memberships))
+                 ;(has-many group-memberships)
+                 )
   (:callbacks (:after-insert friend-add)
               (:after-destroy friend-delete)))
 
@@ -149,7 +150,7 @@ this function returns nil."
 
 (defn find-friend [friend]
   (cond
-    (string? friend) (find-record { :identity_id (:id (name-model/find-name-identity friend)) })
+    ;(string? friend) (find-record { :identity_id (:id (name-model/find-name-identity friend)) })
     (map? friend) (if-let [friend-id (:id friend)] (find-friend friend-id) (find-record friend))
     (integer? friend) (find-record { :id friend })
     (nil? friend) nil
@@ -161,7 +162,7 @@ this function returns nil."
   (when-let [friend (find-friend friend)]
     (when-let [friend-identity (identity/find-record { :id (:friend_id friend) })]
       (or
-        (name-model/first-identity-name friend-identity)
+        ;(name-model/first-identity-name friend-identity)
         (identity/name friend-identity)))))
 
 (defn friend-id [friend]
@@ -170,47 +171,43 @@ this function returns nil."
     (map? friend) (if-let [friend-id (:id friend)] friend-id (:id (find-friend friend)))
     :else (:id (find-friend friend))))
 
-(defn add-friend-to-group
-  "Adds the given friend to the given group."
-  [friend group]
-  (group-membership/add-friend-to-group (friend-id friend) (group/group-id group)))
+;(defn add-friend-to-group
+;  "Adds the given friend to the given group."
+;  [friend group]
+;  (group-membership/add-friend-to-group (friend-id friend) (group/group-id group)))
+;
+;(defn group-member?
+;  "Returns true if the given friend is a member of the given group."
+;  [friend group]
+;  (group-membership/group-member? (friend-id friend) (group/group-id group)))
 
-(defn group-member?
-  "Returns true if the given friend is a member of the given group."
-  [friend group]
-  (group-membership/group-member? (friend-id friend) (group/group-id group)))
+;(defn group-ids
+;  "Returns all of the ids of the groups the given friend is in."
+;  [friend]
+;  (group-membership/group-ids (friend-id friend)))
 
-(defn group-ids
-  "Returns all of the ids of the groups the given friend is in."
-  [friend]
-  (group-membership/group-ids (friend-id friend)))
+;(defn groups
+;  "Returns all of the groups the given friend is in."
+;  [friend]
+;  (group/find-groups (group-ids friend)))
 
-(defn groups
-  "Returns all of the groups the given friend is in."
-  [friend]
-  (group/find-groups (group-ids friend)))
+;(defn remove-friend-from-group
+;  "Removes the given friend to the given group. If the friend is not a member of the given group, then this function
+;does nothing."
+;  [friend group]
+;  (group-membership/remove-friend-from-group (friend-id friend) (group/group-id group)))
 
-(defn remove-friend-from-group
-  "Removes the given friend to the given group. If the friend is not a member of the given group, then this function
-does nothing."
-  [friend group]
-  (group-membership/remove-friend-from-group (friend-id friend) (group/group-id group)))
+;(defn group-friends
+;  "Returns all of the friends in the given group."
+;  [group]
+;  (group-membership/friends (group/group-id group)))
 
-(defn group-friends
-  "Returns all of the friends in the given group."
-  [group]
-  (group-membership/friends (group/group-id group))
-  ;(find-by-sql [(str "SELECT * FROM friends WHERE id IN ("
-  ;                   (string/join (filter integer? (group-membership/friend-ids (group/group-id group))))
-  ;                   ")")])
-  )
+;(defn has-read-permission?
+;  "Returns true if the given friend has the given read permission."
+;  [friend permission]
+;  (group/any-group-has-read-permission? (group-ids friend) permission))
 
-(defn has-read-permission?
-  "Returns true if the given friend has the given read permission."
-  [friend permission]
-  (group/any-group-has-read-permission? (group-ids friend) permission))
-
-(defn has-write-permission?
-  "Returns true if the given friend has the given write permission."
-  [friend permission]
-  (group/any-group-has-write-permission? (group-ids friend) permission))
+;(defn has-write-permission?
+;  "Returns true if the given friend has the given write permission."
+;  [friend permission]
+;  (group/any-group-has-write-permission? (group-ids friend) permission))
