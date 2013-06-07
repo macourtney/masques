@@ -12,8 +12,6 @@
   (:use clojure.test
         korma.core))
 
-; [masques.model.friend :as friend-model]
-
 (def database-map (drift-db/db-map))
 
 (korma-db/defdb mydb database-map)
