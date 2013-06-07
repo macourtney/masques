@@ -179,6 +179,11 @@
       (update-record entity h2-record)
       (insert-record entity h2-record))))
 
+(defn delete-record [entity record]
+  (when-let [id (if (map? record) (or (:ID record) (:id record)) record)]
+    (delete entity
+      (where { :ID id }))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Entities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

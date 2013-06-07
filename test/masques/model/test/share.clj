@@ -4,19 +4,25 @@
   (:use clojure.test
         masques.model.share))
 
-(def message-record (message-model/save {
-  :subject "The subject, G" 
-  :body "Nice body you got there..."
-}))
+(def ^:dynamic message-record {
+                                :subject "The subject, G" 
+                                :body "Nice body you got there..."
+                              })
 
-(def share-record (save {
-  :content-type "message"
-  :message-id (:id message-record)
-}))
+(def ^:dynamic share-record { :content-type "message" })
 
-(def friend-request (save {
-  :content-type "friend"
-}))
+(def ^:dynamic friend-request { :content-type "friend" })
+
+(defn share-test-fixture [function]
+  (binding [message-record (message-model/save message-record)]
+    (binding [share-record (save (assoc share-record :message-id (:id message-record)))
+              friend-request (save friend-request)]
+      (function)
+      (delete-share friend-request)
+      (delete-share share-record))
+    (message-model/delete-message message-record)))
+
+(use-fixtures :once share-test-fixture)
 
 (deftest test-add-share
   (is share-record)

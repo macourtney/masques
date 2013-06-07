@@ -92,3 +92,6 @@
 
 (defn receive [share-record]
   (if (is-valid share-record) (handle share-record) (reject share-record)))
+
+(defn delete-share [record]
+  (delete-record share record))
