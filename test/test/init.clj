@@ -1,6 +1,7 @@
 (ns test.init
   (:import [java.io File])
-  (:require [drift.runner :as drift-runner]
+  (:require [config.db-config :as db-config]
+            [drift.runner :as drift-runner]
             [masques.core :as masques-core]))
 
 (def test-init? (atom false)) 
@@ -10,6 +11,7 @@
   (when (compare-and-set! test-init? false true)
     (println "Initializing test database.")
     (masques-core/set-mode "test")
+    (db-config/update-username-password "test" "password")
     (masques-core/database-init)
     (drift-runner/update-to-version 0) ; Reset the test database
     (drift-runner/update-to-version Long/MAX_VALUE)

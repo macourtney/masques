@@ -16,7 +16,7 @@
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.drift-db/drift-db-h2 "1.1.5"]
+                 [org.drift-db/drift-db-h2 "1.1.6-SNAPSHOT"]
                  [seesaw "1.4.1"]]
 
   :plugins [[lein-libdir "0.1.0"]]
