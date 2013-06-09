@@ -12,7 +12,7 @@
                  [drift "1.5.0"]
                  [korma "0.3.0-beta7"]
                  [log4j/log4j "1.2.16"]
-                 [org.clojure/clojure "1.4.0"]
+                 [org.clojure/clojure "1.5.0-alpha5"]
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.2.3"]
