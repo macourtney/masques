@@ -11,7 +11,7 @@
                  [clj-time "0.5.0"]
                  [com.github.sarxos/windows-registry-util "0.2"]
                  [com.h2database/h2 "1.3.162"]
-                 [drift "1.5.0"]
+                 [drift "1.5.1"]
                  [korma "0.3.0-beta7"
                    :exclusions [org.clojure/clojure]]
                  [log4j/log4j "1.2.16"]
@@ -24,8 +24,7 @@
 
   :plugins [[lein-libdir "0.1.0"]]
 
-  :profiles { :dev { :dependencies [[drift "1.4.6-SNAPSHOT"]
-                                    [org.clojure/clojure "1.5.1"]] } }
+  :profiles { :dev { :dependencies [[org.clojure/clojure "1.5.1"]] } }
 
   :resource-paths ["pkg/resources"]
 
