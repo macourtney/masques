@@ -3,7 +3,7 @@
         config.db-config))
 
 (defn user-directory-fixture [function]
-  (let [old-users-map (get-users-map)]
+  (let [old-users-map (ensure-users-map)]
     (function)
     (reset-users-map old-users-map)))
 
@@ -36,4 +36,22 @@
     (is (= (user-data-directory) "data/db/foo_/"))
     (update-username-password "foo%" "bar")
     (is (= (user-data-directory) "data/db/foo_0/"))
+    (update-data-directory old-data-dir)))
+
+(deftest test-username-file
+  (let [old-data-dir (data-dir)]
+    (update-data-directory "data/db/")
+    (update-username-password "foo" "bar")
+    (is (= (username-file) "data/db/foo/username.clj"))
+    (update-data-directory old-data-dir)))
+
+(deftest test-ensure-users-map
+  (let [old-data-dir (data-dir)
+        test-username "foo"]
+    (update-data-directory "data/db/")
+    (update-username-password test-username "bar")
+    (reset-users-map)
+    (ensure-users-map)
+    (is (user-exists? test-username))
+    (is (is (find-user-directory test-username) "foo"))
     (update-data-directory old-data-dir)))

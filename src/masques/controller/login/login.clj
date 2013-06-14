@@ -1,5 +1,6 @@
 (ns masques.controller.login.login
   (:require [clojure.tools.logging :as logging]
+            [config.db-config :as db-config]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.login.create-user :as create-user]
             [masques.controller.main.main-frame :as main-frame]
@@ -60,6 +61,7 @@
 
 (defn login [login-frame user-name password]
   (future
+    (db-config/update-username-password user-name password)
     (let [logged-in? (user-model/login user-name password)]
       (seesaw-core/invoke-later (login-cleanup login-frame logged-in?)))))
 
