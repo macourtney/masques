@@ -1,8 +1,9 @@
 (ns masques.controller.login.create-user
   (:require [clojure.tools.logging :as logging]
+            [config.db-config :as db-config]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
-            [masques.model.user :as user-model]
+            ;[masques.model.user :as user-model]
             [masques.view.login.create-user :as create-user-view]
             [seesaw.core :as seesaw-core]))
 
@@ -27,7 +28,7 @@
   (reset-password (find-password-field2-text create-user-frame)))
 
 (defn user-name [create-user-frame]
-  (if-let [user-name (user-model/validate-user-name (seesaw-core/text (find-user-name-text create-user-frame)))]
+  (if-let [user-name (db-config/validate-username (seesaw-core/text (find-user-name-text create-user-frame)))]
     user-name
     (create-user-error create-user-frame "The user name you entered is invalid. Either you didn't enter a user name, or the one you entered is already taken.")))
 
@@ -37,8 +38,16 @@
 (defn password2 [create-user-frame]
   (.getPassword (find-password-field2-text create-user-frame)))
 
+(defn char-arrays-equals? [array1 array2]
+  (and (= (count array1) (count array2))
+    (nil? (some #(not %1) (map #(= %1 %2) array1 array2)))))
+
+(defn validate-passwords [password1 password2]
+  (when (char-arrays-equals? password1 password2)
+    password1))
+  
 (defn password [create-user-frame]
-  (if-let [password (user-model/validate-passwords (password1 create-user-frame) (password2 create-user-frame))]
+  (if-let [password (validate-passwords (password1 create-user-frame) (password2 create-user-frame))]
     password
     (create-user-error create-user-frame "The passwords you entered are not the same. Please enter them again.")))
 
@@ -47,12 +56,13 @@
     (if user-id
       (actions-utils/close-window create-user-frame)
       (controller-utils/enable-widget create-user-frame))))
-
+      
 (defn create-user [create-user-frame user-name password]
   (when (and user-name password)
     (future
       (try
-        (create-user-cleanup create-user-frame (user-model/create-user user-name password))
+        (create-user-cleanup create-user-frame
+          (db-config/create-user user-name password))
         (catch Throwable t
           (logging/error t "An error occured while creating the user."))))))
 

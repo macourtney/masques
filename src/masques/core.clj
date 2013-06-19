@@ -65,5 +65,4 @@ production, or test." }
 (defn init-args [args]
   (let [[args-map remaining help] (parse-arguments args)]
     (set-mode (arg-mode args-map))
-    (database-init)
     [remaining help]))

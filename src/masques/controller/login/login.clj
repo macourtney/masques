@@ -3,10 +3,8 @@
             [config.db-config :as db-config]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.login.create-user :as create-user]
-            [masques.controller.main.main-frame :as main-frame]
             [masques.controller.utils :as controller-utils]
             [masques.core :as core]
-            [masques.model.user :as user-model]
             [masques.view.login.login :as login-view]
             [seesaw.core :as seesaw-core]))
 
@@ -14,7 +12,7 @@
   (seesaw-core/select login-frame ["#user-name-combobox"]))
 
 (defn reload-user-name-combobox [login-frame]
-  (seesaw-core/config! (find-user-name-combobox login-frame) :model (user-model/all-user-names))
+  (seesaw-core/config! (find-user-name-combobox login-frame) :model (db-config/all-users))
   login-frame)
 
 (defn load-data [login-frame]
@@ -27,7 +25,7 @@
   (actions-utils/attach-window-close-and-exit-listener login-frame "#cancel-button"))
 
 (defn attach-user-add-listener [login-frame]
-  (user-model/add-user-add-listener (fn [_] (reload-user-name-combobox login-frame)))
+  (db-config/add-user-add-listener (fn [_] (reload-user-name-combobox login-frame)))
   login-frame)
 
 (defn find-password-field [login-frame]
@@ -46,7 +44,8 @@
 
 (defn login-success [login-frame]
   (core/init)
-  (main-frame/show)
+  (core/run-fn 'masques.controller.main.main-frame 'show)
+  ;(main-frame/show)
   (actions-utils/close-window login-frame))
 
 (defn user-not-selected [login-frame]
@@ -62,8 +61,14 @@
 (defn login [login-frame user-name password]
   (future
     (db-config/update-username-password user-name password)
-    (let [logged-in? (user-model/login user-name password)]
-      (seesaw-core/invoke-later (login-cleanup login-frame logged-in?)))))
+    (try
+      (core/database-init)
+      (seesaw-core/invoke-later (login-cleanup login-frame true))
+      (catch Throwable throwable
+        (logging/error throwable "An error occured while logging in.")
+        (seesaw-core/invoke-later (login-cleanup login-frame false))))
+    ;(let [logged-in? (user-model/login user-name password)])
+    ))
 
 (defn login-action [e]
   (let [login-frame (seesaw-core/to-frame e)]

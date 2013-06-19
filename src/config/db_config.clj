@@ -19,6 +19,15 @@
 
 (def users-map (atom nil))
 
+(def user-add-listeners (atom []))
+
+(defn add-user-add-listener [user-add-listener]
+  (swap! user-add-listeners conj user-add-listener))
+  
+(defn call-user-add-listeners [username]
+  (doseq [user-add-listener @user-add-listeners]
+    (user-add-listener username)))
+
 (defn data-dir []
   @data-directory)
 
@@ -44,12 +53,19 @@
     (load-users-map))
   @users-map)
 
+(defn all-users []
+  (keys (ensure-users-map)))
+  
 (defn find-user-directory
   ([] (find-user-directory @username))
   ([username] (get (ensure-users-map) username)))
 
 (defn user-exists? [username]
   (contains? (ensure-users-map) username))
+  
+(defn validate-username [username]
+  (when (and username (not-empty username) (not (user-exists? username)))
+    username))
 
 (defn user-directory-taken? [username user-directory]
   (contains? (set (vals (dissoc (ensure-users-map) username))) user-directory))
@@ -84,7 +100,9 @@
     (let [username-clj-file (java-io/file (username-file))]
       (when-not (.exists username-clj-file)
         (.mkdirs (.getParentFile username-clj-file))
-        (edn/write username-clj-file username)))))
+        (edn/write username-clj-file username)))
+    (call-user-add-listeners username)
+    username))
 
 (defn update-private-key-directory []
   (when-let [private-key-directory (user-data-directory)]
@@ -136,3 +154,16 @@
     (if-let [flavor (create-flavor (keyword environment))]
       flavor
       (throw (new RuntimeException (str "Unknown environment: " environment ". Please check your conjure.environment system property."))))))
+
+(defn create-user
+  "Creates the given user with the given password."
+  [new-username new-password]
+  (when-let [new-username (add-username-if-missing new-username)]
+    (let [old-username @username
+          old-password @password]
+      (try
+        (update-username-password new-username new-password)
+        (load-config)
+        new-username
+        (finally
+          (update-username-password old-username old-password))))))
