@@ -9,15 +9,13 @@
 
 (deftest test-show
   (let [old-saved-data-dir (system-properties/read-data-directory)
-        old-data-dir (db-config/data-dir)
-        frame (show no-op)]
+        old-data-dir (db-config/data-dir)]
     (system-properties/set-data-directory "test_data_dir")
     (is (nil? (show no-op)))
     (system-properties/delete-data-directory)
     (let [frame (show no-op)]
       (is frame)
       (is (.isShowing frame))
-      ;(Thread/sleep 10000)
       (click-save frame)
       (is (= (system-properties/read-data-directory) old-data-dir))
       (is (not (.isShowing frame)))

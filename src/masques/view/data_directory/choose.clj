@@ -1,21 +1,15 @@
 (ns masques.view.data-directory.choose
   (:require [clj-internationalization.term :as term]
             [masques.view.utils :as view-utils]
+            [masques.view.subviews.dialog :as dialog]
             [seesaw.border :as border]
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]
            [javax.swing JLabel ImageIcon]))
 
-(defn create-header []
-  (seesaw-core/border-panel
-    :west (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_light_backgrounds_small.png")))
-    :east (seesaw-core/label :text (term/file-storage) :foreground "#380B61" :font { :size 48 })))
-
 (defn create-directory-chooser-panel []
   (seesaw-core/vertical-panel
-    :items [(create-header)
-            [:fill-v 5]
-            (seesaw-core/border-panel
+    :items [(seesaw-core/border-panel
               :west (seesaw-core/label :text (term/directory-to-store-masques-data) :font { :style :plain }))
             [:fill-v 3]
             (seesaw-core/text :id :data-directory-text :editable? false)]
@@ -38,26 +32,17 @@
 
 (defn create-text-and-buttons []
   (seesaw-core/border-panel
+    :north (create-directory-chooser-panel)
     :center (seesaw-core/scrollable (seesaw-core/text :text (term/file-storage-description) :multi-line? true :editable? false :wrap-lines? true :rows 7))
     :east (create-button-panel)
 
     :border 10))
 
-(defn create-footer []
-  (seesaw-core/border-panel
-    :east (seesaw-core/label :text (term/masques-version) :foreground (Color/WHITE))
-    :background (Color/GRAY)
-
-    :border 5))
-
 (defn create-content []
-  (seesaw-core/border-panel
-    :id :content-panel
-    :north (create-directory-chooser-panel)
-    :center (create-text-and-buttons)
-    :south (create-footer)
-
-    :preferred-size [500 :by 300]))
+  (dialog/create-content
+    (term/file-storage)
+    (create-text-and-buttons)
+    [500 :by 300]))
 
 (defn create []
   (view-utils/center-window
