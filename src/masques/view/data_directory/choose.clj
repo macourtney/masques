@@ -1,7 +1,7 @@
 (ns masques.view.data-directory.choose
   (:require [clj-internationalization.term :as term]
-            [masques.view.utils :as view-utils]
             [masques.view.subviews.dialog :as dialog]
+            [masques.view.utils :as view-utils]
             [seesaw.border :as border]
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]
