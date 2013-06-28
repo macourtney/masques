@@ -1,5 +1,6 @@
 (ns masques.view.subviews.dialog
   (:require [clj-internationalization.term :as term]
+            [seesaw.border :as border]
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]
            [javax.swing JLabel ImageIcon]))
@@ -7,7 +8,9 @@
 (defn create-header [label-text]
   (seesaw-core/border-panel
     :west (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_light_backgrounds_small.png")))
-    :east (seesaw-core/label :text label-text :foreground "#380B61" :font { :size 48 })))
+    :east (seesaw-core/label :text label-text :foreground "#380B61" :font { :size 48 })
+    :border (border/empty-border :top 10 :left 10 :right 10)
+    ))
     
 (defn create-footer []
   (seesaw-core/border-panel
@@ -23,6 +26,4 @@
     :center content
     :south (create-footer)
     
-    :preferred-size preferred-size
-    
-    :border 10))
+    :preferred-size preferred-size))
