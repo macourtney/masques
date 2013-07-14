@@ -14,9 +14,9 @@
 
 (deftest test-attach-item-listener
   (let [test-combobox (new JComboBox)]
-    (is (= (count (.getItemListeners test-combobox)) 1))
+    (is (= (count (.getItemListeners test-combobox)) 2))
     (attach-item-listener test-combobox test-item-listener)
-    (is (= (count (.getItemListeners test-combobox)) 2))))
+    (is (= (count (.getItemListeners test-combobox)) 3))))
 
 (deftest test-enable-disable-widgets
   (let [test-combobox (new JComboBox)

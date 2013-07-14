@@ -14,36 +14,36 @@
   (:use clojure.test
         masques.model.friend))
 
-(def test-identity (first fixtures-identity/records))
-(def test-identity-2 (second fixtures-identity/records))
+#_(def test-identity (first fixtures-identity/records))
+#_(def test-identity-2 (second fixtures-identity/records))
 
-(def test-name (first fixtures-name/records))
-(def test-name-2 (second fixtures-name/records))
+#_(def test-name (first fixtures-name/records))
+#_(def test-name-2 (second fixtures-name/records))
 
-(def test-destination "LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA")
+#_(def test-destination "LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA")
 
-(def test-friend { :identity_id (:id test-identity) :friend_id (:id test-identity-2) })
+#_(def test-friend { :identity_id (:id test-identity) :friend_id (:id test-identity-2) })
 
-(def test-user (first fixtures-user/records))
+#_(def test-user (first fixtures-user/records))
 
-(def test-friend-file (io/as-file "./test/support_files/test_friend.xml"))
+#_(def test-friend-file (io/as-file "./test/support_files/test_friend.xml"))
 
-(def line-separator (System/getProperty "line.separator"))
-(def test-friend-string (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" (when (operating-system/unix?) line-separator) "<friend>" line-separator "  <user name=\"test-user\" publicKey=\"\" publicKeyAlgorithm=\"RSA\"/>" line-separator "  <destination>LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA</destination>" line-separator "</friend>" line-separator))
+#_(def line-separator (System/getProperty "line.separator"))
+#_(def test-friend-string (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" (when (operating-system/unix?) line-separator) "<friend>" line-separator "  <user name=\"test-user\" publicKey=\"\" publicKeyAlgorithm=\"RSA\"/>" line-separator "  <destination>LlC5T8BJovJ2TONm1NuJ4KdmwhFeSRtajxncTi3YvAQeRIvMUqq7IcSTAf5HZiAsKvprZTZa1SncxiCcNivxbQgHZ0sy~AkDOpURrN3BRdQqQn2b8qhYWgs~xvt-Yn7ECrXSgpR7AKjhoFW6~AtiXGSxTdbQafmlZnuwivnzJIb29BUsUx0nOBmcG918nQtethnxnmnTKqLqFBc5c2qP6evP2xYrvWwGaTM4QPidzq-aqEoWUkc1rdkozqWd~M2A0WhNGAjB432Jpp9N8KCacE6SEPM~uKOSsvQtPPZk~9V3UYnDU0941HhhHZgaHZpIy7yeDKkZCGqUMTMh1yEPYwqpOfHbFraoldALDugKz~NkJ0QVL~jxCh40xxnBTBhLsCJuzTe~FfL4odl1vtmwVlACMhaNBHqOaBgKGqUssqmfC1TdLkswnSOni7luA8RZHVgmRI0MnzlHHwg9lHdY53w7Nok1X404OzaWCNy75-bP9po-1DTax4IBNFDpvHrcAAAA</destination>" line-separator "</friend>" line-separator))
 
 ;(test-util/use-combined-login-fixture fixtures-name/fixture-map fixtures-group-permission/fixture-map)
 
-(defn test-friend-listener [friend]
+#_(defn test-friend-listener [friend]
   friend)
 
-(deftest test-add-listener
+#_(deftest test-add-listener
   (is (= (friend-add-listener-count) 0))
   (add-friend-add-listener test-friend-listener)
   (is (= (friend-add-listener-count) 1))
   (remove-friend-add-listener test-friend-listener)
   (is (= (friend-add-listener-count) 0)))
 
-(deftest test-delete-listener
+#_(deftest test-delete-listener
   (is (= (friend-delete-listener-count) 0))
   (add-friend-delete-listener test-friend-listener)
   (is (= (friend-delete-listener-count) 1))
@@ -76,7 +76,7 @@
 ;          (remove-friend test-identity-2 test-identity)
 ;          (is (not (find-record { :id friend-id }))))))))
 
-(deftest test-friend-xml
+#_(deftest test-friend-xml
   (is (nil? (friend-xml nil test-destination)))
   (is (nil? (friend-xml test-user nil)))
   (is (nil? (friend-xml nil nil)))
@@ -85,7 +85,7 @@
     (is (= (first (:content test-xml)) (user-model/xml test-user)))
     (is (= (first (:content (second (:content test-xml)))) test-destination))))
 
-(deftest test-friend-xml-string
+#_(deftest test-friend-xml-string
   (is (nil? (friend-xml-string nil test-destination)))
   (is (nil? (friend-xml-string test-user nil)))
   (is (nil? (friend-xml-string nil nil)))
@@ -93,7 +93,7 @@
     (is test-str)
     (is (= test-str test-friend-string))))
 
-(deftest test-parse-destination-xml
+#_(deftest test-parse-destination-xml
   (is (nil? (parse-destination-xml (data-xml/element :fail {} test-destination))))
   (is (nil? (parse-destination-xml (data-xml/element :destination {}))))
   (is (nil? (parse-destination-xml nil)))
@@ -122,7 +122,7 @@
 ;    (when friend-id
 ;      (destroy-record { :id friend-id }))))
 
-(deftest test-write-friend-xml
+#_(deftest test-write-friend-xml
   (let [test-file (io/as-file "./test/test_friend.xml")]
     (write-friend-xml test-file test-user test-destination)
     (is (.exists test-file))
