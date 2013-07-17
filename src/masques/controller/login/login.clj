@@ -45,7 +45,6 @@
 (defn login-success [login-frame]
   (core/init)
   (core/run-fn 'masques.controller.main.main-frame 'show)
-  ;(main-frame/show)
   (actions-utils/close-window login-frame))
 
 (defn user-not-selected [login-frame]
