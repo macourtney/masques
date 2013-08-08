@@ -17,7 +17,7 @@
   (seesaw-core/border-panel
     :north (tool-bar/create)
     :west (status-panel/create)
-    :east (display-panel/create)
+    :center (display-panel/create)
     :south (create-footer)))
             
 (defn create []

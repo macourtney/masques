@@ -2,7 +2,7 @@
   (:require [seesaw.core :as seesaw-core]))
 
 (defn create-card-panel []
-  (seesaw-core/flow-panel :items ["global actions bar"]))
+  (seesaw-core/flow-panel :items ["Display Panel"]))
 
 (defn create []
   (seesaw-core/border-panel

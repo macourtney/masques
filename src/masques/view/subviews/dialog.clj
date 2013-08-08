@@ -9,8 +9,7 @@
   (seesaw-core/border-panel
     :west (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_light_backgrounds_small.png")))
     :east (seesaw-core/label :text label-text :foreground "#380B61" :font { :size 48 })
-    :border (border/empty-border :top 10 :left 10 :right 10)
-    ))
+    :border (border/empty-border :top 10 :left 10 :right 10)))
     
 (defn create-footer []
   (seesaw-core/border-panel
