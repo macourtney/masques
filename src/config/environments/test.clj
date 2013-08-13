@@ -13,7 +13,7 @@
 (def console-appender (new ConsoleAppender output-pattern))
 (.addFilter console-appender 
   (doto (new LevelRangeFilter)
-    (.setLevelMin (. Level WARN))))
+    (.setLevelMin (. Level ALL))))
 
 (doto (. Logger getRootLogger)
   (.setLevel (. Level ALL))
