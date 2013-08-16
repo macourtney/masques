@@ -1,5 +1,6 @@
 (ns masques.view.main.status-panel
   (:require [clj-internationalization.term :as term]
+            [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]))
@@ -9,7 +10,7 @@
 
 (defn create-update-status []
   (seesaw-core/border-panel
-    :north (seesaw-core/scrollable (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true :rows 5))
+    :north (seesaw-core/scrollable (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true :rows 4) :preferred-size [200 :by 75])
     :south
       (seesaw-core/border-panel
         :west (seesaw-core/button :id :update-status-button :text (term/update-status) :border 0 :background status-background-color :font status-button-font)
@@ -32,4 +33,6 @@
     :south (create-online-friends)
 
     :vgap 3
-    :border 10))
+    :border (seesaw-border/compound-border
+              (seesaw-border/empty-border :thickness 10)
+              (seesaw-border/line-border :right 1))))
