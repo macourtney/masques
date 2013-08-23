@@ -24,7 +24,7 @@
 
   :plugins [[lein-libdir "0.1.0"]]
 
-  :profiles { :dev { :dependencies [[org.clojure/clojure "1.5.1"]] } }
+  :profiles { :dev { :dependencies [[clj-ns-browser "1.3.0"]] } } ; (use 'clj-ns-browser.sdoc) (sdoc)
 
   :resource-paths ["pkg/resources"]
 
