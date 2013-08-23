@@ -43,7 +43,20 @@
     :vgap 3))
 
 (defn create-online-friends []
-  (seesaw-core/flow-panel :items ["global actions bar"]))
+  (seesaw-core/border-panel
+    :north (seesaw-core/border-panel
+             :west (seesaw-core/label :text (term/online-friends) :foreground title-color :font title-font)
+             :east (seesaw-core/button :id :filter-online-friends-button :text (term/filter) :font status-button-font)
+
+             :hgap 3)
+    :south (seesaw-core/scrollable
+             (seesaw-core/listbox :id :online-friends-listbox
+                 ; :model A ListModel, or a sequence of values with which a DefaultListModel will be constructed.
+                 ; :renderer A cell renderer to use. See (seesaw.cells/to-cell-renderer).
+             )
+             :preferred-size [panel-width :by 200])
+
+    :vgap 3))
 
 (defn create []
   (seesaw-core/border-panel
