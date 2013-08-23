@@ -12,7 +12,7 @@
 (def logout-font { :name "DIALOG" :style :bold :size 18 })
            
 (defn create-masques-icon []
-  (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_light_backgrounds_small.png"))))
+  (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png"))))
   
 (defn create-icons-bar []
   (seesaw-core/flow-panel :id :icons-panel :items [] :align :center :hgap 10 :background background-color))
@@ -45,7 +45,7 @@
 
                 :border 5
                 :background search-background-color)]
-      
+
     :background background-color))
 
 (defn create-global-actions-panel []
@@ -62,5 +62,8 @@
     :east (create-global-actions-panel)
 
     :background background-color
-    :border 5
+    :border (seesaw-border/compound-border
+              (seesaw-border/empty-border :thickness 5)
+              (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
+              (seesaw-border/line-border :thickness 1 :color background-color))
     :preferred-size [800 :by 105]))

@@ -4,14 +4,25 @@
             [masques.view.main.status-panel :as status-panel]
             [masques.view.main.tool-bar :as tool-bar]
             [masques.view.utils :as view-utils]
+            [seesaw.border :as seesaw-border]
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]))
 
+(def footer-background-color (Color/GRAY))
+
+(def settings-color "#FFAA00")
+(def settings-font { :name "DIALOG" :style :bold :size 18 })
+
 (defn create-footer []
   (seesaw-core/border-panel
+    :west (seesaw-core/button :id :settings-button :text (term/settings) :foreground settings-color :font settings-font
+                              :border 0 :background footer-background-color)
     :east (seesaw-core/label :text (term/masques-version) :foreground (Color/WHITE))
-    :background (Color/GRAY)
-    :border 5))
+    :background footer-background-color
+    :border (seesaw-border/compound-border
+              (seesaw-border/empty-border :thickness 5)
+              (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
+              (seesaw-border/line-border :thickness 1 :color footer-background-color))))
   
 (defn create-content-panel []
   (seesaw-core/border-panel
@@ -19,7 +30,7 @@
     :west (status-panel/create)
     :center (display-panel/create)
     :south (create-footer)))
-            
+
 (defn create []
   (view-utils/center-window
     (seesaw-core/frame
