@@ -31,7 +31,12 @@
   :libdir-path "lib"
 
   :main masques.main
+  
+  :aot [masques.main]
 
   ; To run in development mode use: lein development
   :aliases { "development" ["run" "-m" "masques.development-main"]
-             "dev" ["run" "-m" "masques.development-main"]})
+             "dev" ["run" "-m" "masques.development-main"]}
+			 
+  ;:offline? true
+  )
