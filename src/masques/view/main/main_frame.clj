@@ -38,3 +38,13 @@
       :content (create-content-panel)
       :on-close :exit
       :visible? false)))
+
+(defn find-display-panel [main-frame]
+  (view-utils/find-component main-frame display-panel/id))
+
+(defn find-tool-bar [main-frame]
+  (view-utils/find-component main-frame tool-bar/id))
+
+(defn add-panel [main-frame panel]
+  (tool-bar/add-icon (find-tool-bar main-frame) panel)
+  (display-panel/add-panel (find-display-panel main-frame) panel))
