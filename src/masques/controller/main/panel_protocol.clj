@@ -7,12 +7,20 @@
   "A protocol for displaying and updating panels added to the main window."
   (panel-name [this] "Returns the name of this panel.")
 
-  (panel [this] "Returns the panel to be placed in the display area of the main window.")
+  (create-view [this] "Creates the view to be placed in the display area of the main window.")
 
   (icon [this] "Returns the icon for this panel.")
 
-  (init [this panel] "Initializes the panel.")
+  (init [this view] "Called when the panel is added.")
 
-  (show [this panel] "Called right before the panel is shown.")
+  (show [this view & args] "Called right before the panel is shown.")
 
-  (hide [this panel] "Called right after the panel is hidden."))
+  (hide [this view] "Called right after the panel is hidden."))
+
+(defn find-panel-name
+  "Returns the name of the given panel. If the given panel does not satisfy PanelProtocol, then this function simply
+returns panel."
+  [panel]
+  (if (satisfies? PanelProtocol panel)
+    (panel-name panel)
+    panel))

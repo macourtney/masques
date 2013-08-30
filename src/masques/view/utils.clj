@@ -11,3 +11,15 @@
 
 (defn find-component [parent-component id]
   (seesaw-core/select parent-component [id]))
+
+(defn save-component-property [component key value]
+  (.putClientProperty component key value)
+  value)
+
+(defn retrieve-component-property [component key]
+  (.getClientProperty component key))
+
+(defn remove-component-property [component key]
+  (let [value (retrieve-component-property component key)]
+    (save-component-property component key nil)
+    value))

@@ -13,14 +13,17 @@
 (def logout-color "#FFAA00")
 (def logout-font { :name "DIALOG" :style :bold :size 18 })
 
-(def id :tool-bar)
-(def icons-panel-id :icons-panel)
+(def id "tool-bar")
+(def icons-panel-id "icons-panel")
 
 (defn create-masques-icon []
   (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png"))))
 
 (defn create-icons-bar []
-  (seesaw-core/flow-panel :id icons-panel-id :items [] :align :center :hgap 10 :background background-color))
+  (seesaw-core/scrollable
+    (seesaw-core/flow-panel :id icons-panel-id :items [] :align :center :hgap 10 :background background-color)
+
+    :border 0))
 
 (defn logout []
   (seesaw-core/flow-panel
@@ -62,7 +65,7 @@
 
 (defn create []
   (seesaw-core/border-panel
-    :id id
+    :id (.substring id 0)
 
     :west (create-masques-icon)
     :center (create-icons-bar)
@@ -75,11 +78,23 @@
               (seesaw-border/line-border :thickness 1 :color background-color))
     :preferred-size [800 :by 105]))
 
-(defn create-icon-button [panel]
-  (seesaw-core/button :id (str "icon-" panel) :icon (panel-protocol/icon panel) :border 0))
+(defn create-icon-button
+  "Creates the icon button for the given panel. If the panel does not have an icon, then the text of the button is set
+to the panel's name."
+  [panel]
+  (let [icon (panel-protocol/icon panel)
+        button (seesaw-core/button :id (str "icon-" panel) :icon icon :border 0 :background background-color)]
+    (when (not icon)
+      (seesaw-core/config! button :text (panel-protocol/panel-name panel)))
+    button))
 
-(defn add-icon [tool-bar panel]
-  (let [icons-panel (view-utils/find-component tool-bar icons-panel-id)
+(defn find-icons-panel [tool-bar]
+  (view-utils/find-component tool-bar (str "#" icons-panel-id)))
+
+(defn add-icon
+  "Adds the given panel as an icon on the tool-bar."
+  [tool-bar panel]
+  (let [icons-panel (find-icons-panel tool-bar)
         current-icons (seesaw-core/config icons-panel :items)]
     (seesaw-core/config! icons-panel
                          :items (conj current-icons (create-icon-button panel)))))

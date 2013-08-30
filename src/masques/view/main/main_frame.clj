@@ -39,12 +39,23 @@
       :on-close :exit
       :visible? false)))
 
-(defn find-display-panel [main-frame]
-  (view-utils/find-component main-frame display-panel/id))
+(defn find-display-panel
+  "Returns the display panel of the given main frame."
+  [main-frame]
+  (view-utils/find-component main-frame (str "#" display-panel/id)))
 
-(defn find-tool-bar [main-frame]
-  (view-utils/find-component main-frame tool-bar/id))
+(defn find-tool-bar
+  "Returns the tool bar of the given main frame."
+  [main-frame]
+  (view-utils/find-component main-frame (str "#" tool-bar/id)))
 
-(defn add-panel [main-frame panel]
+(defn add-panel
+  "Adds the given panel to the main frame. Adds the icon to the tool bar and the panel's view to the display panel."
+  [main-frame panel]
   (tool-bar/add-icon (find-tool-bar main-frame) panel)
   (display-panel/add-panel (find-display-panel main-frame) panel))
+
+(defn show-panel
+  "Shows the given panel (or panel id)."
+  [main-frame panel args]
+  (display-panel/show-panel (find-display-panel main-frame) panel args))

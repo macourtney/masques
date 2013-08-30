@@ -6,7 +6,7 @@
   (:import [java.awt Color]))
 
 (def panel-width 250)
-  
+
 (def status-background-color (seesaw-color/color 238 238 238))
 (def status-button-font { :name "DIALOG" :style :plain :size 10 })
 

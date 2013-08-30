@@ -1,5 +1,6 @@
 (ns masques.controller.utils
   (:require [clojure.tools.logging :as logging]
+            [masques.view.utils :as view-utils] 
             [seesaw.core :as seesaw-core]
             [seesaw.table :as seesaw-table]
             [seesaw.widget-options :as widget-options])
@@ -65,24 +66,12 @@
 (defn enable-widget [parent-component]
   (enable-subwidgets parent-component true))
 
-(defn save-component-property [component key value]
-  (.putClientProperty component key value)
-  value)
-
-(defn retrieve-component-property [component key]
-  (.getClientProperty component key))
-
-(defn remove-component-property [component key]
-  (let [value (retrieve-component-property component key)]
-    (save-component-property component key nil)
-    value))
-
 (defn attach-and-save-listener [component add-listener-fn key listener]
-  (add-listener-fn (save-component-property component key listener))
+  (add-listener-fn (view-utils/save-component-property component key listener))
   component)
 
 (defn detach-and-remove-listener [component remove-listener-fn key]
-  (remove-listener-fn (retrieve-component-property component key))
+  (remove-listener-fn (view-utils/retrieve-component-property component key))
   component)
 
 (defn attach-and-detach-listener [window listener key component-find-fn add-listener-fn remove-listener-fn]
