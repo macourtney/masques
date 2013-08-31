@@ -2,6 +2,7 @@
   (:require [clojure.tools.logging :as logging]
             [masques.controller.group.panel :as group-panel]
             [masques.controller.main.display-panel :as display-panel]
+            [masques.controller.stream.panel :as stream-panel]
             [masques.controller.utils :as controller-utils]
             [masques.view.main.main-frame :as view-main-frame]))
 
@@ -15,7 +16,7 @@
 (defn load-default-panels
   "Adds the default panels to the main frame."
   [main-frame]
-  (add-panels main-frame (group-panel/create)))
+  (add-panels main-frame (group-panel/create) (stream-panel/create)))
 
 (defn show
   "Creates and shows the main frame."

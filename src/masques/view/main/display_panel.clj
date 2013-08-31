@@ -56,10 +56,15 @@
   (view-utils/save-component-property (find-card-panel display-panel) displayed-panel-id
                                       (panel-protocol/find-panel-name panel)))
 
+(defn panel-as-vector
+  "Converts a panel and panel view into a vector for use an item of the card panel."
+  [panel panel-view]
+  [panel-view (name (panel-protocol/panel-name panel))])
+
 (defn panel-map-as-vector
   "Converts a map for a single panel into a vector for use an item of the card panel."
   [panel-map]
-  [(name (panel-protocol/panel-name (:panel panel-map))) (:view panel-map)])
+  (panel-as-vector (:panel panel-map) (:view panel-map)))
 
 (defn find-panels-as-items
   "Returns all of the panels in a list for use in the items list of the card panel."
@@ -72,7 +77,7 @@
   (let [card-panel (find-card-panel display-panel)
         panel-view (panel-protocol/create-view panel)]
     (seesaw-core/config! card-panel
-                         :items (cons [panel-view (name (panel-protocol/panel-name panel))]
+                         :items (cons (panel-as-vector panel panel-view)
                                       (find-panels-as-items display-panel)))
     (save-panel-view display-panel panel panel-view)
     (panel-protocol/init panel panel-view)))
