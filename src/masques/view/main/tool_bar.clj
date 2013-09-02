@@ -3,7 +3,8 @@
             [masques.controller.main.panel-protocol :as panel-protocol]
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
-            [seesaw.core :as seesaw-core])
+            [seesaw.core :as seesaw-core]
+            [seesaw.mig :as seesaw-mig])
   (:import [java.awt Color]
            [javax.swing JLabel ImageIcon]))
 
@@ -21,7 +22,7 @@
 
 (defn create-icons-bar []
   (seesaw-core/scrollable
-    (seesaw-core/flow-panel :id icons-panel-id :items [] :align :center :hgap 10 :background background-color)
+    (seesaw-core/horizontal-panel :id icons-panel-id :items [] :background background-color :border 5)
 
     :border 0))
 
@@ -97,4 +98,4 @@ to the panel's name."
   (let [icons-panel (find-icons-panel tool-bar)
         current-icons (seesaw-core/config icons-panel :items)]
     (seesaw-core/config! icons-panel
-                         :items (conj current-icons (create-icon-button panel)))))
+                         :items (concat current-icons [[:fill-h 5] (create-icon-button panel)]))))

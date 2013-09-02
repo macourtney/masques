@@ -14,7 +14,7 @@
 
   (create-view [this] (panel-view/create))
 
-  (icon [this] (ImageIcon. (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png")))
+  (icon [this] (ImageIcon. (ClassLoader/getSystemResource "stream.png")))
 
   (init [this view])
 
