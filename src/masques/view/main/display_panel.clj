@@ -32,9 +32,11 @@
   (get (get (find-panel-map display-panel) (panel-protocol/find-panel-name panel)) :view))
 
 (defn find-panel
-  "Returns the panel for the given panel id."
+  "Returns the panel for the given panel id. If panel-id is not a string or keyword then this function simply returns panel-id."
   [display-panel panel-id]
-  (get (get (find-panel-map display-panel) panel-id) :panel))
+  (if (or (string? panel-id) (keyword? panel-id)) 
+    (get (get (find-panel-map display-panel) panel-id) :panel)
+    panel-id))
 
 (defn save-panel-view
   "Saves the given panel and panel view to the panel map for retrieval later."
@@ -95,7 +97,9 @@
   "Shows the given panel (or panel id)."
   [display-panel panel args]
   (when panel
-    (let [card-panel (find-card-panel display-panel)]
-      (apply panel-protocol/show panel (find-panel-view display-panel panel) args)
+    (let [card-panel (find-card-panel display-panel)
+          panel-view (find-panel-view display-panel panel)
+          panel (find-panel display-panel panel)]
+      (panel-protocol/show panel panel-view args)
       (.show (.getLayout card-panel) card-panel (name (panel-protocol/find-panel-name panel)))
       (update-displayed-panel display-panel panel))))

@@ -4,19 +4,32 @@
             [masques.controller.main.display-panel :as display-panel]
             [masques.controller.stream.panel :as stream-panel]
             [masques.controller.utils :as controller-utils]
-            [masques.view.main.main-frame :as view-main-frame]))
+            [masques.view.main.main-frame :as view-main-frame]
+            [masques.view.main.tool-bar :as tool-bar-view]
+            [masques.view.utils :as view-utils]
+            [seesaw.core :as seesaw-core]))
+
+(declare show-panel)
+
+(defn panel-button-listener [e]
+  (let [button (seesaw-core/to-widget e)
+        main-frame (view-utils/top-level-ancestor button)]
+    (show-panel main-frame (view-utils/retrieve-component-property button tool-bar-view/button-panel-name))))
 
 (defn add-panels
   "Adds the given panel to the main frame."
   [main-frame & panels]
   (doseq [panel panels]
-    (view-main-frame/add-panel main-frame panel))
+    (view-main-frame/add-panel main-frame panel panel-button-listener))
   main-frame)
 
 (defn load-default-panels
   "Adds the default panels to the main frame."
   [main-frame]
-  (add-panels main-frame (stream-panel/create) (group-panel/create)))
+  (let [stream-panel (stream-panel/create)]
+    (add-panels main-frame stream-panel (group-panel/create))
+    (show-panel main-frame stream-panel)
+    main-frame))
 
 (defn show
   "Creates and shows the main frame."
