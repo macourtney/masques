@@ -34,4 +34,7 @@
 
   ; To run in development mode use: lein development
   :aliases { "development" ["run" "-m" "masques.development-main"]
-             "dev" ["run" "-m" "masques.development-main"]})
+             "dev" ["run" "-m" "masques.development-main"]}
+             
+  ;:offline? true
+)

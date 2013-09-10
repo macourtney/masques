@@ -7,6 +7,6 @@
   (let [login-frame (create)]
     (is login-frame)
     (seesaw-core/show! login-frame)
-    ;(Thread/sleep 10000)
+    (Thread/sleep 10000)
     (seesaw-core/hide! login-frame)
     (seesaw-core/dispose! login-frame)))

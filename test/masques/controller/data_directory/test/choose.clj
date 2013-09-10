@@ -15,6 +15,7 @@
     (system-properties/delete-data-directory)
     (let [frame (show no-op)]
       (is frame)
+      (Thread/sleep 10000)
       (is (.isShowing frame))
       (click-save frame)
       (is (= (system-properties/read-data-directory) old-data-dir))
