@@ -80,12 +80,28 @@
     :west (create-search)
     :east (seesaw-core/label :text (term/stream) :foreground "#380B61" :font { :size 48 })))
 
+(defn create-stream-buttons []
+  (seesaw-core/horizontal-panel
+    :items [(create-button :filter-all-shares (term/all-shares)) " | " (create-button :inbox (term/inbox)) " | " (create-button :from-me (term/from-me))]))
+
+(defn create-stream-list []
+  (seesaw-core/scrollable
+     (seesaw-core/listbox :id :stream-listbox
+         ; :model A ListModel, or a sequence of values with which a DefaultListModel will be constructed.
+         ; :renderer A cell renderer to use. See (seesaw.cells/to-cell-renderer).
+     )))
+
 (defn create-body []
-  (seesaw-core/flow-panel :items ["Body"]))
+  (seesaw-core/border-panel
+    :north (create-stream-buttons)
+    :center (create-stream-list)
+    
+    :vgap 5))
 
 (defn create []
   (seesaw-core/border-panel
     :north (create-header)
     :center (create-body)
     
+    :vgap 10
     :border 11))
