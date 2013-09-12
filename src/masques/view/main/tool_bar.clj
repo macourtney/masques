@@ -64,6 +64,7 @@
     :west (search)
     :east (logout)
 
+    :hgap 30
     :background background-color))
 
 (defn create []
@@ -74,12 +75,13 @@
     :center (create-icons-bar)
     :east (create-global-actions-panel)
 
+    :hgap 30
     :background background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
               (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
               (seesaw-border/line-border :thickness 1 :color background-color))
-    :preferred-size [800 :by 105]))
+    :preferred-size [900 :by 105]))
 
 (defn create-icon-button
   "Creates the icon button for the given panel. If the panel does not have an icon, then the text of the button is set
@@ -102,4 +104,4 @@ to the panel's name."
   (let [icons-panel (find-icons-panel tool-bar)
         current-icons (seesaw-core/config icons-panel :items)]
     (seesaw-core/config! icons-panel
-                         :items (concat current-icons [[:fill-h 5] (create-icon-button panel panel-button-listener)]))))
+                         :items (concat current-icons [[:fill-h 25] (create-icon-button panel panel-button-listener)]))))

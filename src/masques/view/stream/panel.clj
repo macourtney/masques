@@ -78,7 +78,7 @@
 (defn create-header []
   (seesaw-core/border-panel
     :west (create-search)
-    :east (seesaw-core/label :text (term/stream) :foreground "#380B61" :font { :size 48 })))
+    :east (seesaw-core/vertical-panel :items [(seesaw-core/label :text (term/stream) :foreground "#380B61" :font { :size 48 })])))
 
 (defn create-stream-buttons []
   (seesaw-core/horizontal-panel
