@@ -41,12 +41,13 @@
     :background search-background-color))
 
 (defn search-radios-panel []
-  (seesaw-core/flow-panel
-    :items [(seesaw-core/radio :id :search-shares-radio :text (term/shares) :background search-background-color)
-            (seesaw-core/radio :id :search-friends-radio :text (term/friends) :background search-background-color)]
+  (let [share-button-group (seesaw-core/button-group)]
+    (seesaw-core/flow-panel
+      :items [(seesaw-core/radio :id :search-shares-radio :text (term/shares) :background search-background-color :group share-button-group)
+              (seesaw-core/radio :id :search-friends-radio :text (term/friends) :background search-background-color :group share-button-group)]
 
-    :background search-background-color
-    :border (seesaw-border/line-border :top 1)))
+      :background search-background-color
+      :border (seesaw-border/line-border :top 1))))
 
 (defn search []
   (seesaw-core/flow-panel
