@@ -1,7 +1,9 @@
 (ns masques.controller.main.main-frame
   (:require [clojure.tools.logging :as logging]
+            [masques.controller.friend.panel :as friend-panel]
             [masques.controller.group.panel :as group-panel]
             [masques.controller.main.display-panel :as display-panel]
+            [masques.controller.profile.panel :as profile-panel]
             [masques.controller.stream.panel :as stream-panel]
             [masques.controller.utils :as controller-utils]
             [masques.view.main.main-frame :as view-main-frame]
@@ -27,7 +29,7 @@
   "Adds the default panels to the main frame."
   [main-frame]
   (let [stream-panel (stream-panel/create)]
-    (add-panels main-frame stream-panel (group-panel/create))
+    (add-panels main-frame stream-panel (group-panel/create) (friend-panel/create) (profile-panel/create))
     (show-panel main-frame stream-panel)
     main-frame))
 
