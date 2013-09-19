@@ -5,6 +5,7 @@
             [masques.controller.utils :as controller-utils]
             [masques.model.system-properties :as system-properties]
             [masques.view.data-directory.choose :as choose-view]
+            [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
 (def save-listener-key :save-listener-key)
@@ -13,13 +14,13 @@
   (.setText (choose-view/data-directory-text parent-component) path))
 
 (defn save-save-listener [save-listener parent-component]
-  (controller-utils/save-component-property
+  (view-utils/save-component-property
     (choose-view/content-panel parent-component)
     save-listener-key
     save-listener))
 
 (defn retrieve-save-listener [parent-component]
-  (controller-utils/retrieve-component-property
+  (view-utils/retrieve-component-property
     (choose-view/content-panel parent-component)
     save-listener-key))
 
