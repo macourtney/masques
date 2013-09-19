@@ -84,10 +84,14 @@
   (or (:uuid record) (:UUID record)))
 
 (defn unset-uuid [record]
-  (if (:uuid record) (dissoc record :uuid) (dissoc record :UUID)))
+  (if (:uuid record)
+    (dissoc record :uuid)
+    (dissoc record :UUID)))
 
 (defn set-uuid [record]
-  (if (uuid-is-set record) (unset-uuid record) (conj record {:UUID (uuid)})))
+  (if (uuid-is-set record)
+    (unset-uuid record)
+    (conj record {:UUID (uuid)})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
