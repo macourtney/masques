@@ -31,13 +31,13 @@
 (deftest test-show
   ;(assert-no-listeners)
   (let [frame (show)]
-    (Thread/sleep 10000)
+    ;(Thread/sleep 10000)
     (is frame)
     (is (.isShowing frame))
     ;(assert-one-listener-each)
     (.setVisible frame false)
     (.dispose frame)
-    (Thread/sleep 100)
+    ;(Thread/sleep 100)
     (is (not (.isShowing frame)))
     ;(assert-no-listeners)
     ))
