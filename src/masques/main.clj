@@ -13,4 +13,4 @@
   [& args]
   (let [data-directory-choose-ns 'masques.controller.data-directory.choose]
     (require data-directory-choose-ns)
-    ((ns-resolve (find-ns data-directory-choose-ns) 'show) (create-choose-action))))
+    ((ns-resolve (find-ns data-directory-choose-ns) 'show) (create-choose-action args))))
