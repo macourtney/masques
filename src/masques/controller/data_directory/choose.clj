@@ -54,9 +54,11 @@
   parent-component)
 
 (defn show [save-listener]
-  (if (nil? (system-properties/read-data-directory))
-    (controller-utils/show (attach (load-data save-listener (choose-view/create))))
-    (save-listener)))
+  (if-let [data-directory (system-properties/read-data-directory)]
+    (do
+      (db-config/update-data-directory data-directory)
+      (save-listener))
+    (controller-utils/show (attach (load-data save-listener (choose-view/create))))))
 
 (defn click-save [parent-component]
   (choose-view/click-save parent-component))
