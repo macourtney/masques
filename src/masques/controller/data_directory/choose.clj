@@ -36,7 +36,7 @@
 
 (defn create-choose-directory-action [parent-component]
   (fn [e]
-    (when-let [chosen-directory (controller-utils/choose-file parent-component)]
+    (when-let [chosen-directory (controller-utils/choose-directory parent-component)]
       (update-data-directory parent-component (.getPath chosen-directory)))))
 
 (defn create-save-action [parent-component]
