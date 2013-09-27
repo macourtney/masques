@@ -78,31 +78,36 @@
 
 (defn add-username [username]
   (ensure-users-map)
-  (swap! users-map assoc username (user-directory username)))
+  (when username
+    (swap! users-map assoc username (user-directory username))))
 
 (defn reset-users-map
   ([] (reset-users-map nil))
   ([new-users-map]
     (reset! users-map new-users-map)))
 
-(defn user-data-directory []
-  (when-let [data-dir (data-dir)]
-    (when-let [user-directory (find-user-directory)]
-      (str data-dir user-directory "/"))))
+(defn user-data-directory
+  ([] (user-data-directory @username))
+  ([username]
+    (when-let [data-dir (data-dir)]
+      (when-let [user-directory (find-user-directory username)]
+        (str data-dir user-directory "/")))))
 
-(defn username-file []
-  (when-let [user-data-dir (user-data-directory)]
-    (str user-data-dir user-filename-str)))
+(defn username-file
+  ([] (username-file @username))
+  ([username]
+    (when-let [user-data-dir (user-data-directory username)]
+      (str user-data-dir user-filename-str))))
 
 (defn add-username-if-missing [username]
-  (when-not (user-exists? username)
+  (when (and username (not (user-exists? username)))
     (add-username username)
-    (let [username-clj-file (java-io/file (username-file))]
+    (let [username-clj-file (java-io/file (username-file username))]
       (when-not (.exists username-clj-file)
         (.mkdirs (.getParentFile username-clj-file))
         (edn/write username-clj-file username)))
-    (call-user-add-listeners username)
-    username))
+    (call-user-add-listeners username))
+  username)
 
 (defn update-private-key-directory []
   (when-let [private-key-directory (user-data-directory)]
