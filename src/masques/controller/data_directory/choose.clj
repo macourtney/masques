@@ -5,6 +5,7 @@
             [masques.controller.utils :as controller-utils]
             [masques.model.system-properties :as system-properties]
             [masques.view.data-directory.choose :as choose-view]
+            [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
 (def save-listener-key :save-listener-key)
@@ -13,13 +14,13 @@
   (.setText (choose-view/data-directory-text parent-component) path))
 
 (defn save-save-listener [save-listener parent-component]
-  (controller-utils/save-component-property
+  (view-utils/save-component-property
     (choose-view/content-panel parent-component)
     save-listener-key
     save-listener))
 
 (defn retrieve-save-listener [parent-component]
-  (controller-utils/retrieve-component-property
+  (view-utils/retrieve-component-property
     (choose-view/content-panel parent-component)
     save-listener-key))
 
@@ -35,9 +36,8 @@
 
 (defn create-choose-directory-action [parent-component]
   (fn [e]
-    (update-data-directory
-      parent-component
-      (.getPath (controller-utils/choose-file parent-component)))))
+    (when-let [chosen-directory (controller-utils/choose-directory parent-component)]
+      (update-data-directory parent-component (.getPath chosen-directory)))))
 
 (defn create-save-action [parent-component]
   (fn [e]
@@ -54,9 +54,11 @@
   parent-component)
 
 (defn show [save-listener]
-  (if (nil? (system-properties/read-data-directory))
-    (controller-utils/show (attach (load-data save-listener (choose-view/create))))
-    (save-listener)))
+  (if-let [data-directory (system-properties/read-data-directory)]
+    (do
+      (db-config/update-data-directory data-directory)
+      (save-listener))
+    (controller-utils/show (attach (load-data save-listener (choose-view/create))))))
 
 (defn click-save [parent-component]
   (choose-view/click-save parent-component))

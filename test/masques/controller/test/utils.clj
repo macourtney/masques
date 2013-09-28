@@ -1,6 +1,7 @@
 (ns masques.controller.test.utils
   (:use clojure.test
         masques.controller.utils)
+  (:require [masques.view.utils :as view-utils])
   (:import [java.awt.event ItemListener]
            [javax.swing JPanel JComboBox]))
 
@@ -33,15 +34,6 @@
     (is (not (.isEnabled test-panel)))
     (is (not (.isEnabled test-combobox)))))
 
-(deftest test-component-property
-  (let [test-key :key
-        test-value :value
-        test-panel (new JPanel)]
-    (save-component-property test-panel test-key test-value)
-    (is (= (retrieve-component-property test-panel test-key) test-value))
-    (is (= (remove-component-property test-panel test-key) test-value))
-    (is (nil? (retrieve-component-property test-panel test-key)))))
-
 (deftest test-attach-detach-listeners
   (let [test-combobox (new JComboBox)
         original-listener-count (count (.getItemListeners test-combobox))
@@ -49,9 +41,9 @@
         add-item-listener #(.addItemListener test-combobox %)
         remove-item-listener #(.removeItemListener test-combobox %)
         item-listener-key "test-item-listener"]
-    (is (nil? (retrieve-component-property test-combobox item-listener-key))) 
+    (is (nil? (view-utils/retrieve-component-property test-combobox item-listener-key))) 
     (attach-and-save-listener test-combobox add-item-listener item-listener-key item-listener)
     (is (= (count (.getItemListeners test-combobox)) (inc original-listener-count)))
-    (is (= (retrieve-component-property test-combobox item-listener-key) item-listener))
+    (is (= (view-utils/retrieve-component-property test-combobox item-listener-key) item-listener))
     (detach-and-remove-listener test-combobox remove-item-listener item-listener-key)
     (is (= (count (.getItemListeners test-combobox)) original-listener-count))))

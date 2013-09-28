@@ -14,6 +14,10 @@ With Masques, you can be sure your personal information, and entire social netwo
 
 You can learn more about Masques on our website: "Find Masques":http://findmasques.org/
 
+We also have a general Google group: "Masques Social Network":https://groups.google.com/forum/?hl=en#!forum/masques-social-network
+
+And, a development Google group: "Masques Social Network Development":https://groups.google.com/forum/#!forum/masques-social-network-development
+
 h3. License
 
 Copyright (C) 2012 Matthew Courtney

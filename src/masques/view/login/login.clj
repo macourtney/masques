@@ -6,7 +6,7 @@
   (:import [javax.swing JPasswordField]))
 
 (def field-size [300 :by 25])
-  
+
 (defn create-user-name-panel []
   (seesaw-core/flow-panel
     :align :right
@@ -30,7 +30,7 @@
 (defn create-field-panel []
   (seesaw-core/vertical-panel
       :items [(create-user-name-panel) [:fill-v 3] (create-password-panel)]))
-      
+
 (defn create-button-panel []
   (seesaw-core/border-panel :east
     (seesaw-core/border-panel
