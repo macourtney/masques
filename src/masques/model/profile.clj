@@ -12,9 +12,9 @@
   (let [key-pair (clj-crypto/generate-key-pair)
         key-pair-map (clj-crypto/get-key-pair-map key-pair)]
     (merge profile-record { :identity (Base64/encodeBase64String (:bytes (:public-key key-pair-map)))
-                  :identity-algorithm (:algorithm (:public-key key-pair-map))
-                  :private-key (Base64/encodeBase64String (:bytes (:private-key key-pair-map)))
-                  :private-key-algorithm (:algorithm (:private-key key-pair-map)) })))
+                            :identity-algorithm (:algorithm (:public-key key-pair-map))
+                            :private-key (Base64/encodeBase64String (:bytes (:private-key key-pair-map)))
+                            :private-key-algorithm (:algorithm (:private-key key-pair-map)) })))
 
 (defn create-user [user-name]
   (save (generate-keys {:alias user-name})))
