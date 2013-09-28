@@ -4,3 +4,6 @@
 
 (defn save [record]
   (insert-or-update profile record))
+
+(defn create-user [user-name]
+  (save {:alias user-name}))

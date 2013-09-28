@@ -5,6 +5,7 @@
 
 (def profile-record (save {
   :alias "Fred"
+  ; :avatar-path "/Users/Ted/masques/avatar.png"
 }))
 
 (deftest test-add-profile
@@ -15,4 +16,10 @@
   ; (is (:message-id share-record))
   ; (is (not (nil? (:uuid share-record))))
   ; (is (instance? org.joda.time.DateTime (:created-at share-record))))
+
+(deftest create-user-profile
+  (let [user-profile (create-user "Ted")]
+    (is user-profile)
+    (= (:alias user-profile) "Ted")
+    (println user-profile)))
 
