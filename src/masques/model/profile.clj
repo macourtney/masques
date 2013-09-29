@@ -6,10 +6,16 @@
 
 ; SAVE PROFILE
 
+(defn name-avatar [profile-record]
+  (str (:alias profile-record) "'s Avatar"))
+
+(defn insert-avatar [profile-record]
+  (let [avatar-file-map { :path (:avatar-path profile-record) :name (name-avatar profile-record) }]
+    (insert-or-update file avatar-file-map)))
+
 (defn save-avatar [profile-record]
   (if (:avatar-path profile-record)
-    (let [avatar (insert-or-update file { :path (:avatar-path profile-record) :name "Avatar" })]
-      (merge profile-record { :avatar-file-id (:id avatar) }))
+    (merge profile-record { :avatar-file-id (:id (insert-avatar profile-record)) })
     profile-record))
 
 (defn save [record]
@@ -23,8 +29,7 @@
     profile-record))
 
 (defn build [id]
-  (let [profile-record (find-by-id profile id)]
-    (attach-avatar profile-record)))
+  (attach-avatar (find-by-id profile id)))
 
 ; CREATE USER
 
