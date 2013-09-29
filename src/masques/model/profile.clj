@@ -18,12 +18,9 @@
 ; BUILD PROFILE
 
 (defn attach-avatar [profile-record]
-  (cond
-    (:avatar profile-record)
-      profile-record
-    (:avatar-file-id profile-record)
-      (conj { :avatar (find-by-id file (:avatar-file-id profile-record)) } profile-record)
-    :else profile-record))
+  (if (:avatar-file-id profile-record)
+    (conj { :avatar (find-by-id file (:avatar-file-id profile-record)) } profile-record)
+    profile-record))
 
 (defn build [id]
   (let [profile-record (find-by-id profile id)]
