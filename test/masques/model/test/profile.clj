@@ -5,7 +5,7 @@
 
 (def profile-record (save {
   :alias "Fred"
-  ; :avatar-path "/Users/Ted/masques/avatar.png"
+  :avatar-path "/Users/Ted/masques/avatar.png"
 }))
 
 (deftest test-add-profile
