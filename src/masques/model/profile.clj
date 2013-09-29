@@ -1,6 +1,5 @@
 (ns masques.model.profile
-  (:require [clj-record.boot :as clj-record-boot]
-            [clj-crypto.core :as clj-crypto])
+  (:require [clj-crypto.core :as clj-crypto])
   (:use masques.model.base
         korma.core)
   (:import [org.apache.commons.codec.binary Base64]))
