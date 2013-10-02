@@ -1,9 +1,24 @@
 (ns masques.model.profile
-  (:require [clj-crypto.core :as clj-crypto])
+  (:require [clj-crypto.core :as clj-crypto]
+            [config.db-config :as db-config])
   (:use masques.model.base
         korma.core)
   (:import [org.apache.commons.codec.binary Base64]))
 
+(def saved-current-user (atom nil))
+
+; CURRENT USER
+
+(defn current-user
+  "Returns the currently logged in user or nil if no user is logged in."
+  []
+  @saved-current-user)
+  
+(defn set-current-user
+  "Sets the currently logged in user."
+  [profile]
+  (reset! saved-current-user profile))
+  
 ; SAVE PROFILE
 
 (defn name-avatar [profile-record]
@@ -44,3 +59,18 @@
 (defn create-user [user-name]
   (save (generate-keys {:alias user-name})))
 
+(defn find-logged-in-user
+  "Finds the profile for the given user name which is a user of this database."
+  [user-name]
+  (when user-name
+    (clean-up-for-clojure (first (filter :private-key (select profile (where { :alias user-name })))))))
+    
+(defn init
+  "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
+  []
+  (let [user-name (db-config/current-username)]
+    (if-let [user-profile (find-logged-in-user user-name)]
+      (set-current-user user-profile)
+      (do
+        (create-user user-name)
+        (recur)))))

@@ -65,9 +65,7 @@
       (seesaw-core/invoke-later (login-cleanup login-frame true))
       (catch Throwable throwable
         (logging/error throwable "An error occured while logging in.")
-        (seesaw-core/invoke-later (login-cleanup login-frame false))))
-    ;(let [logged-in? (user-model/login user-name password)])
-    ))
+        (seesaw-core/invoke-later (login-cleanup login-frame false))))))
 
 (defn login-action [e]
   (let [login-frame (seesaw-core/to-frame e)]

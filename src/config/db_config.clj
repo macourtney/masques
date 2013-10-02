@@ -28,6 +28,9 @@
   (doseq [user-add-listener @user-add-listeners]
     (user-add-listener username)))
 
+(defn current-username []
+  @username)
+
 (defn data-dir []
   @data-directory)
 
