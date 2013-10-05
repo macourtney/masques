@@ -5,7 +5,7 @@
 
 (def profile-map {
   :alias "Ted"
-  :avatar-path "/Users/Ted/masques/avatar.png"
+  :avatar-path "/Users/ted/ted.png"
 })
 
 (deftest test-add-profile
