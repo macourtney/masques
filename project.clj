@@ -16,7 +16,6 @@
                  [korma "0.3.0-beta7"
                    :exclusions [org.clojure/clojure]]
                  [log4j/log4j "1.2.16"]
-                 [me.raynes/fs "1.4.5"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
