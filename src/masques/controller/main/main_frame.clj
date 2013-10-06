@@ -16,7 +16,7 @@
 (defn load-default-panels
   "Adds the default panels to the main frame."
   [main-frame]
-  (add-panels main-frame (stream-panel/create) (group-panel/create)))
+  (add-panels main-frame (group-panel/create) (stream-panel/create)))
 
 (defn show
   "Creates and shows the main frame."

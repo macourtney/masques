@@ -24,8 +24,6 @@
 
   :plugins [[lein-libdir "0.1.0"]]
 
-  :profiles { :dev { :dependencies [[clj-ns-browser "1.3.0"]] } } ; (use 'clj-ns-browser.sdoc) (sdoc)
-
   :resource-paths ["pkg/resources"]
 
   :libdir-path "lib"
@@ -37,6 +35,6 @@
   ; To run in development mode use: lein development
   :aliases { "development" ["run" "-m" "masques.development-main"]
              "dev" ["run" "-m" "masques.development-main"]}
-			 
+
   ;:offline? true
   )
