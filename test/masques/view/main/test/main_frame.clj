@@ -7,6 +7,6 @@
   (let [main-frame (create)]
     (is main-frame)
     (seesaw-core/show! main-frame)
-    (Thread/sleep 10000)
+    ;(Thread/sleep 10000)
     (seesaw-core/hide! main-frame)
     (seesaw-core/dispose! main-frame)))

@@ -83,7 +83,15 @@
 
 (defn choose-file
   "Pops up a file chooser and returns the chosen file if the user picks one, otherwise this function returns nil."
+  ([owner] (choose-file owner nil))
+  ([owner file-selection-mode]
+    (let [file-chooser (new JFileChooser)]
+      (when file-selection-mode
+        (.setFileSelectionMode file-chooser file-selection-mode))
+      (when (= JFileChooser/APPROVE_OPTION (.showOpenDialog file-chooser owner))
+        (.getSelectedFile file-chooser)))))
+
+(defn choose-directory
+  "Pops up a file chooser which only chooses directories. Returns the chosen directory or nil if the user does not select one."
   [owner]
-  (let [file-chooser (new JFileChooser)]
-    (when (= JFileChooser/APPROVE_OPTION (.showOpenDialog file-chooser owner))
-      (.getSelectedFile file-chooser))))
+  (choose-file owner JFileChooser/DIRECTORIES_ONLY ))

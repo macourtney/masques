@@ -18,7 +18,7 @@
 
   (init [this view])
 
-  (show [this view & args])
+  (show [this view args])
 
   (hide [this view]))
 

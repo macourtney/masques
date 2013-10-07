@@ -36,6 +36,9 @@
     (is (= (user-data-directory) "data/db/foo_/"))
     (update-username-password "foo%" "bar")
     (is (= (user-data-directory) "data/db/foo_0/"))
+    (let [test-username "foofoo"]
+      (add-username test-username)
+      (is (= (user-data-directory test-username) (str "data/db/" test-username "/"))))
     (update-data-directory old-data-dir)))
 
 (deftest test-username-file
@@ -43,6 +46,9 @@
     (update-data-directory "data/db/")
     (update-username-password "foo" "bar")
     (is (= (username-file) "data/db/foo/username.clj"))
+    (let [test-username "foofoo"]
+      (add-username test-username)
+      (is (= (username-file test-username) (str "data/db/" test-username "/username.clj"))))
     (update-data-directory old-data-dir)))
 
 (deftest test-ensure-users-map

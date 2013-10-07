@@ -13,7 +13,7 @@
 
   (init [this view] "Called when the panel is added.")
 
-  (show [this view & args] "Called right before the panel is shown.")
+  (show [this view args] "Called right before the panel is shown.")
 
   (hide [this view] "Called right after the panel is hidden."))
 

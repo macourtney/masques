@@ -4,6 +4,7 @@
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
             [seesaw.core :as seesaw-core]
+            [seesaw.event :as seesaw-event]
             [seesaw.mig :as seesaw-mig])
   (:import [java.awt Color]
            [javax.swing JLabel ImageIcon]))
@@ -16,6 +17,7 @@
 
 (def id "tool-bar")
 (def icons-panel-id "icons-panel")
+(def button-panel-name "panel-name")
 
 (defn create-masques-icon []
   (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png"))))
@@ -39,12 +41,13 @@
     :background search-background-color))
 
 (defn search-radios-panel []
-  (seesaw-core/flow-panel
-    :items [(seesaw-core/radio :id :search-shares-radio :text (term/shares) :background search-background-color)
-            (seesaw-core/radio :id :search-friends-radio :text (term/friends) :background search-background-color)]
+  (let [share-button-group (seesaw-core/button-group)]
+    (seesaw-core/flow-panel
+      :items [(seesaw-core/radio :id :search-shares-radio :text (term/shares) :background search-background-color :group share-button-group)
+              (seesaw-core/radio :id :search-friends-radio :text (term/friends) :background search-background-color :group share-button-group)]
 
-    :background search-background-color
-    :border (seesaw-border/line-border :top 1)))
+      :background search-background-color
+      :border (seesaw-border/line-border :top 1))))
 
 (defn search []
   (seesaw-core/flow-panel
@@ -62,6 +65,7 @@
     :west (search)
     :east (logout)
 
+    :hgap 30
     :background background-color))
 
 (defn create []
@@ -72,21 +76,24 @@
     :center (create-icons-bar)
     :east (create-global-actions-panel)
 
+    :hgap 30
     :background background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
               (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
               (seesaw-border/line-border :thickness 1 :color background-color))
-    :preferred-size [800 :by 105]))
+    :preferred-size [900 :by 105]))
 
 (defn create-icon-button
   "Creates the icon button for the given panel. If the panel does not have an icon, then the text of the button is set
 to the panel's name."
-  [panel]
+  [panel panel-button-listener]
   (let [icon (panel-protocol/icon panel)
         button (seesaw-core/button :id (str "icon-" panel) :icon icon :border 0 :background background-color)]
     (when (not icon)
       (seesaw-core/config! button :text (panel-protocol/panel-name panel)))
+    (view-utils/save-component-property button button-panel-name (panel-protocol/panel-name panel))
+    (seesaw-event/listen button :action-performed panel-button-listener)
     button))
 
 (defn find-icons-panel [tool-bar]
@@ -94,8 +101,8 @@ to the panel's name."
 
 (defn add-icon
   "Adds the given panel as an icon on the tool-bar."
-  [tool-bar panel]
+  [tool-bar panel panel-button-listener]
   (let [icons-panel (find-icons-panel tool-bar)
         current-icons (seesaw-core/config icons-panel :items)]
     (seesaw-core/config! icons-panel
-                         :items (concat current-icons [[:fill-h 5] (create-icon-button panel)]))))
+                         :items (concat current-icons [[:fill-h 25] (create-icon-button panel panel-button-listener)]))))

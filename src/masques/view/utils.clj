@@ -23,3 +23,9 @@
   (let [value (retrieve-component-property component key)]
     (save-component-property component key nil)
     value))
+    
+(defn top-level-ancestor
+"Returns the top-level ancestor of the given component (either the containing Window or Applet), or null if the component is null or has not been added to any container."
+  [component]
+  (when component
+    (.getTopLevelAncestor component)))
