@@ -1,8 +1,10 @@
 (ns masques.test.util
   (:require [clj-i2p.core :as clj-i2p]
             [clojure.test :as clojure-test]
+            [config.db-config :as db-config]
             [fixtures.user :as user-fixture]
             [fixtures.util :as fixture-util]
+            [masques.model.profile :as profile-model]
             [masques.model.user :as user-model]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
@@ -10,11 +12,10 @@
 (def test-destination (clj-i2p/as-destination "pR-QlZfMy3edvvUVMyLBsHvONlskEjWVHk6LPzp3UCEKyx9l6y7AYsGPlUprlfb9QiDQIamxxy6ohsArHvHpdrrFD0fOe9SEWicqnm0VFwY8v6gib-HR5TA~19jcvzqxPKM2v1i4NLVofmbR0b-e~zsdC8~QrY4W8PGeY56lQaSWn9SqPj06EqudaI8VJdkiyTUnvUZY0ReZP5Hn4Bec47QCmL6njtd9UCNkK0jrrmlN0kXBBNH1ICfQa89HAvBE3S7IC2joJXCw1mdr7J9JHqies9DqVEKMFAqC0KHVQvR7MYn47OwIGIcxQm~tKLU~qyMqbdSUsA66JQJCquVjSE~pIU6KxgD-5vz4Dz9tohpI9bQiUkSkyYeydv3pYLegODM~79l6kfszPiBi1Eq7aJhjvvzvV13FO4FjxKVPRJJfnr6vOnJjW2cEauNpriiY-GlOmcWePrro7fN2vceL1M7DlC28icYBZV4YBiwLZ4hr0soCyAS6oiB9P6EBYmNHAAAA"))
 
 (defn login []
-  (when-not (user-model/login "test-user" (.toCharArray "password"))
-    (throw (RuntimeException. "Failed to login as a test user."))))
+  (profile-model/init))
 
 (defn logout []
-  (user-model/logout))
+  (profile-model/logout))
 
 (defn login-fixture [function]
   (try

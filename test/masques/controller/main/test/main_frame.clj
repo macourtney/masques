@@ -5,12 +5,15 @@
             ;[masques.model.friend :as friend-model]
             ;[masques.model.identity :as identity-model]
             ;[masques.model.peer :as peer-model]
-            ;[masques.test.util :as test-util]
-            [seesaw.core :as seesaw-core])
+            [masques.test.util :as test-util]
+            [seesaw.core :as seesaw-core]
+            test.init)
   (:use clojure.test
         masques.controller.main.main-frame))
 
 ;(test-util/use-combined-login-fixture identity-fixture/fixture-map)
+
+(use-fixtures :once test-util/login-fixture)
 
 (defn assert-listener-count [test-count]
   ;(is (= (friend-model/friend-add-listener-count) test-count))

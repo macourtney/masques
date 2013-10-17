@@ -57,13 +57,13 @@
                             :private-key-algorithm (:algorithm (:private-key key-pair-map)) })))
 
 (defn create-user [user-name]
-  (save (generate-keys {:alias user-name})))
+  (save (generate-keys { :alias user-name })))
 
 (defn find-logged-in-user
   "Finds the profile for the given user name which is a user of this database."
   [user-name]
   (when user-name
-    (clean-up-for-clojure (first (filter :private-key (select profile (where { :alias user-name })))))))
+    (clean-up-for-clojure (first (filter :private-key (select profile (where { :ALIAS user-name })))))))
     
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
@@ -71,6 +71,12 @@
   (let [user-name (db-config/current-username)]
     (if-let [user-profile (find-logged-in-user user-name)]
       (set-current-user user-profile)
-      (do
-        (create-user user-name)
-        (recur)))))
+      (let [new-profile (create-user user-name)]
+        (if-let [user-profile (find-logged-in-user user-name)]
+          (set-current-user user-profile)
+          (throw (RuntimeException. (str "Could not create user: " user-name))))))))
+
+(defn logout
+  "Logs out the currently logged in user. Just used for testing."
+  []
+  (set-current-user nil))

@@ -6,9 +6,11 @@
             [seesaw.core :as seesaw-core])
   (:import [javax.swing ImageIcon]))
 
+(def profile-name-id :profile-name)
+  
 (defn create-header []
   (seesaw-core/border-panel
-    :west (seesaw-core/flow-panel :items [(seesaw-core/text :id :profile-name :columns 20)])
+    :west (seesaw-core/flow-panel :items [(seesaw-core/text :id profile-name-id :columns 20)])
     :east (seesaw-core/vertical-panel :items [(panel-subview/create-panel-label (term/your-profile))])))
 
 (defn create-profile-page-tools []
@@ -64,3 +66,18 @@
 
     :vgap 10
     :border 11))
+
+(defn find-profile-name-text
+  "Returns the profile name text field in the given profile panel view."
+  [view]
+  (view-utils/find-component view (str "#" (name profile-name-id))))
+  
+(defn set-profile-name-text
+  "Sets the text of the profile name text field to the given text"
+  [view text]
+  (seesaw-core/config! (find-profile-name-text view) :text text))
+
+(defn fill-panel
+  "Fills the given profile panel view with data from the given profile."
+  [view profile]
+  (set-profile-name-text view (:alias profile)))
