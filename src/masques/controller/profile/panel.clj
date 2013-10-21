@@ -6,6 +6,8 @@
   (:import [masques.controller.main.panel_protocol PanelProtocol]
            [javax.swing ImageIcon]))
 
+(def panel-name-str "Profile")
+
 (defn fill-profile
   "Fills the given profile panel view with data from the currently logged in user."
   [view]
@@ -14,7 +16,7 @@
            
 (deftype ProfilePanel []
   PanelProtocol
-  (panel-name [this] "Profile")
+  (panel-name [this] panel-name-str)
 
   (create-view [this] (panel-view/create))
 

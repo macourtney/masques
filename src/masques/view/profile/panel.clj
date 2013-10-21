@@ -7,6 +7,7 @@
   (:import [javax.swing ImageIcon]))
 
 (def profile-name-id :profile-name)
+(def profile-body-text-id :profile-body-text)
   
 (defn create-header []
   (seesaw-core/border-panel
@@ -31,7 +32,7 @@
   
 (defn create-profile-page-body []
   (seesaw-core/scrollable
-    (seesaw-core/text :id :profile-body-text :multi-line? true :wrap-lines? true)))
+    (seesaw-core/text :id profile-body-text-id :multi-line? true :wrap-lines? true)))
 
 (defn create-profile-page []
   (seesaw-core/border-panel
@@ -72,12 +73,23 @@
   [view]
   (view-utils/find-component view (str "#" (name profile-name-id))))
   
+(defn find-profile-body-text
+  "Returns the profile body text area in the given profile panel view."
+  [view]
+  (view-utils/find-component view (str "#" (name profile-body-text-id))))
+  
 (defn set-profile-name-text
   "Sets the text of the profile name text field to the given text"
   [view text]
   (seesaw-core/config! (find-profile-name-text view) :text text))
+  
+(defn set-profile-body-text
+  "Sets the text of the profile name text field to the given text"
+  [view text]
+  (seesaw-core/config! (find-profile-body-text view) :text text))
 
 (defn fill-panel
   "Fills the given profile panel view with data from the given profile."
   [view profile]
-  (set-profile-name-text view (:alias profile)))
+  (set-profile-name-text view (:alias profile))
+  (set-profile-body-text view (:page profile)))
