@@ -68,21 +68,27 @@
   "Finds the profile for the given user name which is a user of this database."
   [user-name]
   (when user-name
-    (clean-up-for-clojure (first
+    (build (:id (first
       (select profile
-        (fields :ID :ALIAS :PRIVATE_KEY)
+        (fields :ID)
         (where { :ALIAS user-name  :PRIVATE_KEY [not= nil]})
-        (limit 1))))))
-    
+        (limit 1)))))))
+
+(defn reload-current-user
+  "Reloads the current user from the database. Returns the current user."
+  ([] (reload-current-user (db-config/current-username)))
+  ([user-name]
+    (when-let [user-profile (find-logged-in-user user-name)]
+      (set-current-user user-profile)
+      user-profile)))
+
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
   []
   (let [user-name (db-config/current-username)]
-    (if-let [user-profile (find-logged-in-user user-name)]
-      (set-current-user user-profile)
+    (when-not (reload-current-user user-name)
       (let [new-profile (create-user user-name)]
-        (if-let [user-profile (find-logged-in-user user-name)]
-          (set-current-user user-profile)
+        (when-not (reload-current-user user-name)
           (throw (RuntimeException. (str "Could not create user: " user-name))))))))
 
 (defn logout
