@@ -58,12 +58,21 @@
 
 (defn create-user [user-name]
   (save (generate-keys { :alias user-name })))
+  
+(defn create-friend-profile
+  "Creates a profile for a friend where you only have the alias, identity and identity algorithm."
+  [alias identity identity-algorithm]
+  (save { :alias alias :identity identity :identity-algorithm identity-algorithm }))
 
 (defn find-logged-in-user
   "Finds the profile for the given user name which is a user of this database."
   [user-name]
   (when user-name
-    (clean-up-for-clojure (first (filter :private-key (select profile (where { :ALIAS user-name })))))))
+    (clean-up-for-clojure (first
+      (select profile
+        (fields :ID :ALIAS :PRIVATE_KEY)
+        (where { :ALIAS user-name  :PRIVATE_KEY [not= nil]})
+        (limit 1))))))
     
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
