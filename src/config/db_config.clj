@@ -36,7 +36,8 @@
 
 (defn username-from-directory [user-directory]
   (when-let [username-file (java-io/file user-directory user-filename-str)]
-    (edn/read username-file)))
+    (when (.exists username-file)
+      (edn/read username-file))))
 
 (defn add-user-directory-to-map [users-map user-directory]
   (if user-directory
