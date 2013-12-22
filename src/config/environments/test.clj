@@ -2,6 +2,8 @@
   (:import [org.apache.log4j ConsoleAppender FileAppender Level Logger PatternLayout]
            [org.apache.log4j.varia LevelRangeFilter]))
 
+(def view-sleep-time 10000)
+
 ; Sets up the logger for test mode.
 (def output-pattern (new PatternLayout "%d{ISO8601} %-5p [%c]: %m%n"))
 

@@ -1,5 +1,6 @@
 (ns masques.view.login.test.login
-  (:require [seesaw.core :as seesaw-core])
+  (:require [seesaw.core :as seesaw-core]
+            [config.environments.test :as env])
   (:use clojure.test
         masques.view.login.login))
 
@@ -7,6 +8,6 @@
   (let [login-frame (create)]
     (is login-frame)
     (seesaw-core/show! login-frame)
-    ;(Thread/sleep 10000)
+    (Thread/sleep env/view-sleep-time)
     (seesaw-core/hide! login-frame)
     (seesaw-core/dispose! login-frame)))
