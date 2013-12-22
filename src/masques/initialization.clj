@@ -3,7 +3,7 @@
             [masques.interceptor :as interceptor]
             [masques.model.identity :as identity-model]
             [masques.model.peer :as peer-model]
-            [masques.model.test.profile :as profile-model]
+            [masques.model.profile :as profile-model]
             [masques.service.protocol :as service-protocol]))
 
 (defn init
