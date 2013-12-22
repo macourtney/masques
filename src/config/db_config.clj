@@ -95,7 +95,7 @@
   ([username]
     (when-let [data-dir (data-dir)]
       (when-let [user-directory (find-user-directory username)]
-        (str data-dir user-directory "/")))))
+        (str data-dir "/" user-directory "/")))))
 
 (defn username-file
   ([] (username-file @username))
