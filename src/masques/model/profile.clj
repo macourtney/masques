@@ -1,6 +1,7 @@
 (ns masques.model.profile
   (:require [clj-crypto.core :as clj-crypto]
             [config.db-config :as db-config])
+            [masques.model.avatar :as avatar-model])
   (:use masques.model.base
         korma.core)
   (:import [org.apache.commons.codec.binary Base64]))
@@ -26,6 +27,7 @@
 
 (defn insert-avatar [profile-record]
   (let [avatar-file-map { :path (:avatar-path profile-record) :name (name-avatar profile-record) }]
+    (avatar-model/create-avatar-image (:avatar-path profile-record))
     (insert-or-update file avatar-file-map)))
 
 (defn save-avatar [profile-record]
