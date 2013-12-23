@@ -5,6 +5,7 @@
             [clojure.java.io :as java-io]
             [clojure.string :as string]
             [clojure.tools.logging :as logging]
+            [clojure.tools.string-utils :as string-utils]
             [config.environment :as environment]
             [drift-db-h2.flavor :as h2]
             [masques.edn :as edn]))
@@ -95,7 +96,8 @@
   ([username]
     (when-let [data-dir (data-dir)]
       (when-let [user-directory (find-user-directory username)]
-        (str data-dir "/" user-directory "/")))))
+        (str (string-utils/add-ending-if-absent data-dir "/")
+             (string-utils/add-ending-if-absent user-directory "/"))))))
 
 (defn username-file
   ([] (username-file @username))
