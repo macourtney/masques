@@ -2,6 +2,7 @@
   (:require [config.db-config :as db-config]
             [clojure.tools.cli :as cli]
             [clojure.tools.string-utils :as conjure-str-utils]
+            [clojure.tools.logging :as logging]
             [config.environment :as environment]
             [drift.runner :as drift-runner]
             [drift-db.core :as drift-db]))
@@ -38,17 +39,17 @@
   (run-fn 'masques.initialization 'init)
   (deliver init? true))
 
-(defn
-#^{ :doc "Initializes the masques server. This function should be called immediately after a successful login." }
-  init []
+(defn init
+  "Initializes the masques server. This function should be called immediately after a successful login."
+  []
   (when (compare-and-set! initialized? false true)
     (init-promise-fn))
   @init?)
 
-(defn
-#^{ :doc "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
-production, or test." }
-  set-mode [mode]
+(defn set-mode
+  "Sets the server mode to the given mode. The given mode must be a keyword or string like development, 
+production, or test."
+  [mode]
   (when mode
     (println "Setting mode to" mode)
     (environment/set-evironment-property (conjure-str-utils/str-keyword mode))))

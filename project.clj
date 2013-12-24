@@ -10,7 +10,7 @@
                    :exclusions [org.clojure/clojure]]
                  [clj-time "0.5.0"]
                  [com.github.sarxos/windows-registry-util "0.2"]
-                 [com.h2database/h2 "1.3.162"]
+                 [com.h2database/h2 "1.3.174"]
                  [drift "1.5.1"]
                  [image-resizer "0.1.6"]
                  [korma "0.3.0-beta7"

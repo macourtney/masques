@@ -76,7 +76,7 @@
   (contains? (set (vals (dissoc (ensure-users-map) username))) user-directory))
 
 (defn user-directory [username]
-  (let [user-dir (string/replace username #"[ \\/\?%:\|\"<>\t\n\r\f\a\e]" "_")]
+  (let [user-dir (string/replace username #"[ \\/\?%:\|\"<>\t\n\r\f\a\e]" "_")] ;"
     (if (not (user-directory-taken? username user-dir))
       user-dir
       (some #(when (not (user-directory-taken? username %1)) %1) (map #(str user-dir %) (range))))))
@@ -124,11 +124,22 @@
   (update-private-key-directory)
   (reset-users-map))
 
+(defn as-string
+  "Converts the given value to it's string value."
+  [value]
+  (cond
+    (string? value) value
+    ; char array.
+    (instance? (Class/forName "[C") value) (String. value)
+    (nil? value) value
+    :else (throw (RuntimeException. (str "Unknown type:" (class value))))))
+
 (defn update-username-password [new-username new-password]
-  (reset! username new-username)
-  (add-username-if-missing new-username)
-  (reset! password new-password)
-  (update-private-key-directory))
+  (let [new-password-str (as-string new-password)]
+    (reset! username new-username)
+    (add-username-if-missing new-username)
+    (reset! password new-password-str)
+    (update-private-key-directory)))
 
 (defn dbname [environment]
   (condp = environment
@@ -141,9 +152,9 @@
      ;; The name of the test database to use.
      :test "masques_test"))
 
-(defn
-#^{:doc "Returns the database flavor which is used by Conjure to connect to the database."}
-  create-flavor [environment]
+(defn create-flavor
+  "Returns the database flavor which is used by Conjure to connect to the database."
+  [environment]
   (logging/info (str "Environment: " environment))
   (h2/h2-flavor
 
@@ -159,8 +170,9 @@
     ;; Include encryption only when both the username and password are present
     (and @username @password)))
 
-(defn
-  load-config []
+(defn load-config
+  "Loads the db flavor using the preset username, password and environment."
+  []
   (let [environment (environment/environment-name)]
     (if-let [flavor (create-flavor (keyword environment))]
       flavor
