@@ -8,7 +8,7 @@
 
 (def profile-map {
   :alias "Ted"
-  :avatar-path "/Users/ted/ted.png"
+  :avatar-path "./test/support_files/avatar.png"
 })
 
 (deftest test-add-profile
