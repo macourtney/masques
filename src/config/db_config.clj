@@ -122,10 +122,12 @@
   (reset-users-map))
 
 (defn update-username-password [new-username new-password]
-  (reset! username new-username)
-  (add-username-if-missing new-username)
-  (reset! password new-password)
-  (update-private-key-directory))
+  (let [new-username (str new-username)
+        new-password (str new-password)]
+    (reset! username new-username)
+    (add-username-if-missing new-username)
+    (reset! password new-password)
+    (update-private-key-directory)))
 
 (defn dbname [environment]
   (condp = environment
