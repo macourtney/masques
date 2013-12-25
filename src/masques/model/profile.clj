@@ -1,6 +1,6 @@
 (ns masques.model.profile
   (:require [clj-crypto.core :as clj-crypto]
-            [config.db-config :as db-config])
+            [config.db-config :as db-config]
             [masques.model.avatar :as avatar-model])
   (:use masques.model.base
         korma.core)
