@@ -135,11 +135,10 @@
     :else (throw (RuntimeException. (str "Unknown type:" (class value))))))
 
 (defn update-username-password [new-username new-password]
-  (let [new-password-str (as-string new-password)]
-    (reset! username new-username)
-    (add-username-if-missing new-username)
-    (reset! password new-password-str)
-    (update-private-key-directory)))
+  (reset! username new-username)
+  (add-username-if-missing new-username)
+  (reset! password (as-string new-password))
+  (update-private-key-directory))
 
 (defn dbname [environment]
   (condp = environment
