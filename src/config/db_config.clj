@@ -122,7 +122,6 @@
   (reset-users-map))
 
 (defn update-username-password [new-username new-password]
-  (println "START OF UPDATE-USERNAME-PASSWORD" new-password)
   (let [new-password (when new-password (String. new-password))]
     (reset! username new-username)
     (add-username-if-missing new-username)
@@ -172,7 +171,6 @@
     (let [old-username @username
           old-password @password]
       (try
-        (println "FROM CREATE-USER" new-password)
         (update-username-password new-username new-password)
         (load-config)
         new-username
