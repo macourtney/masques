@@ -94,7 +94,7 @@
   ([username]
     (when-let [data-dir (data-dir)]
       (when-let [user-directory (find-user-directory username)]
-        (str data-dir user-directory "/")))))
+        (str data-dir "/" user-directory "/")))))
 
 (defn username-file
   ([] (username-file @username))
@@ -122,8 +122,8 @@
   (reset-users-map))
 
 (defn update-username-password [new-username new-password]
-  (let [new-username (str new-username)
-        new-password (str new-password)]
+  (println "START OF UPDATE-USERNAME-PASSWORD" new-password)
+  (let [new-password (when new-password (String. new-password))]
     (reset! username new-username)
     (add-username-if-missing new-username)
     (reset! password new-password)
@@ -172,6 +172,7 @@
     (let [old-username @username
           old-password @password]
       (try
+        (println "FROM CREATE-USER" new-password)
         (update-username-password new-username new-password)
         (load-config)
         new-username
