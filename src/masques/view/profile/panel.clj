@@ -2,6 +2,7 @@
   (:require [clj-internationalization.term :as term]
             [masques.view.subviews.panel :as panel-subview]
             [masques.view.utils :as view-utils]
+            [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing ImageIcon]))
@@ -42,8 +43,47 @@
     :hgap 5
     :border 11))
 
+(defn create-visibility-selection-type []
+  (let [selection-type-group (seesaw-core/button-group)]
+    (seesaw-core/vertical-panel
+      :items [(seesaw-core/radio :id :default-share-group-button 
+                                 :text (term/default-share-group)
+                                 :group selection-type-group
+                                 :selected? true)
+              [:fill-v 3]
+              (seesaw-core/radio :id :all-button
+                                 :text (term/all)
+                                 :group selection-type-group)
+              [:fill-v 3]
+              (seesaw-core/radio :id :selected-button
+                                 :text (term/selected)
+                                 :group selection-type-group)] 
+
+      :border (seesaw-border/line-border))))
+
+(defn create-visibility-share-with []
+  (seesaw-core/scrollable
+    (seesaw-core/listbox)
+ 
+    :preferred-size  [200 :by 80]))
+
+(defn create-visibility-selection-panel []
+  (seesaw-core/horizontal-panel
+    :items [(create-visibility-selection-type) [:fill-h 5] 
+            (create-visibility-share-with)]))
+
 (defn create-visibility []
-  (seesaw-core/flow-panel :items ["visibility"]))
+  (seesaw-core/border-panel
+    :north (seesaw-core/border-panel
+             :north (term/who-can-see-my-profile)
+             :center (create-visibility-selection-panel)
+             :south (seesaw-core/text 
+                      :text (term/you-may-see-everyone-you-have-shared-your-profile-with)
+                      :multi-line? true :wrap-lines? true :editable? false
+                      :opaque? false)
+    
+             :vgap 5
+             :border 11)))
 
 (defn create-shares []
   (seesaw-core/flow-panel :items ["shares"]))
