@@ -63,7 +63,7 @@
 
 (defn create-visibility-share-with []
   (seesaw-core/scrollable
-    (seesaw-core/listbox)
+    (seesaw-core/listbox :id :select-who-can-see-listbox)
  
     :preferred-size  [200 :by 80]))
 
@@ -86,7 +86,13 @@
              :border 11)))
 
 (defn create-shares []
-  (seesaw-core/flow-panel :items ["shares"]))
+  (seesaw-core/border-panel
+    :north (term/i-have-shared-my-profile-with)
+    :center (seesaw-core/scrollable
+              (seesaw-core/listbox :id :shared-profile-with-listbox))
+    
+    :vgap 5
+    :border 11))
 
 (defn create-advanced []
   (seesaw-core/flow-panel :items ["advanced"]))
