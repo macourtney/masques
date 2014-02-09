@@ -38,6 +38,10 @@
 (defn save [record]
   (insert-or-update profile (dissoc (save-avatar record) :avatar :avatar-path)))
 
+(defn save-current-user [record]
+  (when-not (find-by-id profile 1)
+    (save record)))
+
 ; BUILD PROFILE
 
 (defn attach-avatar [profile-record]

@@ -3,6 +3,12 @@
   (:use masques.model.base
         korma.core))
 
+(defn file-mime-type [path]
+  "todo")
+
+(defn file-size [path]
+  "todo")
+
 (defn save [record]
   (insert-or-update file record))
 
@@ -11,4 +17,10 @@
 
 (defn copy [source-path dest-path]
   (io/copy (io/file source-path) (io/file dest-path)))
+
+(defn file [path]
+  (io/file path))
+
+(defn delete [path]
+  (io/delete-file path))
 

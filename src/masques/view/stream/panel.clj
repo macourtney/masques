@@ -10,6 +10,8 @@
 (def button-size [100 :by 25])
 (def date-range-text-size [50 :by 25])
 
+(def share-types [:friend-request :file])
+
 (def group-background-color (seesaw-color/color 238 238 238))
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 

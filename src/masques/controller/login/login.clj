@@ -62,6 +62,8 @@
     (db-config/update-username-password user-name password)
     (try
       (core/database-init)
+      #_(profile-model/save-user {:alias (db-config/current-username)})
+      "todo: insert record into profile"
       (seesaw-core/invoke-later (login-cleanup login-frame true))
       (catch Throwable throwable
         (logging/error throwable "An error occured while logging in.")

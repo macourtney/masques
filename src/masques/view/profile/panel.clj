@@ -30,6 +30,13 @@
             (term/password)
             (panel-subview/create-button :password-change-button (term/change))]))
   
+(defn create-profile-save-button []
+  (seesaw-core/button :id :profile-save-button :text (term/save)))
+
+(defn create-save-button-panel []
+  (seesaw-core/border-panel
+    :east (create-profile-save-button)))
+
 (defn create-profile-page-body []
   (seesaw-core/scrollable
     (seesaw-core/text :id profile-body-text-id :multi-line? true :wrap-lines? true)))
@@ -38,6 +45,7 @@
   (seesaw-core/border-panel
     :west (create-profile-page-tools)
     :center (create-profile-page-body)
+    :south (create-save-button-panel)
     
     :hgap 5
     :border 11))
@@ -68,6 +76,11 @@
     :vgap 10
     :border 11))
 
+(defn find-profile-save-button
+  "Returns the save button for the profile."
+  [view]
+  (view-utils/find-component view "#profile-save-button"))
+
 (defn find-profile-name-text
   "Returns the profile name text field in the given profile panel view."
   [view]
@@ -77,6 +90,12 @@
   "Returns the profile body text area in the given profile panel view."
   [view]
   (view-utils/find-component view (str "#" (name profile-body-text-id))))
+
+(defn profile-body-text
+  ([view]
+    (seesaw-core/text (find-profile-body-text view)))
+  ([view text]
+    (seesaw-core/text (find-profile-body-text view) text)))
   
 (defn set-profile-name-text
   "Sets the text of the profile name text field to the given text"

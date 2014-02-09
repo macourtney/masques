@@ -7,7 +7,7 @@
   (:import [java.sql Clob]
            [org.apache.commons.codec.binary Base64]))
 
-(def saved-current-user (atom nil))
+(def user (atom nil))
 
 (def user-add-listeners (atom []))
 
@@ -25,6 +25,15 @@
 
 (defn user-clean-up [user]
   (clean-clob-key (clean-clob-key user :public_key) :private_key))
+
+(defn find-profile 
+  ([user]
+    (find-by-id profile (:profile-id user)))
+  ([]
+    (find-profile @user)))
+
+(defn attach-profile []
+  "todo")
 
 (defn password-str [password]
   (if (string? password)
@@ -103,16 +112,16 @@
     (:encrypted_password_n user)))
 
 (defn login [user-name password]
-  (when-let [user (find-user-by-name user-name)]
-    (when (= (:encrypted_password user) (encrypted-password user password))
-      (reset! saved-current-user (assoc user :password password))
-      @saved-current-user)))
+  (when-let [user-record (find-user-by-name user-name)]
+    (when (= (:encrypted_password user-record) (encrypted-password user-record password))
+      (reset! user (assoc user-record :password password))
+      @user)))
 
 (defn logout []
-  (reset! saved-current-user nil))
+  (reset! user nil))
 
 (defn current-user []
-  @saved-current-user)
+  @user)
 
 (defn decode-base64 [string]
   (when string
