@@ -18,9 +18,9 @@
 (defn copy [source-path dest-path]
   (io/copy (io/file source-path) (io/file dest-path)))
 
-(defn file [path]
+(defn as-file [path]
   (io/file path))
 
-(defn delete [path]
+(defn delete-file [path]
   (io/delete-file path))
 

@@ -10,7 +10,7 @@
                    :exclusions [org.clojure/clojure]]
                  [clj-time "0.5.0"]
                  [com.github.sarxos/windows-registry-util "0.2"]
-                 [com.h2database/h2 "1.3.162"]
+                 [com.h2database/h2 "1.3.174"]
                  [drift "1.5.1"]
                  [image-resizer "0.1.6"]
                  [korma "0.3.0-beta7"
@@ -20,7 +20,7 @@
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.drift-db/drift-db-h2 "1.1.6"]
+                 [org.drift-db/drift-db-h2 "1.1.7-SNAPSHOT"]
                  [seesaw "1.4.1"]]
 
   :plugins [[lein-libdir "0.1.0"]]

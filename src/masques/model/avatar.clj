@@ -10,7 +10,7 @@
 (def avatar-width 150)
 
 (defn resize-avatar [source-path]
-  (format/as-file (resizer/resize-to-width (io/file source-path) avatar-width) (str (db-config/user-data-directory) "avatar.png")))
+  (format/as-file (resizer/resize-to-width (io/as-file source-path) avatar-width) (str (db-config/user-data-directory) "avatar.png")))
 
 (defn create-avatar-image [source-path]
   ; (try

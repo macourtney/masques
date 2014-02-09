@@ -5,6 +5,7 @@
             [clojure.java.io :as java-io]
             [clojure.string :as string]
             [clojure.tools.logging :as logging]
+            [clojure.tools.string-utils :as string-utils]
             [config.environment :as environment]
             [drift-db-h2.flavor :as h2]
             [masques.edn :as edn]))
@@ -36,7 +37,8 @@
 
 (defn username-from-directory [user-directory]
   (when-let [username-file (java-io/file user-directory user-filename-str)]
-    (edn/read username-file)))
+    (when (.exists username-file)
+      (edn/read username-file))))
 
 (defn add-user-directory-to-map [users-map user-directory]
   (if user-directory
@@ -74,7 +76,7 @@
   (contains? (set (vals (dissoc (ensure-users-map) username))) user-directory))
 
 (defn user-directory [username]
-  (let [user-dir (string/replace username #"[ \\/\?%:\|\"<>\t\n\r\f\a\e]" "_")]
+  (let [user-dir (string/replace username #"[ \\/\?%:\|\"<>\t\n\r\f\a\e]" "_")] ;"
     (if (not (user-directory-taken? username user-dir))
       user-dir
       (some #(when (not (user-directory-taken? username %1)) %1) (map #(str user-dir %) (range))))))
@@ -94,7 +96,8 @@
   ([username]
     (when-let [data-dir (data-dir)]
       (when-let [user-directory (find-user-directory username)]
-        (str data-dir "/" user-directory "/")))))
+        (str (string-utils/add-ending-if-absent data-dir "/")
+             (string-utils/add-ending-if-absent user-directory "/"))))))
 
 (defn username-file
   ([] (username-file @username))
@@ -121,12 +124,23 @@
   (update-private-key-directory)
   (reset-users-map))
 
+(defn as-string
+  "Converts the given value to it's string value."
+  [value]
+  (cond
+    (string? value) value
+    ; char array.
+    (instance? (Class/forName "[C") value) (String. value)
+    (nil? value) value
+    :else (throw (RuntimeException. (str "Unknown type:" (class value))))))
+
 (defn update-username-password [new-username new-password]
   (let [new-password (when new-password (String. new-password))]
     (reset! username new-username)
     (add-username-if-missing new-username)
     (reset! password new-password)
     (update-private-key-directory)))
+
 
 (defn dbname [environment]
   (condp = environment
@@ -139,9 +153,9 @@
      ;; The name of the test database to use.
      :test "masques_test"))
 
-(defn
-#^{:doc "Returns the database flavor which is used by Conjure to connect to the database."}
-  create-flavor [environment]
+(defn create-flavor
+  "Returns the database flavor which is used by Conjure to connect to the database."
+  [environment]
   (logging/info (str "Environment: " environment))
   (h2/h2-flavor
 
@@ -157,8 +171,9 @@
     ;; Include encryption only when both the username and password are present
     (and @username @password)))
 
-(defn
-  load-config []
+(defn load-config
+  "Loads the db flavor using the preset username, password and environment."
+  []
   (let [environment (environment/environment-name)]
     (if-let [flavor (create-flavor (keyword environment))]
       flavor

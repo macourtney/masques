@@ -3,7 +3,6 @@
             [config.db-config :as db-config]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.utils :as controller-utils]
-            ;[masques.model.user :as user-model]
             [masques.view.login.create-user :as create-user-view]
             [seesaw.core :as seesaw-core]))
 
