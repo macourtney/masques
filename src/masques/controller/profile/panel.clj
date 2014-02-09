@@ -1,5 +1,6 @@
 (ns masques.controller.profile.panel
-  (:require [masques.controller.actions.utils :as action-utils]
+  (:require [clj-internationalization.term :as term]
+            [masques.controller.actions.utils :as action-utils]
             [masques.controller.main.panel-protocol :as panel-protocol]
             [masques.model.profile :as profile-model]
             [masques.view.profile.panel :as panel-view]
@@ -42,6 +43,8 @@
   (create-view [this] (create-profile-panel))
 
   (icon [this] (ImageIcon. (ClassLoader/getSystemResource "profile.png")))
+  
+  (display-text [this] (term/profile))
 
   (init [this view])
 

@@ -1,5 +1,11 @@
 (ns masques.view.utils
-  (:require [seesaw.core :as seesaw-core]))
+  (:require [seesaw.color :as seesaw-color]
+            [seesaw.core :as seesaw-core]))
+
+(def link-color "#FFAA00")
+
+(defn create-link-font [size]
+  { :name "DIALOG" :style :bold :size size })
 
 (defn center-window-on [parent window]
   (seesaw-core/pack! window)

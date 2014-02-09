@@ -10,6 +10,8 @@
   (create-view [this] "Creates the view to be placed in the display area of the main window.")
 
   (icon [this] "Returns the icon for this panel.")
+  
+  (display-text [this] "Returns the text representation of this panel. Used in the tool bar.")
 
   (init [this view] "Called when the panel is added.")
 

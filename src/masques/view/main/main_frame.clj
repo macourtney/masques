@@ -58,4 +58,5 @@
 (defn show-panel
   "Shows the given panel (or panel id)."
   [main-frame panel args]
+  (tool-bar/select-icon-button (find-tool-bar main-frame) panel)
   (display-panel/show-panel (find-display-panel main-frame) panel (or args [])))

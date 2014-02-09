@@ -1,5 +1,6 @@
 (ns masques.controller.stream.panel
-  (:require [clojure.java.io :as java-io]
+  (:require [clj-internationalization.term :as term]
+            [clojure.java.io :as java-io]
             [masques.controller.actions.utils :as actions-utils]
             [masques.controller.main.panel-protocol :as panel-protocol]
             [masques.controller.utils :as controller-utils]
@@ -15,6 +16,8 @@
   (create-view [this] (panel-view/create))
 
   (icon [this] (ImageIcon. (ClassLoader/getSystemResource "stream.png")))
+
+  (display-text [this] (term/stream))
 
   (init [this view])
 
