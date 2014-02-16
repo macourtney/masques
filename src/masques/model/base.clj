@@ -124,8 +124,6 @@
   "Prepares H2 data, from the database, for the rest of our clojure application."
   (let [field-data (get record field-name)]
     (cond
-      ; (nil? field-data)
-        ; (remove-item field-name record)
       (instance? Clob field-data)
         (clean-clob-for-clojure record field-name field-data)
       (instance? java.sql.Timestamp field-data)
@@ -163,18 +161,13 @@
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
 
 (defn insert-record [entity record]
-  (println (str "\nbefore insert: " record))
   (let [id (vals (insert entity (values record)))]
-    (println "\nthe insert just happened")
-    (println "\nafter insert: " (find-by-id entity id))
     (find-by-id entity id)))
 
 (defn update-record [entity record]
-  (println (str "\nbefore update: " record))
   (update entity
     (set-fields record)
     (where {:ID (:ID record)}))
-  (println (str "\nafter update: " (find-by-id entity (:ID record))))
   (find-by-id entity (:ID record)))
 
 (defn insert-or-update [entity record]
