@@ -1,15 +1,15 @@
 (ns masques.edn
   (:refer-clojure :exclude [read read-string])
   (:require [clojure.edn :as edn]
-            [clojure.java.io :as java-io])
+            [clojure.java.io :as java-io]
+            [clojure.tools.string-utils :as string-utils])
   (:import [java.io PushbackReader StringReader StringWriter]))
 
 (defn write-out
   "Writes the given forms to standard out."
   [& forms]
-  (binding [*print-dup* true]
-    (doseq [form forms]
-      (println form))))
+  (doseq [form forms]
+    (println (string-utils/form-str form))))
 
 (defn write
   "Writes the given forms to the given out. Out must be something which can be turned into a java.io.Writer."

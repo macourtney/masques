@@ -1,9 +1,8 @@
 (ns masques.model.profile
   (:require [clj-crypto.core :as clj-crypto]
             [clj-i2p.core :as clj-i2p]
-            [clojure.edn :as edn]
+            [masques.edn :as edn]
             [clojure.java.io :as io]
-            [clojure.tools.string-utils :as string-utils]
             [config.db-config :as db-config]
             [masques.model.avatar :as avatar-model])
   (:use masques.model.base
@@ -12,6 +11,7 @@
            [java.io PushbackReader]))
 
 (def alias-key :alias)
+(def avatar-path-key :avatar-path)
 (def destination-key :destination)
 (def identity-key :identity)
 (def identity-algorithm-key :identity-algorithm)
@@ -19,6 +19,17 @@
 (def private-key-algorithm-key :private-key-algorithm)
 
 (def saved-current-user (atom nil))
+
+(defn find-profile
+  "Finds the profile with the given id."
+  [id]
+  (find-by-id profile id))
+
+(defn delete-profile
+  "Deletes the given profile from the database. The profile should include the
+id."
+  [profile-record]
+  (delete-record profile profile-record))
 
 ; CURRENT USER
 
@@ -38,17 +49,17 @@
   (str (alias-key profile-record) "'s Avatar"))
 
 (defn insert-avatar [profile-record]
-  (let [avatar-file-map { :path (:avatar-path profile-record) :name (name-avatar profile-record) }]
-    (avatar-model/create-avatar-image (:avatar-path profile-record))
+  (let [avatar-file-map { :path (avatar-path-key profile-record) :name (name-avatar profile-record) }]
+    (avatar-model/create-avatar-image (avatar-path-key profile-record))
     (insert-or-update file avatar-file-map)))
 
 (defn save-avatar [profile-record]
-  (if (:avatar-path profile-record)
+  (if (avatar-path-key profile-record)
     (merge profile-record { :avatar-file-id (:id (insert-avatar profile-record)) })
     profile-record))
 
 (defn save [record]
-  (insert-or-update profile (dissoc (save-avatar record) :avatar :avatar-path)))
+  (insert-or-update profile (dissoc (save-avatar record) :avatar avatar-path-key)))
 
 (defn save-current-user [record]
   (when-not (find-by-id profile 1)
@@ -127,9 +138,23 @@ to the file. If a profile is not given, then the currently logged in profile is
 used."
   ([file] (create-masques-id-file file (current-user)))
   ([file profile]
-    (spit file (string-utils/form-str (create-masques-id-map profile)))))
+    (edn/write file (create-masques-id-map profile))))
 
 (defn read-masques-id-file 
   "Reads the given masques id file and returns the masques id map."
   [file]
-  (edn/read (PushbackReader. (io/reader file))))
+  (edn/read file))
+
+(defn load-masques-id-map
+  "Creates a profile from the given masques id map, saves it to the database,
+and returns the new id. This function should not be directly called."
+  [masques-id-map]
+  (when masques-id-map
+    (save masques-id-map)))
+
+(defn load-masques-id-file
+  "Creates a profile from the given masques id file, saves it to the database
+and returns the new id. Do not call this function directly. Use the
+send-request in friend_request instead."
+  [file]
+  (load-masques-id-map (read-masques-id-file file)))
