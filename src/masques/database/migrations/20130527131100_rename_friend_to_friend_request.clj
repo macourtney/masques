@@ -5,7 +5,6 @@
 (defn up
   "Changes the name of the table from friend to friend_request."
   []
-  (drop-table :friend)
   (create-table :friend_request
     (id)
     (date-time :created_at)
@@ -17,12 +16,5 @@
 (defn down
   "Changes the name of the table back to friend, from friend_request"
   []
-  (drop-table :friend_request)
-  (create-table :friend
-    (id)
-    (date-time :created_at)
-    (string :request_status)
-    (date-time :friend_requested_at)
-    (date-time :friend_request_approved_at)
-    (belongs-to :profile)))
+  (drop-table :friend_request))
 
