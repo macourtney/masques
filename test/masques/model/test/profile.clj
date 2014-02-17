@@ -67,8 +67,7 @@
   (is (.exists test-masques-id-file))
   (is (= (read-masques-id-file test-masques-id-file) 
          (create-masques-id-map profile-map)))
-  ;(io/delete-file test-masques-id-file)
-  )
+  (io/delete-file test-masques-id-file))
 
 (deftest test-load-masques-id-map
   (let [profile (load-masques-id-map (create-masques-id-map profile-map))]
@@ -90,5 +89,4 @@
     (is (= (identity-key profile) (identity-key profile-map)))
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
     (delete-profile profile)
-    ;(io/delete-file test-masques-id-file)
-    ))
+    (io/delete-file test-masques-id-file)))
