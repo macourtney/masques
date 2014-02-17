@@ -117,7 +117,8 @@
 
 (defn update-private-key-directory []
   (when-let [private-key-directory (user-data-directory)]
-    (clj-i2p/set-private-key-file-directory (java-io/file private-key-directory))))
+    (clj-i2p/set-private-key-file-directory
+      (java-io/file private-key-directory))))
 
 (defn update-data-directory [new-data-dir]
   (reset! data-directory new-data-dir)

@@ -1,10 +1,22 @@
 (ns masques.model.profile
   (:require [clj-crypto.core :as clj-crypto]
+            [clj-i2p.core :as clj-i2p]
+            [clojure.edn :as edn]
+            [clojure.java.io :as io]
+            [clojure.tools.string-utils :as string-utils]
             [config.db-config :as db-config]
             [masques.model.avatar :as avatar-model])
   (:use masques.model.base
         korma.core)
-  (:import [org.apache.commons.codec.binary Base64]))
+  (:import [org.apache.commons.codec.binary Base64]
+           [java.io PushbackReader]))
+
+(def alias-key :alias)
+(def destination-key :destination)
+(def identity-key :identity)
+(def identity-algorithm-key :identity-algorithm)
+(def private-key-key :private-key)
+(def private-key-algorithm-key :private-key-algorithm)
 
 (def saved-current-user (atom nil))
 
@@ -23,7 +35,7 @@
 ; SAVE PROFILE
 
 (defn name-avatar [profile-record]
-  (str (:alias profile-record) "'s Avatar"))
+  (str (alias-key profile-record) "'s Avatar"))
 
 (defn insert-avatar [profile-record]
   (let [avatar-file-map { :path (:avatar-path profile-record) :name (name-avatar profile-record) }]
@@ -57,18 +69,18 @@
 (defn generate-keys [profile-record]
   (let [key-pair (clj-crypto/generate-key-pair)
         key-pair-map (clj-crypto/get-key-pair-map key-pair)]
-    (merge profile-record { :identity (Base64/encodeBase64String (:bytes (:public-key key-pair-map)))
-                            :identity-algorithm (:algorithm (:public-key key-pair-map))
-                            :private-key (Base64/encodeBase64String (:bytes (:private-key key-pair-map)))
-                            :private-key-algorithm (:algorithm (:private-key key-pair-map)) })))
+    (merge profile-record { identity-key (Base64/encodeBase64String (:bytes (:public-key key-pair-map)))
+                            identity-algorithm-key (:algorithm (:public-key key-pair-map))
+                            private-key-key (Base64/encodeBase64String (:bytes (:private-key key-pair-map)))
+                            private-key-algorithm-key (:algorithm (:private-key key-pair-map)) })))
 
 (defn create-user [user-name]
-  (save (generate-keys { :alias user-name })))
+  (save (generate-keys { alias-key user-name })))
   
 (defn create-friend-profile
   "Creates a profile for a friend where you only have the alias, identity and identity algorithm."
   [alias identity identity-algorithm]
-  (save { :alias alias :identity identity :identity-algorithm identity-algorithm }))
+  (save { alias-key alias identity-key identity identity-algorithm-key identity-algorithm }))
 
 (defn find-logged-in-user
   "Finds the profile for the given user name which is a user of this database."
@@ -101,3 +113,23 @@
   "Logs out the currently logged in user. Just used for testing."
   []
   (set-current-user nil))
+
+(defn create-masques-id-map
+  "Creates a masques id map from the given profile. If the profile is not given, then the current logged in profile is used."
+  ([] (create-masques-id-map (current-user)))
+  ([profile]
+    (assoc (select-keys profile [alias-key identity-key identity-algorithm-key])
+           destination-key (clj-i2p/base-64-destination))))
+           
+(defn create-masques-id-file
+  "Given a file and a profile, this function saves the profile as a masques id
+to the file. If a profile is not given, then the currently logged in profile is
+used."
+  ([file] (create-masques-id-file file (current-user)))
+  ([file profile]
+    (spit file (string-utils/form-str (create-masques-id-map profile)))))
+
+(defn read-masques-id-file 
+  "Reads the given masques id file and returns the masques id map."
+  [file]
+  (edn/read (PushbackReader. (io/reader file))))
