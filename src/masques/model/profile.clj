@@ -126,11 +126,16 @@ id."
   (set-current-user nil))
 
 (defn create-masques-id-map
-  "Creates a masques id map from the given profile. If the profile is not given, then the current logged in profile is used."
+  "Creates a masques id map from the given profile. If the profile is not given,
+then the current logged in profile is used."
   ([] (create-masques-id-map (current-user)))
   ([profile]
-    (assoc (select-keys profile [alias-key identity-key identity-algorithm-key])
-           destination-key (clj-i2p/base-64-destination))))
+    (let [destination-map (if (clj-i2p/base-64-destination)
+                            { destination-key (clj-i2p/base-64-destination) }
+                            {})]
+      (merge
+        (select-keys profile [alias-key identity-key identity-algorithm-key])
+        destination-map))))
            
 (defn create-masques-id-file
   "Given a file and a profile, this function saves the profile as a masques id

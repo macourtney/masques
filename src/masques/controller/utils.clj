@@ -94,4 +94,4 @@
 (defn choose-directory
   "Pops up a file chooser which only chooses directories. Returns the chosen directory or nil if the user does not select one."
   [owner]
-  (choose-file owner JFileChooser/DIRECTORIES_ONLY ))
+  (choose-file owner JFileChooser/DIRECTORIES_ONLY))

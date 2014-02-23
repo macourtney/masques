@@ -1,10 +1,11 @@
 (ns masques.controller.friend.panel
   (:require [clj-internationalization.term :as term]
             [masques.controller.main.panel-protocol :as panel-protocol]
-            [masques.view.friend.panel :as panel-view]
-            [seesaw.core :as seesaw-core])
+            [masques.view.friend.panel :as panel-view])
   (:import [masques.controller.main.panel_protocol PanelProtocol]
            [javax.swing ImageIcon]))
+
+
 
 (deftype FriendPanel []
   PanelProtocol
@@ -16,7 +17,7 @@
   
   (display-text [this] (term/friends))
 
-  (init [this view])
+  (init [this view] (panel-view/initialize view))
 
   (show [this view args])
 
