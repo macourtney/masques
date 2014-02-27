@@ -19,7 +19,7 @@
 
   (init [this view] (panel-view/initialize view))
 
-  (show [this view args])
+  (show [this view args] (panel-view/show view args))
 
   (hide [this view]))
 
