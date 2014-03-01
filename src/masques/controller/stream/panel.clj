@@ -19,7 +19,7 @@
 
   (display-text [this] (term/stream))
 
-  (init [this view])
+  (init [this view show-panel-fn])
 
   (show [this view args])
 

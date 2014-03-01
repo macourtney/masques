@@ -13,16 +13,24 @@
 
 (declare show-panel)
 
-(defn panel-button-listener [e]
-  (let [button (seesaw-core/to-widget e)
+(defn show-panel
+  "Shows the given panel (or panel id) passing along the args to the panel."
+  [main-frame panel & args]
+  (view-main-frame/show-panel main-frame panel args))
+
+(defn panel-button-listener [event]
+  (let [button (seesaw-core/to-widget event)
         main-frame (view-utils/top-level-ancestor button)]
-    (show-panel main-frame (view-utils/retrieve-component-property button tool-bar-view/button-panel-name))))
+    (show-panel main-frame
+      (view-utils/retrieve-component-property
+        button tool-bar-view/button-panel-name))))
 
 (defn add-panels
   "Adds the given panel to the main frame."
   [main-frame & panels]
   (doseq [panel panels]
-    (view-main-frame/add-panel main-frame panel panel-button-listener))
+    (view-main-frame/add-panel main-frame panel panel-button-listener
+                               (partial show-panel main-frame)))
   main-frame)
 
 (defn load-default-panels
@@ -40,7 +48,3 @@
     (display-panel/init (view-main-frame/find-display-panel main-frame))
     (controller-utils/show (load-default-panels main-frame))))
 
-(defn show-panel
-  "Shows the given panel (or panel id) passing along the args to the panel."
-  [main-frame panel & args]
-  (view-main-frame/show-panel main-frame panel args))

@@ -46,7 +46,7 @@
   
   (display-text [this] (term/profile))
 
-  (init [this view])
+  (init [this view show-panel-fn])
 
   (show [this view args]
     (fill-profile view))

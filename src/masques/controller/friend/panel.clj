@@ -11,13 +11,13 @@
   PanelProtocol
   (panel-name [this] "Friends")
 
-  (create-view [this] (panel-view/create))
+  (create-view [this] (panel-view/create this))
 
   (icon [this] (ImageIcon. (ClassLoader/getSystemResource "friends.png")))
   
   (display-text [this] (term/friends))
 
-  (init [this view] (panel-view/initialize view))
+  (init [this view show-panel-fn] (panel-view/initialize view show-panel-fn))
 
   (show [this view args] (panel-view/show view args))
 

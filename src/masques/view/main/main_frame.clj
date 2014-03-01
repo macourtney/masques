@@ -51,9 +51,9 @@
 
 (defn add-panel
   "Adds the given panel to the main frame. Adds the icon to the tool bar and the panel's view to the display panel."
-  [main-frame panel panel-button-listener]
+  [main-frame panel panel-button-listener show-panel-fn]
   (tool-bar/add-icon (find-tool-bar main-frame) panel panel-button-listener)
-  (display-panel/add-panel (find-display-panel main-frame) panel))
+  (display-panel/add-panel (find-display-panel main-frame) panel show-panel-fn))
 
 (defn show-panel
   "Shows the given panel (or panel id)."

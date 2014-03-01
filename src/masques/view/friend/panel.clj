@@ -15,12 +15,18 @@
 (def send-friend-request-button-listener-key
   :send-friend-request-button-listener)
 
+(def send-friend-request-cancel-button-id :send-friend-request-cancel-button)
+(def send-friend-request-cancel-button-listener-key
+  :send-friend-request-cancel-button-listener)
+
 (def friend-request-message-text-id :friend-request-message-text-id)
 
 (def main-panel-key :main-panel-key)
 (def import-friend-panel-key :import-friend-panel-key)
 
 (def card-panel-id "friend-panel")
+(def friend-panel-key :friend-panel)
+(def show-panel-fn-key :show-panel-fn)
 
 (def link-button-font { :name "DIALOG" :style :plain :size 12 })
 
@@ -118,6 +124,7 @@
 (defn create-friend-request-message-text []
   (seesaw-core/scrollable
     (seesaw-core/text :id friend-request-message-text-id
+                      :rows 5
                       :multi-line? true
                       :wrap-lines? true)))
 
@@ -125,21 +132,21 @@
   (seesaw-core/horizontal-panel
     :items [(create-link-button :load-mid-file-button (term/load-mid-file))
             [:fill-h 3]
-            (seesaw-core/text :id :load-mid-file-text)]))
+            (seesaw-core/text :id :load-mid-file-text :editable? false)]))
 
 (defn create-send-friend-button-panel []
   (seesaw-core/horizontal-panel
     :items [(create-link-button :send-friend-request-button-2
                                 (term/send-friend-request))
             [:fill-h 25]
-            (create-link-button :send-friend-request-cancel-button
+            (create-link-button send-friend-request-cancel-button-id
                                 (term/cancel))]))
 
 (defn create-send-friend-request-body-panel []
   (seesaw-core/vertical-panel
     :items [(panel-subview/create-panel-label (term/send-friend-request))
             [:fill-v 5]
-            (term/message)
+            (seesaw-core/border-panel :west (term/message))
             [:fill-v 3]
             (create-friend-request-message-text)
             [:fill-v 5]
@@ -169,12 +176,27 @@
   (seesaw-core/show-card! (find-friend-panel view) import-friend-panel-key)
   view)
 
-(defn create []
-  (show-main-panel
-    (seesaw-core/card-panel
-      :id card-panel-id
-      :items [[(create-main-panel) main-panel-key]
-              [(create-import-friend-panel) import-friend-panel-key]])))
+(defn create [friend-panel]
+  (let [friend-panel-view
+        (seesaw-core/card-panel
+          :id card-panel-id
+          :items [[(create-main-panel) main-panel-key]
+                  [(create-import-friend-panel) import-friend-panel-key]])]
+    (view-utils/save-component-property friend-panel-view friend-panel-key
+                                      friend-panel)
+    (show-main-panel friend-panel-view)))
+
+(defn find-panel
+  "Finds the panel attached to the view."
+  [view]
+  (view-utils/retrieve-component-property (find-friend-panel view)
+                                          friend-panel-key))
+
+(defn find-show-panel-fn
+  "Finds the show panel fn attached to the view."
+  [view]
+  (view-utils/retrieve-component-property (find-friend-panel view)
+                                          show-panel-fn-key))
 
 (defn find-export-mid-button
   "Finds the export mid button in the given view."
@@ -185,6 +207,36 @@
   "Finds the send friend request button in the given view."
   [view]
   (view-utils/find-component view send-friend-request-button-id))
+
+(defn find-send-friend-request-cancel-button
+  "Finds the send friend request cancel button in the given view."
+  [view]
+  (view-utils/find-component view send-friend-request-cancel-button-id))
+
+(defn add-action-listener-to-send-friend-request-cancel-button
+  "Adds the given listener to the send friend request cancel button."
+  [view listener]
+  (let [send-friend-request-cancel-button
+          (find-send-friend-request-cancel-button view)
+        listener-remover (seesaw-core/listen send-friend-request-cancel-button
+                                             :action-performed listener)]
+    (view-utils/save-component-property send-friend-request-cancel-button
+                                        send-friend-request-cancel-button-listener-key
+                                        listener-remover)))
+
+(defn send-friend-request-cancel-listener
+  "Opens the friend panel."
+  [event]
+  (let [friend-panel-view (find-friend-panel (view-utils/top-level-ancestor
+                                               (seesaw-core/to-widget event)))]
+    ((find-show-panel-fn friend-panel-view) (find-panel friend-panel-view))))
+
+(defn attach-send-friend-request-cancel-listener
+  "Attaches the send friend request cancel listener to the send friend request
+cancel button in the given view."
+  [view]
+  (add-action-listener-to-send-friend-request-cancel-button
+    view send-friend-request-cancel-listener))
 
 (defn add-action-listener-to-export-mid-button
   "Adds the given action listener to the export mid button."
@@ -245,9 +297,12 @@ in the given view."
 (defn initialize
   "Called when the panel is created to initialize the view by attaching
 listeners and loading initial data."
-  [view]
+  [view show-panel-fn]
+  (view-utils/save-component-property (find-friend-panel view) show-panel-fn-key
+                                      show-panel-fn)
   (attach-export-mid-listener view)
-  (attach-send-friend-request-listener view))
+  (attach-send-friend-request-listener view)
+  (attach-send-friend-request-cancel-listener view))
 
 (defn show
   "Makes sure the main panel is visible."

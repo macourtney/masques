@@ -75,14 +75,14 @@
 
 (defn add-panel
   "Adds the given panel to the view."
-  [display-panel panel]
+  [display-panel panel show-panel-fn]
   (let [card-panel (find-card-panel display-panel)
         panel-view (panel-protocol/create-view panel)]
     (seesaw-core/config! card-panel
                          :items (cons (panel-as-vector panel panel-view)
                                       (find-panels-as-items display-panel)))
     (save-panel-view display-panel panel panel-view)
-    (panel-protocol/init panel panel-view)))
+    (panel-protocol/init panel panel-view show-panel-fn)))
 
 (defn update-displayed-panel
   "Updates the displayed panel to the given panel."
