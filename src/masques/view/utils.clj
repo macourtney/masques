@@ -6,6 +6,8 @@
 
 (def link-color "#FFAA00")
 
+(def link-button-font { :name "DIALOG" :style :plain :size 12 })
+
 (defn create-link-font [size]
   { :name "DIALOG" :style :bold :size size })
 
@@ -88,3 +90,18 @@ the user does not select one."
   ;(choose-file owner JFileChooser/FILES_ONLY
   ;                     JFileChooser/SAVE_DIALOG)
   )
+
+(defn create-link-button
+  "Creates a borderless button which looks some what like a webpage link."
+  [& args]
+  (let [opts (apply hash-map args)]
+    (apply seesaw-core/button
+           (mapcat identity
+                   (merge { :font link-button-font :border 0 } opts)))))
+
+(defn add-action-listener-to-button
+  "Adds the given listener to the given button saving the listener-remover to
+the button as a property with the given listener key."
+  [button listener listener-key]
+  (let [listener-remover (seesaw-core/listen button :action-performed listener)]
+    (save-component-property button listener-key listener-remover)))

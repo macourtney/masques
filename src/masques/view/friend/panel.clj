@@ -4,6 +4,7 @@
             [masques.view.subviews.panel :as panel-subview]
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
+            [seesaw.chooser :as seesaw-chooser]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing JOptionPane]))
@@ -18,6 +19,10 @@
 (def send-friend-request-cancel-button-id :send-friend-request-cancel-button)
 (def send-friend-request-cancel-button-listener-key
   :send-friend-request-cancel-button-listener)
+(def load-mid-file-button-id :load-mid-file-button)
+(def load-mid-file-button-listener-key :load-mid-file-button-listener)
+(def load-mid-file-button-file-key :load-mid-file-button-file)
+(def load-mid-file-text-id :load-mid-file-text)
 
 (def friend-request-message-text-id :friend-request-message-text-id)
 
@@ -28,13 +33,8 @@
 (def friend-panel-key :friend-panel)
 (def show-panel-fn-key :show-panel-fn)
 
-(def link-button-font { :name "DIALOG" :style :plain :size 12 })
-
 (def mid-file-filters [["Masques Id File" ["mid"]]
                        ["Folders" (fn [file] (.isDirectory file))]])
-
-(defn create-link-button [id text]
-  (seesaw-core/button :id id :text text :border 0 :font link-button-font))
 
 (defn create-search-fields-panel []
   (seesaw-core/vertical-panel
@@ -46,8 +46,8 @@
                                                 :columns 10)
                               [:fill-h 5]
                               (term/alias-or-nick)])
-              :east (create-link-button
-                      :clear-search-button (term/clear-search)))
+              :east (view-utils/create-link-button :id :clear-search-button
+                                        :text (term/clear-search)))
             (seesaw-core/border-panel
               :west (seesaw-core/horizontal-panel
                       :items [(term/group)
@@ -65,8 +65,8 @@
                                 [:fill-h 5]
                                 (seesaw-core/text :id :added-to-2-search-text
                                                   :columns 10)])
-              :east (create-link-button
-                      :search-friends-button (term/search-friends))
+              :east (view-utils/create-link-button :id :search-friends-button
+                                        :text (term/search-friends))
               :hgap 15)]
     
     :border [15 (seesaw-border/line-border :thickness 1)]))
@@ -75,8 +75,8 @@
   (seesaw-core/border-panel
     :center (create-search-fields-panel)
     :south (seesaw-core/border-panel
-             :west (create-link-button :advanced-friend-search-button
-                                       (term/advanced-friend-search)))
+             :west (view-utils/create-link-button :id :advanced-friend-search-button
+                                       :text (term/advanced-friend-search)))
     
     :vgap 5))
 
@@ -87,9 +87,10 @@
 (defn create-all-friends-tab []
   (seesaw-core/border-panel
     :north (seesaw-core/border-panel
-             :west (create-link-button send-friend-request-button-id
-                                       (term/plus-send-friend-request))
-             :east (create-link-button export-mid-button-id (term/export-mid)))
+             :west (view-utils/create-link-button :id send-friend-request-button-id
+                                       :text (term/plus-send-friend-request))
+             :east (view-utils/create-link-button :id export-mid-button-id
+                                       :text (term/export-mid)))
     :center (create-all-friends-table)
 
     :vgap 5
@@ -130,17 +131,19 @@
 
 (defn create-load-mid-file-panel []
   (seesaw-core/horizontal-panel
-    :items [(create-link-button :load-mid-file-button (term/load-mid-file))
+    :items [(view-utils/create-link-button :id load-mid-file-button-id
+                                :text (term/load-mid-file))
             [:fill-h 3]
-            (seesaw-core/text :id :load-mid-file-text :editable? false)]))
+            (seesaw-core/text :id load-mid-file-text-id :editable? false)]))
 
 (defn create-send-friend-button-panel []
   (seesaw-core/horizontal-panel
-    :items [(create-link-button :send-friend-request-button-2
-                                (term/send-friend-request))
+    :items [(view-utils/create-link-button :id :send-friend-request-button-2
+                                :text (term/send-friend-request))
             [:fill-h 25]
-            (create-link-button send-friend-request-cancel-button-id
-                                (term/cancel))]))
+            (view-utils/create-link-button
+              :id send-friend-request-cancel-button-id
+              :text (term/cancel))]))
 
 (defn create-send-friend-request-body-panel []
   (seesaw-core/vertical-panel
@@ -213,16 +216,56 @@
   [view]
   (view-utils/find-component view send-friend-request-cancel-button-id))
 
+(defn find-load-mid-file-button
+  "Finds the load mid file button from the given view."
+  [view]
+  (view-utils/find-component view load-mid-file-button-id))
+
+(defn find-load-mid-file-text
+  "Finds the load mid file text field from the given view."
+  [view]
+  (view-utils/find-component view load-mid-file-text-id))
+
+(defn add-action-listener-to-load-mid-file-button
+  "Adds the given listener to the mid file button."
+  [view listener]
+  (view-utils/add-action-listener-to-button
+    (find-load-mid-file-button view)
+    listener 
+    load-mid-file-button-listener-key))
+
+(defn load-mid-file-success
+  "Saves the file to a property on the load mid file button and adds the mid 
+file text to the text field."
+  [view file-chooser file]
+  (view-utils/save-component-property
+    (find-load-mid-file-button view) load-mid-file-button-file-key file)
+  (seesaw-core/config! (find-load-mid-file-text view) :text (.getName file)))
+
+(defn load-mid-file-listener
+  "Opens a file chooser to choose a mid file and loads it into the view for
+later importing into the friend request model."
+  [event]
+  (let [friend-panel-view (find-friend-panel (view-utils/top-level-ancestor
+                                               (seesaw-core/to-widget event)))]
+    (seesaw-chooser/choose-file
+      :type :open
+      :selection-mode :files-only
+      :filters mid-file-filters
+      :success-fn (partial load-mid-file-success friend-panel-view))))
+
+(defn attach-load-mid-file-listener
+  "Attaches the load mid file listener to the load mid file button."
+  [view]
+  (add-action-listener-to-load-mid-file-button view load-mid-file-listener))
+
 (defn add-action-listener-to-send-friend-request-cancel-button
   "Adds the given listener to the send friend request cancel button."
   [view listener]
-  (let [send-friend-request-cancel-button
-          (find-send-friend-request-cancel-button view)
-        listener-remover (seesaw-core/listen send-friend-request-cancel-button
-                                             :action-performed listener)]
-    (view-utils/save-component-property send-friend-request-cancel-button
-                                        send-friend-request-cancel-button-listener-key
-                                        listener-remover)))
+  (view-utils/add-action-listener-to-button
+    (find-send-friend-request-cancel-button view)
+    listener 
+    send-friend-request-cancel-button-listener-key))
 
 (defn send-friend-request-cancel-listener
   "Opens the friend panel."
@@ -241,11 +284,8 @@ cancel button in the given view."
 (defn add-action-listener-to-export-mid-button
   "Adds the given action listener to the export mid button."
   [view listener]
-  (let [export-mid-button (find-export-mid-button view)
-        listener-remover (seesaw-core/listen export-mid-button :action-performed listener)]
-    (view-utils/save-component-property export-mid-button
-                                        export-mid-button-listener-key
-                                        listener-remover)))
+  (view-utils/add-action-listener-to-button
+    (find-export-mid-button view) listener export-mid-button-listener-key))
 
 (defn export-mid-success
   [file-chooser mid-file]
@@ -272,12 +312,9 @@ chooses."
 (defn add-action-listener-to-send-friend-request-button
   "Adds the given action listener to the send friend request button."
   [view listener]
-  (let [send-friend-request-button (find-send-friend-request-button view)
-        listener-remover (seesaw-core/listen send-friend-request-button 
-                                             :action-performed listener)]
-    (view-utils/save-component-property send-friend-request-button
-                                        send-friend-request-button-listener-key
-                                        listener-remover)))
+  (view-utils/add-action-listener-to-button
+    (find-send-friend-request-button view) listener
+    send-friend-request-button-listener-key))
 
 (defn send-friend-request-listener
   "Opens the import friend panel."
@@ -290,7 +327,6 @@ chooses."
   "Attaches the send friend request listener to the send friend request button
 in the given view."
   [view]
-  send-friend-request-button-id
   (add-action-listener-to-send-friend-request-button view
                                               send-friend-request-listener))
 
@@ -302,7 +338,8 @@ listeners and loading initial data."
                                       show-panel-fn)
   (attach-export-mid-listener view)
   (attach-send-friend-request-listener view)
-  (attach-send-friend-request-cancel-listener view))
+  (attach-send-friend-request-cancel-listener view)
+  (attach-load-mid-file-listener view))
 
 (defn show
   "Makes sure the main panel is visible."
