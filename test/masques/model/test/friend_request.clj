@@ -2,6 +2,7 @@
   (:require test.init
             [clojure.java.io :as io]
             [masques.model.profile :as profile]
+            [masques.model.share :as share]
             [masques.test.util :as test-util])
   (:use clojure.test
         masques.model.base
@@ -43,13 +44,15 @@
 
 (deftest test-send-request
   (profile/create-masques-id-file test-masques-id-file profile-map)
-  (let [friend-request (send-request test-masques-id-file)]
+  (let [friend-request-share (send-request test-masques-id-file "test message")
+        friend-request (share/get-content friend-request-share)]
     (is friend-request)
     (is (= (request-status-key friend-request) pending-status))
     (is (requested-at-key friend-request))
     (let [profile-id (profile-id-key friend-request)]
       (is profile-id)
       (is (profile/find-profile profile-id)))
-    (delete-friend-request friend-request))
+    (delete-friend-request friend-request)
+    (share/delete-share friend-request-share))
   (io/delete-file test-masques-id-file))
 

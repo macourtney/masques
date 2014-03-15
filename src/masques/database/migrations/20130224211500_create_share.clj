@@ -8,7 +8,6 @@
   (create-table :share
     (id)
     (date-time :created_at)
-    ;(uuid :uuid)
     (integer :message_id)
     (integer :content_id)
     (integer :group_id)

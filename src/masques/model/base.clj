@@ -156,6 +156,14 @@
 ; SQL/ORM helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn id
+  "Returns the id of the given record or if the given record is not a map then
+this function simply returns the record."
+  [record]
+  (if (map? record)
+    (or (:ID record) (:id record))
+    record))
+
 (defn find-by-id [entity id]
   (when id
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
@@ -167,17 +175,17 @@
 (defn update-record [entity record]
   (update entity
     (set-fields record)
-    (where {:ID (:ID record)}))
-  (find-by-id entity (:ID record)))
+    (where {:ID (id record)}))
+  (find-by-id entity (id record)))
 
 (defn insert-or-update [entity record]
   (let [h2-record (clean-up-for-h2 record)]
-    (if (:ID h2-record)
+    (if (id h2-record)
       (update-record entity h2-record)
       (insert-record entity h2-record))))
 
 (defn delete-record [entity record]
-  (when-let [id (if (map? record) (or (:ID record) (:id record)) record)]
+  (when-let [id (if (map? record) (id record) record)]
     (delete entity
       (where { :ID id }))))
 

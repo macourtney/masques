@@ -163,3 +163,13 @@ and returns the new id. Do not call this function directly. Use the
 send-request in friend_request instead."
   [file]
   (load-masques-id-map (read-masques-id-file file)))
+
+(defn identity
+  "Returns the identity for the given profile."
+  [profile]
+  (:identity profile))
+
+(defn identity-algorithm
+  "Returns the identity algorithm used for the given profile."
+  [profile]
+  (:identity-algorithm profile))

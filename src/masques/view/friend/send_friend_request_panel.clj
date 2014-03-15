@@ -1,5 +1,6 @@
 (ns masques.view.friend.send-friend-request-panel
   (:require [clj-internationalization.term :as term]
+            [masques.model.friend-request :as friend-request-model]
             [masques.view.friend.utils :as friend-utils]
             [masques.view.subviews.panel :as panel-subview]
             [masques.view.utils :as view-utils]
@@ -17,6 +18,10 @@
 (def send-friend-request-cancel-button-listener-key
   :send-friend-request-cancel-button-listener)
 
+(def send-friend-request-send-button-id :send-friend-request-button-2)
+(def send-friend-request-send-button-listener-key
+  :send-friend-request-send-button-listener)
+
 (defn create-friend-request-message-text []
   (seesaw-core/scrollable
     (seesaw-core/text :id friend-request-message-text-id
@@ -33,8 +38,10 @@
 
 (defn create-send-friend-button-panel []
   (seesaw-core/horizontal-panel
-    :items [(view-utils/create-link-button :id :send-friend-request-button-2
-                                :text (term/send-friend-request))
+    :items [(view-utils/create-link-button
+              :id send-friend-request-send-button-id
+              :text (term/send-friend-request)
+              :enabled? false)
             [:fill-h 25]
             (view-utils/create-link-button
               :id send-friend-request-cancel-button-id
@@ -66,6 +73,11 @@
   [view]
   (view-utils/find-component view send-friend-request-cancel-button-id))
 
+(defn find-send-friend-request-send-button
+  "Finds the send friend request cancel button in the given view."
+  [view]
+  (view-utils/find-component view send-friend-request-send-button-id))
+
 (defn find-load-mid-file-button
   "Finds the load mid file button from the given view."
   [view]
@@ -75,6 +87,11 @@
   "Finds the load mid file text field from the given view."
   [view]
   (view-utils/find-component view load-mid-file-text-id))
+
+(defn find-friend-request-message-text
+  "Finds the friend request message text in the given view."
+  [view]
+  (view-utils/find-component view friend-request-message-text-id))
 
 (defn add-action-listener-to-load-mid-file-button
   "Adds the given listener to the mid file button."
@@ -90,7 +107,15 @@ file text to the text field."
   [view file-chooser file]
   (view-utils/save-component-property
     (find-load-mid-file-button view) load-mid-file-button-file-key file)
-  (seesaw-core/config! (find-load-mid-file-text view) :text (.getName file)))
+  (seesaw-core/config! (find-load-mid-file-text view) :text (.getName file))
+  (seesaw-core/config! (find-send-friend-request-send-button view)
+                       :enabled? true))
+
+(defn mid-file
+  "Finds the mid file saved after loading the mid file."
+  [view]
+  (view-utils/retrieve-component-property (find-load-mid-file-button view)
+                                          load-mid-file-button-file-key))
 
 (defn load-mid-file-listener
   "Opens a file chooser to choose a mid file and loads it into the view for
@@ -134,8 +159,36 @@ cancel button in the given view."
   (add-action-listener-to-send-friend-request-cancel-button
     view send-friend-request-cancel-listener))
 
+(defn add-action-listener-to-send-friend-request-send-button
+  "Adds the given listener to the send friend request send button."
+  [view listener]
+  (view-utils/add-action-listener-to-button
+    (find-send-friend-request-send-button view)
+    listener 
+    send-friend-request-send-button-listener-key))
+
+(defn send-friend-request-send-listener
+  "Opens the friend panel."
+  [event]
+  (let [friend-panel-view (friend-utils/find-friend-panel
+                            (view-utils/top-level-ancestor
+                              (seesaw-core/to-widget event)))
+        message-text (seesaw-core/text
+                       (find-friend-request-message-text friend-panel-view))
+        file (mid-file friend-panel-view)]
+    (friend-request-model/send-request file message-text))
+  (send-friend-request-cancel-listener event))
+
+(defn attach-send-friend-request-send-listener
+  "Attaches the send friend request cancel listener to the send friend request
+cancel button in the given view."
+  [view]
+  (add-action-listener-to-send-friend-request-send-button
+    view send-friend-request-send-listener))
+
 (defn initialize
   "Initializes the send friend request panel."
   [view]
+  (attach-load-mid-file-listener view)
   (attach-send-friend-request-cancel-listener view)
-  (attach-load-mid-file-listener view))
+  (attach-send-friend-request-send-listener view))
