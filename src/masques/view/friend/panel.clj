@@ -81,21 +81,32 @@
     :vgap 5
     :border 15))
 
-(defn create-pending-friend-requests-table []
+(defn create-my-requests-table []
   (seesaw-core/scrollable
     (seesaw-core/table :model [:columns [""  :Alias :Message ""]])))
 
-(defn create-pending-friend-requests-tab []
+(defn create-my-requests-tab []
   (seesaw-core/border-panel
-    :center (create-pending-friend-requests-table)
+    :center (create-my-requests-table)
+
+    :border 15))
+
+(defn create-sent-requests-table []
+  (seesaw-core/scrollable
+    (seesaw-core/table :model [:columns [""  :Alias :Message ""]])))
+
+(defn create-sent-requests-tab []
+  (seesaw-core/border-panel
+    :center (create-sent-requests-table)
 
     :border 15))
 
 (defn create-body-panel []
   (seesaw-core/tabbed-panel
     :tabs [{ :title (term/all-friends) :content (create-all-friends-tab) }
-           { :title (term/pending-friend-requests)
-            :content (create-pending-friend-requests-tab) }]))
+           { :title (term/my-requests) :content (create-my-requests-tab) }
+           { :title (term/sent-requests) 
+             :content (create-sent-requests-tab) }]))
 
 (defn create-main-panel []
   (seesaw-core/border-panel

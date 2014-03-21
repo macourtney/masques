@@ -40,5 +40,5 @@ include the id."
   (when-let [new-profile (profile/load-masques-id-file masques-id-file)]
     (let [new-request (save
                         { request-status-key pending-status
-                         profile-id-key (:id new-profile) })]
+                          profile-id-key (:id new-profile) })]
       (share/create-friend-request-share message profile new-request))))
