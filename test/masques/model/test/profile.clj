@@ -90,3 +90,9 @@
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
     (delete-profile profile)
     (io/delete-file test-masques-id-file)))
+
+(deftest test-alias
+  (is (= (alias-key profile-map) (alias profile-map)))
+  (let [saved-profile (save profile-map)]
+    (is (= (alias-key profile-map) (alias (:id saved-profile))))
+    (delete-profile saved-profile)))

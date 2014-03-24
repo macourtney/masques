@@ -27,3 +27,11 @@ used to get a fresh copy from the database."
     (string? message) (create-message message)
     (map? message) (find-message (id message))
     :else (throw (RuntimeException. (str "Unknown message type: " message) ))))
+
+(defn body
+  "Returns the message body for the given message, if the given message is an
+integer, then it is treated as the id for a message in the database."
+  [message]
+  (if (integer? message)
+    (body (find-message message))
+    (:body message)))

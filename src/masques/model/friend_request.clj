@@ -1,5 +1,6 @@
 (ns masques.model.friend-request
   (:require [clj-time.core :as clj-time]
+            [korma.core :as korma]
             [masques.model.profile :as profile]
             [masques.model.share :as share])
   (:use masques.model.base))
@@ -42,3 +43,24 @@ include the id."
                         { request-status-key pending-status
                           profile-id-key (:id new-profile) })]
       (share/create-friend-request-share message profile new-request))))
+
+(defn count-pending-requests
+  "Returns the number of requests pending."
+  []
+  (:count
+    (first
+      (korma/select
+        friend-request
+        (korma/aggregate (count :*) :count)
+        (korma/where { (h2-keyword request-status-key) pending-status })))))
+
+(defn pending-request
+  "Returns the pending request at the given index."
+  [index]
+  (first
+    (korma/select
+      friend-request
+      (korma/fields (h2-keyword :id) (h2-keyword :profile-id))
+      (korma/where { (h2-keyword request-status-key) pending-status })
+      (korma/limit 1)
+      (korma/offset index))))

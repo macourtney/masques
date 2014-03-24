@@ -3,6 +3,8 @@
             [masques.model.profile :as profile-model]
             [masques.view.friend.send-friend-request-panel 
              :as send-friend-request-panel]
+            [masques.view.friend.sent-friend-request-table-model
+             :as sent-friend-request-table-model]
             [masques.view.friend.utils :as friend-utils]
             [masques.view.subviews.panel :as panel-subview]
             [masques.view.utils :as view-utils]
@@ -93,7 +95,7 @@
 
 (defn create-sent-requests-table []
   (seesaw-core/scrollable
-    (seesaw-core/table :model [:columns [""  :Alias :Message ""]])))
+    (seesaw-core/table :model (sent-friend-request-table-model/create))))
 
 (defn create-sent-requests-tab []
   (seesaw-core/border-panel

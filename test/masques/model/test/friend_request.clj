@@ -36,17 +36,22 @@
 
 (deftest test-save-request
   (let [request-record (save request-map)]
-    (request-tester request-record)))
+    (request-tester request-record)
+    (delete-friend-request request-record)))
 
 (deftest test-find-request
   (let [request-record (save request-map)]
-    (request-tester request-record)))
+    (request-tester request-record)
+    (delete-friend-request request-record)))
 
 (deftest test-send-request
+  (is (= 0 (count-pending-requests)))
   (profile/create-masques-id-file test-masques-id-file profile-map)
   (let [friend-request-share (send-request test-masques-id-file "test message")
         friend-request (share/get-content friend-request-share)]
     (is friend-request)
+    (is (= 1 (count-pending-requests)))
+    (is (= (select-keys friend-request [:id :profile-id]) (pending-request 0)))
     (is (= (request-status-key friend-request) pending-status))
     (is (requested-at-key friend-request))
     (let [profile-id (profile-id-key friend-request)]
@@ -55,4 +60,3 @@
     (delete-friend-request friend-request)
     (share/delete-share friend-request-share))
   (io/delete-file test-masques-id-file))
-

@@ -183,3 +183,17 @@ it needs to be created."
       message-key message
       to-profile-key profile
       content-id-key (id friend-request) }))
+
+(defn find-friend-request-share
+  "Finds the share for the given friend request. Friend request can be either an
+integer id or map containing the id of the friend request."
+  [friend-request & fields]
+  (let [friend-request-id (if (map? friend-request)
+                            (:id friend-request)
+                            friend-request)
+        fields (if (empty? fields) [:id] fields)]
+    (select share
+      (apply fields fields)
+      (where { (h2-keyword content-type-key) friend-content-type
+               (h2-keyword content-id-key) friend-request-id })
+      (limit 1))))

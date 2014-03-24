@@ -164,6 +164,14 @@ send-request in friend_request instead."
   [file]
   (load-masques-id-map (read-masques-id-file file)))
 
+(defn alias
+  "Returns the alias for the given profile. If an integer is passed for the
+profile, then it is used as the id of the profile to get."
+  [profile]
+  (if (integer? profile)
+    (alias (find-profile profile))
+    (alias-key profile)))
+
 (defn identity
   "Returns the identity for the given profile."
   [profile]
