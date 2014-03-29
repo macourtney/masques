@@ -33,12 +33,12 @@
   (getValueAt [this row-index column-index]
     (condp = column-index
       1 (profile-model/alias
-          (:profile-id (friend-request-model/pending-request column-index)))
+          (:profile-id (friend-request-model/pending-request row-index)))
       2 (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
-              (friend-request-model/pending-request column-index)
-              [(base-model/h2-keyword share-model/message-id-key)])))
+              (friend-request-model/pending-request row-index)
+              (base-model/h2-keyword share-model/message-id-key))))
       nil))
   
   (isCellEditable [this _ _]
