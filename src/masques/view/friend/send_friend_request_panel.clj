@@ -1,6 +1,8 @@
 (ns masques.view.friend.send-friend-request-panel
   (:require [clj-internationalization.term :as term]
             [masques.model.friend-request :as friend-request-model]
+            [masques.service.calls.request-friendship
+             :as request-friendship-call]
             [masques.view.friend.utils :as friend-utils]
             [masques.view.subviews.panel :as panel-subview]
             [masques.view.utils :as view-utils]
@@ -176,7 +178,7 @@ cancel button in the given view."
         message-text (seesaw-core/text
                        (find-friend-request-message-text friend-panel-view))
         file (mid-file friend-panel-view)]
-    (friend-request-model/send-request file message-text))
+    (request-friendship-call/send-friend-request file message-text))
   (send-friend-request-cancel-listener event))
 
 (defn attach-send-friend-request-send-listener

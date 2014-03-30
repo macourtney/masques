@@ -1,4 +1,5 @@
 (ns config.test.db-config
+  (:require [clojure.java.io :as io])
   (:use clojure.test
         config.db-config))
 
@@ -8,6 +9,14 @@
     (reset-users-map old-users-map)))
 
 (use-fixtures :each user-directory-fixture)
+
+(defn delete-directory
+  "Deletes the given directory"
+  [directory]
+  (when (.isDirectory directory)
+    (doseq [child (.listFiles directory)]
+      (delete-directory child)))
+  (io/delete-file directory))
 
 (deftest test-user-directory-taken?
   (is (not (user-directory-taken? "blah" "blah")))
@@ -32,13 +41,17 @@
     (update-data-directory "data/db/")
     (update-username-password "foo" "bar")
     (is (= (user-data-directory) "data/db/foo/"))
+    (delete-directory (io/file (user-data-directory)))
     (update-username-password "foo?" "bar")
     (is (= (user-data-directory) "data/db/foo_/"))
+    (delete-directory (io/file (user-data-directory)))
     (update-username-password "foo%" "bar")
     (is (= (user-data-directory) "data/db/foo_0/"))
+    (delete-directory (io/file (user-data-directory)))
     (let [test-username "foofoo"]
       (add-username test-username)
-      (is (= (user-data-directory test-username) (str "data/db/" test-username "/"))))
+      (is (= (user-data-directory test-username)
+             (str "data/db/" test-username "/"))))
     (update-data-directory old-data-dir)))
 
 (deftest test-username-file
@@ -49,6 +62,7 @@
     (let [test-username "foofoo"]
       (add-username test-username)
       (is (= (username-file test-username) (str "data/db/" test-username "/username.clj"))))
+    (delete-directory (io/file (user-data-directory)))
     (update-data-directory old-data-dir)))
 
 (deftest test-ensure-users-map
@@ -60,4 +74,5 @@
     (ensure-users-map)
     (is (user-exists? test-username))
     (is (is (find-user-directory test-username) "foo"))
+    (delete-directory (io/file (user-data-directory)))
     (update-data-directory old-data-dir)))

@@ -53,3 +53,10 @@ request share."
               request-friendship-action/action
               (create-data-map share)))
       (update-friend-request share))))
+
+(defn send-friend-request
+  "Sends a friend request given the mid file and the message text."
+  [mid-file message-text]
+  (let [share (friend-request-model/send-request mid-file message-text)]
+    (request-friendship share)
+    share))
