@@ -1,11 +1,14 @@
 (ns fixtures.util
   (:refer-clojure :exclude [boolean byte-array])
-  (:require [clojure.test :as clojure-test] 
+  (:require [clojure.test :as clojure-test]
+            [masques.model.base :as model-base]
             [test.init :as test-init])
   (:use drift-db.core))
 
 (defn load-records [fixture-map]
-  (apply insert-into (:table fixture-map) (:records fixture-map)))
+  (apply insert-into
+         (:table fixture-map)
+         (map model-base/clean-up-for-h2 (:records fixture-map))))
 
 (defn unload-records [fixture-map]
   (try

@@ -8,4 +8,5 @@
     (is (= :masques-service (service-protocol/key service)))
     (is (= "Masques Service" (service-protocol/name service)))
     (is (= "1.0.0-SNAPSHOT" (service-protocol/version service)))
-    (is (= "This is a service which handles all Masques requests." (service-protocol/description service)))))
+    (is (= "This is a service which handles all Masques requests."
+           (service-protocol/description service)))))

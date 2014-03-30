@@ -10,6 +10,8 @@
   (:import [org.apache.commons.codec.binary Base64]
            [java.io PushbackReader]))
 
+(def current-user-id 1)
+
 (def alias-key :alias)
 (def avatar-path-key :avatar-path)
 (def destination-key :destination)
@@ -62,7 +64,7 @@ id."
   (insert-or-update profile (dissoc (save-avatar record) :avatar avatar-path-key)))
 
 (defn save-current-user [record]
-  (when-not (find-by-id profile 1)
+  (when-not (find-by-id profile current-user-id)
     (save record)))
 
 ; BUILD PROFILE
@@ -80,13 +82,17 @@ id."
 (defn generate-keys [profile-record]
   (let [key-pair (clj-crypto/generate-key-pair)
         key-pair-map (clj-crypto/get-key-pair-map key-pair)]
-    (merge profile-record { identity-key (Base64/encodeBase64String (:bytes (:public-key key-pair-map)))
-                            identity-algorithm-key (:algorithm (:public-key key-pair-map))
-                            private-key-key (Base64/encodeBase64String (:bytes (:private-key key-pair-map)))
-                            private-key-algorithm-key (:algorithm (:private-key key-pair-map)) })))
+    (merge profile-record
+      { :id current-user-id
+        identity-key (Base64/encodeBase64String
+                       (:bytes (:public-key key-pair-map)))
+        identity-algorithm-key (:algorithm (:public-key key-pair-map))
+        private-key-key (Base64/encodeBase64String
+                          (:bytes (:private-key key-pair-map)))
+        private-key-algorithm-key (:algorithm (:private-key key-pair-map)) })))
 
 (defn create-user [user-name]
-  (save (generate-keys { alias-key user-name })))
+  (insert-record profile (generate-keys { alias-key user-name })))
   
 (defn create-friend-profile
   "Creates a profile for a friend where you only have the alias, identity and identity algorithm."
@@ -105,20 +111,19 @@ id."
 
 (defn reload-current-user
   "Reloads the current user from the database. Returns the current user."
-  ([] (reload-current-user (db-config/current-username)))
-  ([user-name]
-    (when-let [user-profile (find-logged-in-user user-name)]
-      (set-current-user user-profile)
-      user-profile)))
+  []
+  (find-profile current-user-id))
 
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
   []
-  (let [user-name (db-config/current-username)]
-    (when-not (reload-current-user user-name)
-      (let [new-profile (create-user user-name)]
-        (when-not (reload-current-user user-name)
-          (throw (RuntimeException. (str "Could not create user: " user-name))))))))
+  (if-let [logged-in-profile (find-profile current-user-id)]
+    (set-current-user logged-in-profile)
+    (let [user-name (db-config/current-username)]
+      (if-let [new-profile (create-user user-name)]
+        (set-current-user new-profile)
+        (throw (RuntimeException. (str "Could not create user: "
+                                       user-name)))))))
 
 (defn logout
   "Logs out the currently logged in user. Just used for testing."
@@ -175,9 +180,14 @@ profile, then it is used as the id of the profile to get."
 (defn identity
   "Returns the identity for the given profile."
   [profile]
-  (:identity profile))
+  (identity-key profile))
 
 (defn identity-algorithm
   "Returns the identity algorithm used for the given profile."
   [profile]
-  (:identity-algorithm profile))
+  (identity-algorithm-key profile))
+
+(defn destination
+  "Returns the destination attached to the given profile."
+  [profile]
+  (destination-key profile))

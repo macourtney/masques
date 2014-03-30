@@ -43,7 +43,7 @@
     (is (= 1 (count-pending-requests)))
     (is (= (select-keys friend-request [:id :profile-id]) (pending-request 0)))
     (is (= (request-status-key friend-request) pending-status))
-    (is (requested-at-key friend-request))
+    (is (not (requested-at-key friend-request)))
     (let [profile-id (profile-id-key friend-request)]
       (is profile-id)
       (is (profile/find-profile profile-id)))

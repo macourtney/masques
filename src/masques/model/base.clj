@@ -169,20 +169,20 @@ this function simply returns the record."
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
 
 (defn insert-record [entity record]
-  (let [id (vals (insert entity (values record)))]
+  (let [new-id-map (insert entity (values (clean-up-for-h2 record)))
+        id (or (first (vals new-id-map)) (id record))]
     (find-by-id entity id)))
 
 (defn update-record [entity record]
   (update entity
-    (set-fields record)
+    (set-fields (clean-up-for-h2 record))
     (where {:ID (id record)}))
   (find-by-id entity (id record)))
 
 (defn insert-or-update [entity record]
-  (let [h2-record (clean-up-for-h2 record)]
-    (if (id h2-record)
-      (update-record entity h2-record)
-      (insert-record entity h2-record))))
+  (if (id record)
+    (update-record entity record)
+    (insert-record entity record)))
 
 (defn delete-record [entity record]
   (when-let [id (if (map? record) (id record) record)]

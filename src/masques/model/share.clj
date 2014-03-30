@@ -87,10 +87,11 @@ it needs to be created."
 ; To identity
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn find-to-profile-for-identity
-  "Finds the to profile attached to the given share."
+(defn to-profile
+  "Returns the to profile attached to the given share."
   [share]
-  (to-profile-key share))
+  (or (to-profile-key share)
+      (profile-model/find-profile (profile-to-id-key share))))
 
 (defn remove-to-profile
   "Removes the to-profile key from the given share."
@@ -101,7 +102,7 @@ it needs to be created."
   "Attaches the to identity to the given share record."
   [share]
   (let [sanitized-share (remove-to-profile share)]
-    (if-let [to-profile (find-to-profile-for-identity share)]
+    (if-let [to-profile (to-profile share)]
       (assoc sanitized-share profile-to-id-key (id to-profile))
       sanitized-share)))
 
@@ -182,6 +183,15 @@ it needs to be created."
     { content-type-key friend-content-type
       message-key message
       to-profile-key profile
+      content-id-key (id friend-request) }))
+
+(defn create-received-friend-request-share
+  "Creates an incoming friend request share."
+  [message friend-request]
+  (create-share
+    { content-type-key friend-content-type
+      message-key message
+      to-profile-key (id (profile-model/current-user))
       content-id-key (id friend-request) }))
 
 (defn find-friend-request-share

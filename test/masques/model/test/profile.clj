@@ -43,14 +43,17 @@
   (let [test-alias "Ted"
         user-profile (create-user test-alias)]
     (is user-profile)
-    (is (= (alias-key user-profile) test-alias))))
+    (is (= (alias-key user-profile) test-alias))
+    (delete-profile user-profile)))
 
 (deftest test-init
   (is (nil? (current-user)))
   (init)
   (is (= (current-user) (find-logged-in-user (db-config/current-username))))
-  (logout)
-  (is (nil? (current-user))))
+  (let [old-user (current-user)]
+    (logout)
+    (is (nil? (current-user)))
+    (delete-profile old-user)))
 
 (deftest test-create-masques-id-map
   (is (not (nil? (clj-i2p/base-64-destination))))
