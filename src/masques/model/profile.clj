@@ -99,16 +99,6 @@ id."
   [alias identity identity-algorithm]
   (save { alias-key alias identity-key identity identity-algorithm-key identity-algorithm }))
 
-(defn find-logged-in-user
-  "Finds the profile for the given user name which is a user of this database."
-  [user-name]
-  (when user-name
-    (build (:id (first
-      (select profile
-        (fields :ID)
-        (where { :ALIAS user-name  :PRIVATE_KEY [not= nil]})
-        (limit 1)))))))
-
 (defn reload-current-user
   "Reloads the current user from the database. Returns the current user."
   []

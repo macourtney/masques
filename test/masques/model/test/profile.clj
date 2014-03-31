@@ -49,7 +49,6 @@
 (deftest test-init
   (is (nil? (current-user)))
   (init)
-  (is (= (current-user) (find-logged-in-user (db-config/current-username))))
   (let [old-user (current-user)]
     (logout)
     (is (nil? (current-user)))
