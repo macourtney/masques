@@ -5,6 +5,7 @@
             [masques.controller.main.display-panel :as display-panel]
             [masques.controller.profile.panel :as profile-panel]
             [masques.controller.stream.panel :as stream-panel]
+            [masques.controller.main.tool-bar :as tool-bar-panel]
             [masques.controller.utils :as controller-utils]
             [masques.view.main.main-frame :as view-main-frame]
             [masques.view.main.tool-bar :as tool-bar-view]
@@ -45,6 +46,7 @@
   "Creates and shows the main frame."
   []
   (let [main-frame (view-main-frame/create)]
+    (tool-bar-panel/init (tool-bar-view/find-tool-bar main-frame))
     (display-panel/init (view-main-frame/find-display-panel main-frame))
     (controller-utils/show (load-default-panels main-frame))))
 

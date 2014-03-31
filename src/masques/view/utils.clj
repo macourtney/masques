@@ -2,7 +2,7 @@
   (:require [seesaw.chooser :as seesaw-chooser]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
-  (:import [javax.swing JFileChooser]))
+  (:import [javax.swing JFileChooser UIManager]))
 
 (def link-color "#FFAA00")
 
@@ -31,8 +31,9 @@
   "Finds the given component with the given id which is a child component of the
 given parent component."
   [parent-component id]
-  (let []
-    (seesaw-core/select parent-component [(to-select-id id)])))
+  (when parent-component
+    (let [select-vector (if (vector? id) id [(to-select-id id)])]
+      (seesaw-core/select parent-component select-vector))))
 
 (defn save-component-property [component key value]
   (.putClientProperty component key value)
@@ -86,22 +87,69 @@ the user does not select one."
       :type :save
       :selection-mode :files-only
       :filters filters
-      :success-fn success-fn))
-  ;(choose-file owner JFileChooser/FILES_ONLY
-  ;                     JFileChooser/SAVE_DIALOG)
-  )
+      :success-fn success-fn)))
+
+()
+
+(defn add-mouse-over-background-change
+  "Adds mouse listeners to change the background of a widget when the mouse is
+over it. Options:
+
+  :widget - The widget to add the background change to.
+  :background - The original background of the given widget. If nil then uses
+                the UIManager. Default nil.
+  :hover-color - The background color when the mouse is over the widget. Default
+                 :lightgray.
+  :pressed-color - The background color when the moused is pressed on the
+                   widget. Default :white."
+  [& args]
+    (let [{ :keys [widget background hover-color pressed-color]
+            :or { background nil hover-color :lightgray pressed-color :white } }
+            (apply hash-map args)]
+      (seesaw-core/listen widget
+        :mouse-entered
+          (fn [event]
+            (seesaw-core/config! (seesaw-core/to-widget event)
+                                 :background hover-color))
+
+        :mouse-exited
+          (fn [event]
+            (seesaw-core/config! (seesaw-core/to-widget event)
+                                 :background (or background
+                                                 (UIManager/getColor "control"))))
+      
+        :mouse-pressed
+          (fn [event]
+            (seesaw-core/config! (seesaw-core/to-widget event)
+                                 :background pressed-color))
+    
+        :mouse-released
+          (fn [event]
+            (seesaw-core/config! (seesaw-core/to-widget event)
+                                 :background hover-color)))))
 
 (defn create-link-button
   "Creates a borderless button which looks some what like a webpage link."
   [& args]
-  (let [opts (apply hash-map args)]
-    (apply seesaw-core/button
-           (mapcat identity
-                   (merge { :font link-button-font :border 0 } opts)))))
+  (let [opts (apply hash-map args)
+        link-button (apply seesaw-core/button
+                           (mapcat identity
+                             (merge { :font link-button-font :border 5 }
+                               (dissoc opts :hover-color :pressed-color))))]
+    (apply add-mouse-over-background-change
+      :widget link-button
+      (mapcat identity
+              (select-keys opts [:background :hover-color :pressed-color])))
+    link-button))
 
 (defn add-action-listener-to-button
   "Adds the given listener to the given button saving the listener-remover to
-the button as a property with the given listener key."
-  [button listener listener-key]
-  (let [listener-remover (seesaw-core/listen button :action-performed listener)]
-    (save-component-property button listener-key listener-remover)))
+the button as a property with the given listener key. If no listener-key is
+given, then :listener-remover is used."
+  ([button listener] (add-action-listener-to-button
+                       button listener :listener-remover))
+  ([button listener listener-key]
+    (when (and button listener)
+      (let [listener-remover (seesaw-core/listen
+                               button :action-performed listener)]
+        (save-component-property button listener-key listener-remover)))))

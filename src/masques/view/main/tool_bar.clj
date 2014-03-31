@@ -1,6 +1,7 @@
 (ns masques.view.main.tool-bar
   (:require [clj-internationalization.term :as term]
             [masques.controller.main.panel-protocol :as panel-protocol]
+            [masques.model.profile :as profile-model]
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
             [seesaw.core :as seesaw-core]
@@ -22,19 +23,34 @@
 (def button-panel-font (view-utils/create-link-font 14))
 (def icons-button-group (seesaw-core/button-group))
 
+(def logout-button-id :logout-button)
+
 (defn create-masques-icon []
-  (JLabel. (ImageIcon. (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png"))))
+  (JLabel.
+    (ImageIcon.
+      (ClassLoader/getSystemResource "logo_for_dark_backgrounds_small.png"))))
 
 (defn create-icons-bar []
   (seesaw-core/scrollable
-    (seesaw-core/horizontal-panel :id icons-panel-id :items [] :background background-color :border 5)
+    (seesaw-core/horizontal-panel
+      :id icons-panel-id :items [] :background background-color :border 3)
 
     :border 0))
 
 (defn logout []
   (seesaw-core/flow-panel
-    :items [(seesaw-core/label :id :hello-label :text (term/hello-user "") :foreground logout-color :font logout-font)
-            (seesaw-core/button :id :logout-button :text (term/logout) :foreground logout-color :font logout-font :border 0 :background background-color)]
+    :items [(seesaw-core/label
+              :id :hello-label
+              :text (term/hello-user
+                      (profile-model/alias (profile-model/current-user)))
+              :foreground logout-color
+              :font logout-font)
+            (view-utils/create-link-button
+              :id logout-button-id
+              :text (term/logout)
+              :foreground logout-color
+              :font logout-font
+              :background background-color)]
     :background background-color))
 
 (defn search-text-panel []
@@ -68,24 +84,24 @@
     :west (search)
     :east (logout)
 
-    :hgap 30
+    :hgap 0
     :background background-color))
 
 (defn create []
   (seesaw-core/border-panel
-    :id (.substring id 0)
+    :id id
 
     :west (create-masques-icon)
     :center (create-icons-bar)
     :east (create-global-actions-panel)
 
-    :hgap 30
+    :hgap 15
     :background background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
               (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
               (seesaw-border/line-border :thickness 1 :color background-color))
-    :preferred-size [900 :by 105]))
+    :preferred-size [900 :by 115]))
 
 (defn create-icon-button-id [panel]
   (str "icon-" (panel-protocol/find-panel-name panel)))
@@ -99,7 +115,7 @@ to the panel's name."
                  :id (create-icon-button-id panel)
                  :text (panel-protocol/display-text panel)
                  :icon icon
-                 :border 0
+                 :border 5
                  :background background-color
                  :font button-panel-font
                  :foreground view-utils/link-color
@@ -111,13 +127,34 @@ to the panel's name."
                              (if (.isSelected button)
                                Color/WHITE
                                view-utils/link-color))))
+    (view-utils/add-mouse-over-background-change
+      :widget button :background background-color :hover-color :darkgray
+      :pressed-color :lightgray)
     (view-utils/save-component-property button button-panel-name
                                         (panel-protocol/panel-name panel))
     (seesaw-event/listen button :action-performed panel-button-listener)
     button))
 
-(defn find-icons-panel [tool-bar]
-  (view-utils/find-component tool-bar (str "#" icons-panel-id)))
+(defn find-tool-bar
+  "Returns the tool-bar panel from the given frame."
+  [frame]
+  (view-utils/find-component frame id))
+
+(defn find-icons-panel
+  "Finds the panel which holds the icons on the main frame."
+  [tool-bar]
+  (view-utils/find-component tool-bar icons-panel-id))
+
+(defn find-icon-button
+  "Finds the button for the given panel in the given tool bar."
+  [tool-bar panel]
+  (view-utils/find-component
+    (find-icons-panel tool-bar) (create-icon-button-id panel)))
+
+(defn find-logout-button
+  "Finds the button for the given panel in the given tool bar."
+  [tool-bar]
+  (view-utils/find-component tool-bar logout-button-id))
 
 (defn add-icon
   "Adds the given panel as an icon on the tool-bar."
@@ -126,16 +163,24 @@ to the panel's name."
         current-icons (seesaw-core/config icons-panel :items)]
     (seesaw-core/config! icons-panel
       :items (concat current-icons
-                     [[:fill-h 25]
+                     [[:fill-h 15]
                       (create-icon-button panel panel-button-listener)]))))
-
-(defn find-icon-button
-  "Finds the button for the given panel in the given tool bar."
-  [tool-bar panel]
-  (view-utils/find-component (find-icons-panel tool-bar)
-                             (str "#" (create-icon-button-id panel))))
 
 (defn select-icon-button
   "Selects the button for the given panel in the given tool bar."
   [tool-bar panel]
   (seesaw-core/config! (find-icon-button tool-bar panel) :selected? true))
+
+(defn logout-listener
+  "Closes the main frame and exits."
+  [event]
+  (let [frame (view-utils/top-level-ancestor (seesaw-core/to-widget event))]
+    (.hide frame)
+    (.dispose frame)
+    (System/exit 0)))
+
+(defn attach-logout-listener
+  "Attaches the logout listener to the logout button in the given tool bar."
+  [tool-bar]
+  (view-utils/add-action-listener-to-button
+    (find-logout-button tool-bar) logout-listener))

@@ -57,10 +57,10 @@
   (clj-time-coerce/to-sql-date clojure-date-time))
 
 (defn clean-date-time-for-clojure [record field-name field-data]
-  (conj record {field-name (h2-to-clojure-date-time field-data)}))
+  (conj record { field-name (h2-to-clojure-date-time field-data) }))
 
 (defn clean-date-time-for-h2 [record field-name field-data]
-  (conj record {field-name (clojure-to-h2-date-time field-data)}))
+  (conj record { field-name (clojure-to-h2-date-time field-data) }))
 
 (defn created-at-is-set [record]
   (or (:created-at record) (:CREATED_AT record)))

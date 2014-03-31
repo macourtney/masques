@@ -1,5 +1,6 @@
 (ns masques.view.main.status-panel
   (:require [clj-internationalization.term :as term]
+            [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
@@ -13,14 +14,18 @@
 (def title-color (seesaw-color/color 100 100 100))
 (def title-font { :name "DIALOG" :style :bold :size 14 })
 
+(defn status-button
+  "Creates a link button with a font for the status panel."
+  [id text]
+  (view-utils/create-link-button :id id :text text :font status-button-font))
+
 (defn create-update-status []
   (seesaw-core/border-panel
     :north (seesaw-core/scrollable (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true :rows 4) :preferred-size [panel-width :by 75])
     :south
       (seesaw-core/border-panel
-        :west (seesaw-core/button :id :update-status-button :text (term/update-status) :border 0 :background status-background-color :font status-button-font)
-        :east (seesaw-core/button :id :create-new-share-button :text (term/create-new-share) :border 0 :background status-background-color :font status-button-font)
-        
+        :west (status-button :update-status-button (term/update-status))
+        :east (status-button :create-new-share-button (term/create-new-share))
         :hgap 3)
         
     :vgap 3))
@@ -29,7 +34,7 @@
   (seesaw-core/border-panel
     :north (seesaw-core/border-panel
              :west (seesaw-core/label :text (term/recent-shares) :foreground title-color :font title-font)
-             :center (seesaw-core/button :id :inbox-button :text (term/inbox) :border 0 :background status-background-color :font status-button-font)
+             :center (status-button :inbox-button (term/inbox))
              :east (seesaw-core/button :id :filter-button :text (term/filter) :font status-button-font)
 
              :hgap 3)

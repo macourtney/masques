@@ -15,14 +15,22 @@
 
 (defn create-footer []
   (seesaw-core/border-panel
-    :west (seesaw-core/button :id :settings-button :text (term/settings) :foreground settings-color :font settings-font
-                              :border 0 :background footer-background-color)
-    :east (seesaw-core/label :text (term/masques-version) :foreground (Color/WHITE))
+    :west (view-utils/create-link-button
+            :id :settings-button
+            :text (term/settings)
+            :foreground settings-color
+            :font settings-font
+            :background footer-background-color
+            :hover-color :darkgray
+            :pressed-color :lightgray)
+    :east (seesaw-core/label :text (term/masques-version)
+                             :foreground (Color/WHITE))
     :background footer-background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
               (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
-              (seesaw-border/line-border :thickness 1 :color footer-background-color))))
+              (seesaw-border/line-border :thickness 1
+                                         :color footer-background-color))))
   
 (defn create-content-panel []
   (seesaw-core/border-panel

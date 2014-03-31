@@ -17,19 +17,30 @@
 
 (defn create-profile-page-tools []
   (seesaw-core/vertical-panel
-    :items [(seesaw-core/button :icon (ImageIcon. (ClassLoader/getSystemResource "profile.png")))
-            (panel-subview/create-button :change-avatar-button (term/change-avatar))
+    :items [(seesaw-core/button
+              :icon (ImageIcon. (ClassLoader/getSystemResource "profile.png")))
+            (view-utils/create-link-button
+              :id :change-avatar-button
+              :text (term/change-avatar))
             [:fill-v 15]
             (term/identity)
-            (panel-subview/create-button :identity-text-button (term/text))
-            (panel-subview/create-button :identity-qr-code-button (term/qr-code))
+            (view-utils/create-link-button
+              :id :identity-text-button
+              :text (term/text))
+            (view-utils/create-link-button
+              :id :identity-qr-code-button
+              :text (term/qr-code))
             [:fill-v 15]
             (term/time-zone)
             (seesaw-core/label :id :time-zone-label :text "EST (GMT -5)" :font { :name "DIALOG" :style :plain :size 10 })
-            (panel-subview/create-button :time-zone-change-button (term/change))
+            (view-utils/create-link-button
+              :id :time-zone-change-button
+              :text (term/change))
             [:fill-v 15]
             (term/password)
-            (panel-subview/create-button :password-change-button (term/change))]))
+            (view-utils/create-link-button
+              :id :password-change-button
+              :text (term/change))]))
   
 (defn create-profile-save-button []
   (seesaw-core/button :id :profile-save-button :text (term/save)))

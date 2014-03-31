@@ -4,11 +4,13 @@
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core]))
 
-(def group-background-color (seesaw-color/color 238 238 238))
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 
 (defn create-button [id text]
-  (seesaw-core/button :id id :text text :border 0 :font group-button-font :background group-background-color))
+  (view-utils/create-link-button
+    :id id
+    :text text
+    :font group-button-font))
 
 (defn create-filter []
   (seesaw-core/border-panel

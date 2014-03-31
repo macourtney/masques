@@ -12,12 +12,14 @@
 
 (def share-types [:friend-request :file])
 
-(def group-background-color (seesaw-color/color 238 238 238))
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 
 (defn create-button
   ([id text]
-    (seesaw-core/button :id id :text text :border 0 :font group-button-font :background group-background-color))
+    (view-utils/create-link-button
+      :id id
+      :text text
+      :font group-button-font))
   ([id text size]
     (let [button (create-button id text)]
       (seesaw-core/config! button :preferred-size size :maximum-size size)

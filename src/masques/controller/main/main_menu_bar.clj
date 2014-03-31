@@ -5,7 +5,8 @@
   (:import [javax.swing JMenuItem JMenu]))
 
 (defn attach-main-menu-actions [main-frame]
-  (actions-utils/attach-window-close-and-exit-listener main-frame "#exit-menu-item"))
+  (actions-utils/attach-window-close-and-exit-listener
+    main-frame "#exit-menu-item"))
 
 (defn init [main-frame]
   (attach-main-menu-actions main-frame))
