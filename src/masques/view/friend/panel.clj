@@ -1,6 +1,8 @@
 (ns masques.view.friend.panel
   (:require [clj-internationalization.term :as term]
             [masques.model.profile :as profile-model]
+            [masques.view.friend.my-requests-table-model
+             :as my-requests-table-model]
             [masques.view.friend.send-friend-request-panel 
              :as send-friend-request-panel]
             [masques.view.friend.sent-friend-request-table-model
@@ -85,7 +87,7 @@
 
 (defn create-my-requests-table []
   (seesaw-core/scrollable
-    (seesaw-core/table :model [:columns [""  :Alias :Message ""]])))
+    (seesaw-core/table :model (my-requests-table-model/create))))
 
 (defn create-my-requests-tab []
   (seesaw-core/border-panel

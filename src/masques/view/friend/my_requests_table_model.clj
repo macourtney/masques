@@ -1,4 +1,4 @@
-(ns masques.view.friend.sent-friend-request-table-model
+(ns masques.view.friend.my-requests-table-model
   (:require [clj-internationalization.term :as term]
             [masques.model.base :as base-model]
             [masques.model.friend-request :as friend-request-model]
@@ -17,7 +17,7 @@
 (defn find-column [column]
   (some #(when (= column (:text %1)) %1) columns))
 
-(deftype SentFriendRequestTableModel []
+(deftype MyRequestsTableModel []
   korma-table-model/DbModel
   (columns [this]
     (map :text columns))
@@ -26,18 +26,19 @@
     (:class (find-column column)))
   
   (row-count [this]
-    (friend-request-model/count-pending-requests))
+    (friend-request-model/count-pending-acceptance-requests))
   
   (value-at [this row-index column]
     (condp = column
       (term/alias)
         (profile-model/alias
-          (:profile-id (friend-request-model/pending-request row-index)))
+          (:profile-id
+            (friend-request-model/pending-acceptance-request row-index)))
       (term/message)
         (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
-              (friend-request-model/pending-request row-index)
+              (friend-request-model/pending-acceptance-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
       nil))
   
@@ -47,4 +48,4 @@
   (update-value [this _ _ _]))
 
 (defn create []
-  (korma-table-model/create (new SentFriendRequestTableModel)))
+  (korma-table-model/create (new MyRequestsTableModel)))
