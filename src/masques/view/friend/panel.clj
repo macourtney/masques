@@ -9,6 +9,7 @@
              :as sent-friend-request-table-model]
             [masques.view.friend.utils :as friend-utils]
             [masques.view.subviews.panel :as panel-subview]
+            [masques.view.subviews.table-renderer :as table-renderer]
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
@@ -86,8 +87,21 @@
     :border 15))
 
 (defn create-my-requests-table []
-  (seesaw-core/scrollable
-    (seesaw-core/table :model (my-requests-table-model/create))))
+  (let [my-requests-table (seesaw-core/table
+                            :model (my-requests-table-model/create)
+                            :auto-resize :all-columns)
+        table-column-model (.getColumnModel my-requests-table)]
+    (table-renderer/set-renderer my-requests-table 0
+      table-renderer/image-cell-renderer)
+    (table-renderer/set-renderer my-requests-table 3
+      my-requests-table-model/accept-button-cell-renderer)
+    (table-renderer/set-renderer my-requests-table 4
+      my-requests-table-model/reject-button-cell-renderer)
+    (.setRowHeight my-requests-table 32)
+    (.setMaxWidth (.getColumn table-column-model 0) 36)
+    (.setMaxWidth (.getColumn table-column-model 3) 80)
+    (.setMaxWidth (.getColumn table-column-model 4) 80)
+    (seesaw-core/scrollable my-requests-table)))
 
 (defn create-my-requests-tab []
   (seesaw-core/border-panel
@@ -96,8 +110,18 @@
     :border 15))
 
 (defn create-sent-requests-table []
-  (seesaw-core/scrollable
-    (seesaw-core/table :model (sent-friend-request-table-model/create))))
+  (let [sent-requests-table (seesaw-core/table
+                              :model (sent-friend-request-table-model/create)
+                              :auto-resize :all-columns)
+        table-column-model (.getColumnModel sent-requests-table)]
+    (table-renderer/set-renderer sent-requests-table 0
+      table-renderer/image-cell-renderer)
+    (table-renderer/set-renderer sent-requests-table 3
+      sent-friend-request-table-model/cancel-button-cell-renderer)
+    (.setRowHeight sent-requests-table 32)
+    (.setMaxWidth (.getColumn table-column-model 0) 36)
+    (.setMaxWidth (.getColumn table-column-model 3) 80)
+    (seesaw-core/scrollable sent-requests-table)))
 
 (defn create-sent-requests-tab []
   (seesaw-core/border-panel

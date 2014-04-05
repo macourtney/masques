@@ -14,13 +14,20 @@
 
 (deftype TestTableModel []
   DbModel
-  (columns [this] test-columns)
+  (column-id [this column-index]
+    (nth test-columns column-index))
+
+  (column-name [this column-id]
+    column-id)
   
   (column-class [this column]
     (condp = column
       column0 Integer
       column1 String
       nil))
+  
+  (column-count [this]
+    (count test-columns))
   
   (row-count [this]
     (count test-rows))
