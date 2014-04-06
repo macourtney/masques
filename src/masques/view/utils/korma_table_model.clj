@@ -1,4 +1,4 @@
-(ns masques.view.subviews.korma-table-model
+(ns masques.view.utils.korma-table-model
   (:import [javax.swing.table TableModel]))
 
 (defprotocol DbModel

@@ -8,9 +8,10 @@
             [masques.view.friend.sent-friend-request-table-model
              :as sent-friend-request-table-model]
             [masques.view.friend.utils :as friend-utils]
-            [masques.view.subviews.panel :as panel-subview]
-            [masques.view.subviews.table-renderer :as table-renderer]
             [masques.view.utils :as view-utils]
+            [masques.view.utils.button-table-cell-editor
+             :as button-table-cell-editor]
+            [masques.view.utils.table-renderer :as table-renderer]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
@@ -86,21 +87,26 @@
     :vgap 5
     :border 15))
 
+(defn set-button-table-cell-renderer
+  "Sets the table cell renderer for the given column index on the given table.
+You can also set the column width. If no width is given, then it is set to 80."
+  ([table column-index renderer]
+    (set-button-table-cell-renderer table column-index renderer 80))
+  ([table column-index renderer width]
+    (table-renderer/set-renderer table column-index renderer)
+    (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width)))
+
 (defn create-my-requests-table []
   (let [my-requests-table (seesaw-core/table
                             :model (my-requests-table-model/create)
-                            :auto-resize :all-columns)
-        table-column-model (.getColumnModel my-requests-table)]
-    (table-renderer/set-renderer my-requests-table 0
-      table-renderer/image-cell-renderer)
-    (table-renderer/set-renderer my-requests-table 3
+                            :auto-resize :all-columns)]
+    (set-button-table-cell-renderer my-requests-table 0
+      table-renderer/image-cell-renderer 36)
+    (set-button-table-cell-renderer my-requests-table 3
       my-requests-table-model/accept-button-cell-renderer)
-    (table-renderer/set-renderer my-requests-table 4
+    (set-button-table-cell-renderer my-requests-table 4
       my-requests-table-model/reject-button-cell-renderer)
     (.setRowHeight my-requests-table 32)
-    (.setMaxWidth (.getColumn table-column-model 0) 36)
-    (.setMaxWidth (.getColumn table-column-model 3) 80)
-    (.setMaxWidth (.getColumn table-column-model 4) 80)
     (seesaw-core/scrollable my-requests-table)))
 
 (defn create-my-requests-tab []
@@ -109,18 +115,24 @@
 
     :border 15))
 
+(defn create-cancel-request-listener
+  "Creates a listener for the cancel button in the sent requests table."
+  [table]
+  (fn [event]
+    (println "cancel pressed.")))
+
 (defn create-sent-requests-table []
   (let [sent-requests-table (seesaw-core/table
                               :model (sent-friend-request-table-model/create)
-                              :auto-resize :all-columns)
-        table-column-model (.getColumnModel sent-requests-table)]
-    (table-renderer/set-renderer sent-requests-table 0
-      table-renderer/image-cell-renderer)
-    (table-renderer/set-renderer sent-requests-table 3
+                              :auto-resize :all-columns)]
+    (set-button-table-cell-renderer sent-requests-table 0
+      table-renderer/image-cell-renderer 36)
+    (set-button-table-cell-renderer sent-requests-table 3
       sent-friend-request-table-model/cancel-button-cell-renderer)
+    (button-table-cell-editor/set-cell-editor 
+      sent-requests-table 3 (term/cancel)
+      (create-cancel-request-listener sent-requests-table))
     (.setRowHeight sent-requests-table 32)
-    (.setMaxWidth (.getColumn table-column-model 0) 36)
-    (.setMaxWidth (.getColumn table-column-model 3) 80)
     (seesaw-core/scrollable sent-requests-table)))
 
 (defn create-sent-requests-tab []

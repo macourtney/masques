@@ -18,8 +18,8 @@
 
 (deftest run-test
   (is (run test-request-map))
-  (is (= (friend-request-model/count-pending-acceptance-requests) 1))
-  (let [friend-request (friend-request-model/pending-acceptance-request 0)
+  (is (= (friend-request-model/count-pending-received-requests) 1))
+  (let [friend-request (friend-request-model/pending-received-request 0)
         friend-request-share
           (share-model/find-friend-request-share friend-request)]
     (is friend-request)

@@ -1,6 +1,6 @@
-(ns masques.view.subviews.test.korma-data-model
+(ns masques.view.utils.test.korma-data-model
   (:use clojure.test
-        masques.view.subviews.korma-table-model))
+        masques.view.utils.korma-table-model))
 
 (def column0 "test-column-0")
 (def column1 "test-column-1")

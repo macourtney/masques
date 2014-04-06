@@ -12,8 +12,9 @@
 (def request-approved-at-key :request-approved-at)
 (def profile-id-key :profile-id)
 
-(def pending-status "pending")
-(def pending-acceptance-status "pending-acceptance")
+(def approved-status "approved")
+(def pending-received-status "pending-received")
+(def pending-sent-status "pending-sent")
 
 (defn find
   "Returns the friend request with the given id."
@@ -57,7 +58,7 @@ user."
  ; We need to create a share, attach a friend request and profile to it.
   (when-let [new-profile (profile/load-masques-id-file masques-id-file)]
     (let [new-request (save
-                        { request-status-key pending-status
+                        { request-status-key pending-sent-status
                           profile-id-key (id new-profile) })]
       (share/create-friend-request-share message new-profile new-request))))
 
@@ -66,7 +67,7 @@ user."
   [profile message]
   (when-let [new-profile (profile/save profile)]
     (let [new-request (save
-                        { request-status-key pending-acceptance-status
+                        { request-status-key pending-received-status
                           profile-id-key (id new-profile)
                           requested-at-key (str (clj-time/now)) })]
       (share/create-received-friend-request-share message new-request))))
@@ -81,16 +82,16 @@ user."
         (korma/aggregate (count :*) :count)
         (korma/where where-map)))))
 
-(defn count-pending-requests
+(defn count-pending-sent-requests
   "Returns the number of requests pending."
   []
-  (count-requests { (h2-keyword request-status-key) pending-status }))
+  (count-requests { (h2-keyword request-status-key) pending-sent-status }))
 
-(defn count-pending-acceptance-requests
+(defn count-pending-received-requests
   "Returns the number of requests waiting to be accepted by the user."
   []
   (count-requests
-    { (h2-keyword request-status-key) pending-acceptance-status }))
+    { (h2-keyword request-status-key) pending-received-status }))
 
 (defn find-table-request
   "Returns a friend request with just the id and profile id at the given index
@@ -104,13 +105,14 @@ with the given where map."
       (korma/limit 1)
       (korma/offset index))))
 
-(defn pending-request
+(defn pending-sent-request
   "Returns the pending request at the given index."
   [index]
-  (find-table-request index { (h2-keyword request-status-key) pending-status }))
+  (find-table-request index
+    { (h2-keyword request-status-key) pending-sent-status }))
 
-(defn pending-acceptance-request
-  "Returns the pending acceptance request at the given index."
+(defn pending-received-request
+  "Returns the pending received request at the given index."
   [index]
   (find-table-request index
-    { (h2-keyword request-status-key) pending-acceptance-status }))
+    { (h2-keyword request-status-key) pending-received-status }))

@@ -5,7 +5,7 @@
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
             [masques.model.share :as share-model]
-            [masques.view.subviews.korma-table-model :as korma-table-model]
+            [masques.view.utils.korma-table-model :as korma-table-model]
             [masques.view.utils :as utils])
   (:import [javax.swing ImageIcon]
            [javax.swing.table TableModel]))
@@ -39,7 +39,7 @@
     (count columns))
 
   (row-count [this]
-    (friend-request-model/count-pending-requests))
+    (friend-request-model/count-pending-sent-requests))
   
   (value-at [this row-index column-id]
     (condp = column-id
@@ -48,19 +48,19 @@
           (ClassLoader/getSystemResource "profile.png"))
       :alias
         (profile-model/alias
-          (:profile-id (friend-request-model/pending-request row-index)))
+          (:profile-id (friend-request-model/pending-sent-request row-index)))
       :message
         (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
-              (friend-request-model/pending-request row-index)
+              (friend-request-model/pending-sent-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
       :cancel
-        (:id (friend-request-model/pending-request row-index))
+        (:id (friend-request-model/pending-sent-request row-index))
       nil))
   
-  (cell-editable? [this _ _]
-    false)
+  (cell-editable? [this row-index column-id]
+    (= :cancel column-id))
   
   (update-value [this _ _ _]))
 

@@ -64,34 +64,44 @@
 (deftype DbPeerPersister []
   persister-protocol/PeerPersister
   (insert-peer [persister peer]
-    (insert peer))
+    ;(insert peer)
+    )
 
   (update-peer [persister peer]
-    (update peer))
+    ;(update peer)
+    )
 
   (delete-peer [persister peer]
-    (destroy-record peer))
+    ;(destroy-record peer)
+    )
 
   (all-peers [persister]
-    (find-records [true]))
+    ;(find-records [true])
+    )
 
   (all-foreign-peers [persister]
-    (find-by-sql ["SELECT * FROM peers WHERE local IS NULL OR local = 0"]))
+    ;(find-by-sql ["SELECT * FROM peers WHERE local IS NULL OR local = 0"])
+    )
 
   (find-peer [persister peer]
-    (find-record peer))
+    ;(find-record peer)
+    )
 
   (find-all-peers [persister peer]
-    (find-records peer))
+    ;(find-records peer)
+    )
 
   (last-updated-peer [persister]
-    (first (find-by-sql ["SELECT * FROM peers WHERE local IS NULL OR local = 0 ORDER BY updated_at DESC LIMIT 1"])))
+    ;(first (find-by-sql ["SELECT * FROM peers WHERE local IS NULL OR local = 0 ORDER BY updated_at DESC LIMIT 1"]))
+    )
 
   (all-unnotified-peers [persister]
-    (find-by-sql ["SELECT * FROM peers WHERE notified IS NULL"]))
+    ;(find-by-sql ["SELECT * FROM peers WHERE notified IS NULL"])
+    )
 
   (all-notified-peers [persister]
-    (find-by-sql ["SELECT * FROM peers WHERE notified IS NOT NULL AND NOT notified = 0"]))
+    ;(find-by-sql ["SELECT * FROM peers WHERE notified IS NOT NULL AND NOT notified = 0"])
+    )
 
   (add-peer-update-listener [persister listener]
     (add-peer-update-listener listener))

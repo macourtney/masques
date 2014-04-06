@@ -33,16 +33,17 @@
     (delete-friend-request request-record)))
 
 (deftest test-send-request
-  (is (= 0 (count-pending-requests)))
+  (is (= 0 (count-pending-sent-requests)))
   (profile/create-masques-id-file test-util/test-masques-id-file
                                   test-util/profile-map)
   (let [friend-request-share (send-request test-util/test-masques-id-file
                                            "test message")
         friend-request (share/get-content friend-request-share)]
     (is friend-request)
-    (is (= 1 (count-pending-requests)))
-    (is (= (select-keys friend-request [:id :profile-id]) (pending-request 0)))
-    (is (= (request-status-key friend-request) pending-status))
+    (is (= 1 (count-pending-sent-requests)))
+    (is (= (select-keys friend-request [:id :profile-id])
+           (pending-sent-request 0)))
+    (is (= (request-status-key friend-request) pending-sent-status))
     (is (not (requested-at-key friend-request)))
     (let [profile-id (profile-id-key friend-request)]
       (is profile-id)

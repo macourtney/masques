@@ -5,8 +5,7 @@
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
             [masques.model.share :as share-model]
-            [masques.view.subviews.korma-table-model :as korma-table-model]
-            [masques.view.subviews.table-renderer :as table-renderer]
+            [masques.view.utils.korma-table-model :as korma-table-model]
             [seesaw.core :as seesaw-core]
             [masques.view.utils :as utils])
   (:import [javax.swing.table TableModel]
@@ -42,7 +41,7 @@
     (count columns))
   
   (row-count [this]
-    (friend-request-model/count-pending-acceptance-requests))
+    (friend-request-model/count-pending-received-requests))
   
   (value-at [this row-index column-id]
     (condp = column-id
@@ -52,21 +51,21 @@
       :alias
         (profile-model/alias
           (:profile-id
-            (friend-request-model/pending-acceptance-request row-index)))
+            (friend-request-model/pending-received-request row-index)))
       :message
         (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
-              (friend-request-model/pending-acceptance-request row-index)
+              (friend-request-model/pending-received-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
       :accept
-        (:id (friend-request-model/pending-request row-index))
+        (:id (friend-request-model/pending-received-request row-index))
       :reject
-        (:id (friend-request-model/pending-request row-index))
+        (:id (friend-request-model/pending-received-request row-index))
       nil))
   
-  (cell-editable? [this row-index column]
-    false)
+  (cell-editable? [this row-index column-id]
+    (contains? #{ :accept :reject } column-id ))
   
   (update-value [this _ _ _]))
 

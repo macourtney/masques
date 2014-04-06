@@ -1,4 +1,4 @@
-(ns masques.view.subviews.table-renderer
+(ns masques.view.utils.table-renderer
   (:import [javax.swing.table TableCellRenderer]
            [javax.swing JLabel]))
 
