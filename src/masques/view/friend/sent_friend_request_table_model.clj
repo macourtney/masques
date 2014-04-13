@@ -12,12 +12,22 @@
 
 (def request-id-key :request-id)
 
-(def columns [{ :id :avatar :text "" }
-              { :id :alias :text (term/alias) :class String }
-              { :id :message :text (term/message) :class String }
-              { :id :cancel :text "" }])
+(def id-key :id)
+(def text-key :text)
+(def class-key :class)
 
-(def columns-map (reduce #(assoc %1 (:id %2) %2) {} columns))
+(def alias-column-id :alias)
+(def avatar-column-id :avatar)
+(def message-column-id :message)
+(def unfriend-column-id :unfriend)
+
+(def columns [{ id-key avatar-column-id text-key "" }
+              { id-key alias-column-id text-key (term/alias) class-key String }
+              { id-key message-column-id text-key (term/message)
+                class-key String }
+              { id-key unfriend-column-id text-key "" }])
+
+(def columns-map (reduce #(assoc %1 (id-key %2) %2) {} columns))
 
 (defn find-column
   "Finds the column with the given column-id"
@@ -27,13 +37,13 @@
 (deftype SentFriendRequestTableModel []
   korma-table-model/DbModel
   (column-id [this column-index]
-    (:id (nth columns column-index)))
+    (id-key (nth columns column-index)))
 
   (column-name [this column-id]
-    (:text (find-column column-id)))
+    (text-key (find-column column-id)))
   
   (column-class [this column-id]
-    (:class (find-column column-id)))
+    (class-key (find-column column-id)))
   
   (column-count [this]
     (count columns))
@@ -43,24 +53,25 @@
   
   (value-at [this row-index column-id]
     (condp = column-id
-      :avatar
+      avatar-column-id
         (ImageIcon.
           (ClassLoader/getSystemResource "profile.png"))
-      :alias
+      alias-column-id
         (profile-model/alias
-          (:profile-id (friend-request-model/pending-sent-request row-index)))
-      :message
+          (friend-request-model/profile-id-key
+            (friend-request-model/pending-sent-request row-index)))
+      message-column-id
         (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
               (friend-request-model/pending-sent-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
-      :cancel
-        (:id (friend-request-model/pending-sent-request row-index))
+      unfriend-column-id
+        (id-key (friend-request-model/pending-sent-request row-index))
       nil))
   
   (cell-editable? [this row-index column-id]
-    (= :cancel column-id))
+    (= unfriend-column-id column-id))
   
   (update-value [this _ _ _]))
 

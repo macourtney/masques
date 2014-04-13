@@ -55,7 +55,7 @@ function updates the status for the given request."
 (defn requested-at-set?
   "Returns true if the given request is set."
   [request]
-  (let [request (if (integer? request) (find request) request)]
+  (let [request (if (integer? request) (find-friend-request request) request)]
     (requested-at-key request)))
 
 (defn requested-at
@@ -153,7 +153,7 @@ with the given where map."
 (defn pending-sent?
   "Returns true if the given request has a status of pending sent."
   [request]
-  (let [request (if (integer? request) (find request) request)]
+  (let [request (if (integer? request) (find-friend-request request) request)]
     (= (request-status-key request) pending-sent-status)))
 
 (defn pending-sent-request
@@ -178,13 +178,13 @@ with the given where map."
           (first
             (korma/select friend-request
               (korma/fields (h2-keyword profile-id-key))
-              (korma/where { :ID id }))))))))
+              (korma/where { :ID request-id }))))))))
 
 (defn unfriend
   "Updates the given request to an unfriend."
   [request]
   (when-let [request-id (id request)]
-    (when-let [request (find request-id)]
+    (when-let [request (find-friend-request request-id)]
       (update-record friend-request
              { :ID (id request)
                (h2-keyword request-status-key) unfriend-status
@@ -194,4 +194,4 @@ with the given where map."
               (and
                 (pending-sent? request)
                 (requested-at-set? request)))
-         (find request)))))
+         (find-friend-request request)))))

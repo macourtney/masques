@@ -47,7 +47,25 @@
     (is (not (requested-at-key friend-request)))
     (let [profile-id (profile-id-key friend-request)]
       (is profile-id)
-      (is (profile/find-profile profile-id)))
+      (is (profile/find-profile profile-id))
+      (let [to-profile (find-to-profile friend-request)]
+        (is to-profile)
+        (is (= (id to-profile) profile-id))))
+    (delete-friend-request friend-request)
+    (share/delete-share friend-request-share))
+  (io/delete-file test-util/test-masques-id-file))
+
+(deftest test-unfriend
+  (is (= 0 (count-pending-sent-requests)))
+  (profile/create-masques-id-file test-util/test-masques-id-file
+                                  test-util/profile-map)
+  (let [friend-request-share (send-request test-util/test-masques-id-file
+                                           "test message")
+        friend-request (share/get-content friend-request-share)]
+    (is (= (request-status-key friend-request) pending-sent-status))
+    (let [unfriend-request (unfriend friend-request)]
+      (is unfriend-request)
+      (is (= (request-status-key unfriend-request) unfriend-status)))
     (delete-friend-request friend-request)
     (share/delete-share friend-request-share))
   (io/delete-file test-util/test-masques-id-file))
