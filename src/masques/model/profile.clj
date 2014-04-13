@@ -1,10 +1,13 @@
 (ns masques.model.profile
+  (:refer-clojure :exclude [identity alias])
   (:require [clj-crypto.core :as clj-crypto]
             [clj-i2p.core :as clj-i2p]
-            [masques.edn :as edn]
+            [clj-i2p.peer-service.persister-protocol :as persister-protocol]
             [clojure.java.io :as io]
             [config.db-config :as db-config]
-            [masques.model.avatar :as avatar-model])
+            [masques.edn :as edn]
+            [masques.model.avatar :as avatar-model]
+            [masques.model.property :as property])
   (:use masques.model.base
         korma.core)
   (:import [org.apache.commons.codec.binary Base64]
@@ -21,6 +24,22 @@
 (def private-key-algorithm-key :private-key-algorithm)
 
 (def saved-current-user (atom nil))
+
+(def peer-update-listeners (atom []))
+
+(def peer-delete-listeners (atom []))
+
+(defn add-peer-update-listener [listener]
+  (swap! peer-update-listeners conj listener))
+
+(defn remove-peer-update-listener [listener]
+  (swap! peer-update-listeners remove-listener listener))
+
+(defn add-peer-delete-listener [listener]
+  (swap! peer-delete-listeners conj listener))
+
+(defn remove-peer-delete-listener [listener]
+  (swap! peer-delete-listeners remove-listener listener))
 
 (defn find-profile
   "Finds the profile with the given id."
@@ -39,6 +58,12 @@ id."
   "Returns the currently logged in user or nil if no user is logged in."
   []
   @saved-current-user)
+
+(defn clean-user-data
+  "Returns the current user cleaned for sending across the network."
+  []
+  (select-keys (current-user)
+    [:alias :identity :identity-algorithm :destination]))
   
 (defn set-current-user
   "Sets the currently logged in user."
@@ -104,17 +129,6 @@ id."
   []
   (find-profile current-user-id))
 
-(defn init
-  "Loads the currently logged in user's profile into memory. Creating the profile if it does not alreay exist."
-  []
-  (if-let [logged-in-profile (find-profile current-user-id)]
-    (set-current-user logged-in-profile)
-    (let [user-name (db-config/current-username)]
-      (if-let [new-profile (create-user user-name)]
-        (set-current-user new-profile)
-        (throw (RuntimeException. (str "Could not create user: "
-                                       user-name)))))))
-
 (defn logout
   "Logs out the currently logged in user. Just used for testing."
   []
@@ -145,12 +159,32 @@ used."
   [file]
   (edn/read file))
 
+(defn identity
+  "Returns the identity for the given profile."
+  [profile]
+  (identity-key profile))
+
+(defn identity-algorithm
+  "Returns the identity algorithm used for the given profile."
+  [profile]
+  (identity-algorithm-key profile))
+
+(defn find-by-identity
+  "Finds the profile with the given identity or identity map."
+  ([identity-map]
+    (find-by-identity (identity identity-map) (identity-algorithm identity-map)))
+  ([identity identity-algorithm]
+    (first
+      (select profile
+        (where { (h2-keyword identity-key) identity
+                 (h2-keyword identity-algorithm-key) identity-algorithm })))))
+
 (defn load-masques-id-map
   "Creates a profile from the given masques id map, saves it to the database,
 and returns the new id. This function should not be directly called."
   [masques-id-map]
   (when masques-id-map
-    (save masques-id-map)))
+    (or (find-by-identity masques-id-map) (save masques-id-map))))
 
 (defn load-masques-id-file
   "Creates a profile from the given masques id file, saves it to the database
@@ -167,17 +201,77 @@ profile, then it is used as the id of the profile to get."
     (alias (find-profile profile))
     (alias-key profile)))
 
-(defn identity
-  "Returns the identity for the given profile."
-  [profile]
-  (identity-key profile))
-
-(defn identity-algorithm
-  "Returns the identity algorithm used for the given profile."
-  [profile]
-  (identity-algorithm-key profile))
-
 (defn destination
   "Returns the destination attached to the given profile."
   [profile]
   (destination-key profile))
+
+(defn all-destinations
+  "Returns all of the destinations of all the profiles."
+  []
+  (map destination-key
+       (select profile (fields [(h2-keyword destination-key)]))))
+
+(deftype DbPeerPersister []
+  persister-protocol/PeerPersister
+  (insert-peer [persister peer])
+
+  (update-peer [persister peer])
+
+  (delete-peer [persister peer])
+
+  (all-peers [persister])
+
+  (all-foreign-peers [persister])
+
+  (find-peer [persister peer])
+
+  (find-all-peers [persister peer])
+
+  (last-updated-peer [persister])
+
+  (all-unnotified-peers [persister])
+
+  (all-notified-peers [persister])
+
+  (add-peer-update-listener [persister listener]
+    (add-peer-update-listener listener))
+
+  (remove-peer-update-listener [persister listener]
+    (remove-peer-update-listener listener))
+
+  (add-peer-delete-listener [persister listener]
+    (add-peer-delete-listener listener))
+
+  (remove-peer-delete-listener [persister listener]
+    (remove-peer-delete-listener listener))
+
+  (default-destinations [persister]
+    (all-destinations))
+
+  (peers-downloaded? [persister]
+    (property/peers-downloaded?))
+
+  (set-peers-downloaded? [persister value]
+    (property/set-peers-downloaded? value)))
+
+(defn create-peer-persister
+  "Creates a new instance of DbPeerPersister and returns it."
+  []
+  (DbPeerPersister.))
+
+(defn init
+  "Loads the currently logged in user's profile into memory. Creating the
+profile if it does not alreay exist. Also, creates a new instance of
+DbPeerPersister and registers it with the persister protocol if one is not
+already registered."
+  []
+  (when (not (persister-protocol/protocol-registered?))
+    (persister-protocol/register (create-peer-persister)))
+  (if-let [logged-in-profile (find-profile current-user-id)]
+    (set-current-user logged-in-profile)
+    (let [user-name (db-config/current-username)]
+      (if-let [new-profile (create-user user-name)]
+        (set-current-user new-profile)
+        (throw (RuntimeException.
+                 (str "Could not create user: " user-name)))))))

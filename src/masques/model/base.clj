@@ -10,6 +10,9 @@
   (:import [java.sql Clob])
   (:import [java.util.UUID]))
 
+; The id key as a valid h2 keyword.
+(def id-key :ID)
+
 ; Database connections. db is for non-korma stuff.
 (def db (deref masques-core/db))
 (korma-db/defdb mydb (drift-db/db-map))
@@ -164,6 +167,18 @@ this function simply returns the record."
     (or (:ID record) (:id record))
     record))
 
+(defn find-all
+  "Finds records which statisfy the given prototype."
+  [entity record]
+  (when (and entity record)
+    (map clean-up-for-clojure
+      (select entity (where (clean-up-for-h2 record))))))
+
+(defn find-first
+  "Finds the first record which statisfy the given prototype."
+  [entity record]
+  (first (find-all entity record)))
+
 (defn find-by-id [entity id]
   (when id
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
@@ -188,6 +203,20 @@ this function simply returns the record."
   (when-let [id (if (map? record) (id record) record)]
     (delete entity
       (where { :ID id }))))
+
+(defn count-records
+  "Returns the number of records for the given entity. You can pass a record to
+use as a prototype of the records to count."
+  ([entity]
+    (:count
+      (first (select entity (aggregate (count :*) :count)))))
+  ([entity record]
+    (:count
+      (first
+        (select
+          entity
+          (aggregate (count :*) :count)
+          (where record))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Entities

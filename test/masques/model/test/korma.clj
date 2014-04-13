@@ -87,3 +87,11 @@
   ; #_(println (h2-table-names))
   ; #_(println model/album)
 )
+
+(deftest test-find-all
+  (let [test-message (message-model/create-message "test message")
+        all-messages (model/find-all model/message
+                                     { :id (model/id test-message) })]
+    (is all-messages)
+    (is (= all-messages [test-message]))
+    (message-model/delete-message test-message)))

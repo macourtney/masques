@@ -4,10 +4,8 @@
             [clojure.test :as clojure-test]
             [config.db-config :as db-config]
             [fixtures.profile :as profile-fixture]
-            [fixtures.user :as user-fixture]
             [fixtures.util :as fixture-util]
             [masques.model.profile :as profile-model]
-            [masques.model.user :as user-model]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 

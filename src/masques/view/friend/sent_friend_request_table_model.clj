@@ -67,9 +67,9 @@
 (defn create []
   (korma-table-model/create (new SentFriendRequestTableModel)))
 
-(defn cancel-button-cell-renderer
+(defn unfriend-button-cell-renderer
   "A table cell renderer function for the cancel button."
   [table value isSelected hasFocus row column]
-  (let [cancel-button (utils/create-link-button :text (term/cancel))]
-    (utils/save-component-property cancel-button request-id-key value)
-    cancel-button))
+  (let [unfriend-button (utils/create-link-button :text (term/unfriend))]
+    (utils/save-component-property unfriend-button request-id-key value)
+    unfriend-button))

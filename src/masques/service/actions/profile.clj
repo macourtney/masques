@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [name])
   (:require ;[masques.model.address :as address-model]
             ;[masques.model.email-address :as email-model]
-            [masques.model.friend :as friend-model] 
+            ;[masques.model.friend :as friend-model] 
             ;[masques.model.name :as name-model]
             ;[masques.model.phone-number :as phone-number-model]
             ;[masques.model.permission :as permission-model]
@@ -62,9 +62,10 @@
   )
 
 (defn run [request-map]
-  (let [sender-friend (request-map-utils/sender-friend? request-map)]
-    { :data
-      { :name (name sender-friend)
-        :email (email sender-friend)
-        :phone-number (phone-number sender-friend)
-        :address (full-address sender-friend) }}))
+  ;(let [sender-friend (request-map-utils/sender-friend? request-map)]
+  ;  { :data
+  ;    { :name (name sender-friend)
+  ;      :email (email sender-friend)
+  ;      :phone-number (phone-number sender-friend)
+  ;      :address (full-address sender-friend) }})
+  )

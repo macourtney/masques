@@ -4,12 +4,17 @@
   (:import [javax.swing.event ChangeEvent]
            [javax.swing.table TableCellEditor]))
 
-(def request-id-key :request-id)
+(def value-key :value)
+
+(defn value-from
+  "Returns the value attached to the given button by the ButtonTableCellEditor."
+  [button]
+  (utils/retrieve-component-property button value-key))
 
 (deftype ButtonTableCellEditor [cell-editor-listeners button]
   TableCellEditor
   (getTableCellEditorComponent [this table value isSelected row column]
-    (utils/save-component-property button request-id-key value)
+    (utils/save-component-property button value-key value)
     button)
   
   (getCellEditorValue [this]

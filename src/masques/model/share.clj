@@ -134,36 +134,9 @@ it needs to be created."
 (defn is-friend-request [share-record]
   (is-type share-record friend-content-type))
 
-(defn is-valid [share-record]
-  (println (str "\nTesting if valid " share-record))
-  true)
-
 (defn is-from-friend [share-record]
   (println (str "\nTesting if from from friend " share-record))
   true)
-
-(defn handle-friend-request [share-record]
-  (println (str "\nThis is a friend request " share-record))
-  true)
-
-(defn accept [share-record]
-  (println (str "\nWe are accepting the share record " share-record))
-  true)
-
-(defn reject [share-record]
-  (println (str "A share record was rejected " share-record))
-  (logging/error (str "\nA share record was rejected " share-record)))
-
-(defn handle [share-record]
-  (cond
-    (is-friend-request share-record)
-      (handle-friend-request share-record)
-    (is-from-friend share-record)
-      (accept share-record)
-    :else (reject share-record)))
-
-(defn receive [share-record]
-  (if (is-valid share-record) (handle share-record) (reject share-record)))
 
 (defn delete-share [share-record]
   (when share-record
@@ -176,14 +149,25 @@ it needs to be created."
   [share]
   (save (attach-to-identity (attach-from-profile (attach-message-id share)))))
 
+(defn find-friend-request-share-with-profile
+  "Finds the friend request share pointing to the given profile."
+  [profile]
+  (find-first share
+    { content-type-key friend-content-type
+      profile-to-id-key (id profile) }))
+
 (defn create-friend-request-share
   "Creates a friend request share."
   [message profile friend-request]
-  (create-share
-    { content-type-key friend-content-type
-      message-key message
-      to-profile-key profile
-      content-id-key (id friend-request) }))
+  (if-let [old-share (find-friend-request-share-with-profile profile)]
+    (do
+      (message-model/update-message (message-id old-share) message)
+      old-share)
+    (create-share
+      { content-type-key friend-content-type
+        message-key message
+        to-profile-key profile
+        content-id-key (id friend-request) })))
 
 (defn create-received-friend-request-share
   "Creates an incoming friend request share."

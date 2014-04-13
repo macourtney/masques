@@ -2,6 +2,8 @@
   (:use masques.model.base
         korma.core))
 
+(def body-key :body)
+
 (defn find-message
   "Finds the message with the given id."
   [message-id]
@@ -16,7 +18,12 @@
 (defn create-message
   "Creates a message from the given message string."
   [message-str]
-  (insert-or-update message { :body message-str }))
+  (insert-or-update message { body-key message-str }))
+
+(defn update-message
+  "Updates the body of the given message."
+  [message-id body]
+  (update-record message { id-key (id message-id) body-key body }))
 
 (defn find-or-create
   "Finds or creates a message from the given message. If message is a string,
@@ -34,4 +41,4 @@ integer, then it is treated as the id for a message in the database."
   [message]
   (if (integer? message)
     (body (find-message message))
-    (:body message)))
+    (body-key message)))

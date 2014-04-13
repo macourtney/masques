@@ -13,11 +13,10 @@
             [fixtures.user :as user-fixture]
             ;[masques.model.address :as address-model]
             ;[masques.model.email-address :as email-model]
-            [masques.model.identity :as identity-model] 
             ;[masques.model.name :as name-model]
             ;[masques.model.phone-number :as phone-number-model]
             ;[masques.model.record-utils :as record-utils]
-            [masques.model.user :as user-model]
+            ;[masques.model.user :as user-model]
             [masques.test.util :as test-util]))
 
 ;(test-util/use-combined-login-fixture address-fixture/fixture-map friend-fixture/fixture-map

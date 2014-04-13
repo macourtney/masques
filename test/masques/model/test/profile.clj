@@ -18,11 +18,11 @@
 (def profile-map {
   alias-key "Ted"
   avatar-path-key "./test/support_files/avatar.png"
-  private-key-key "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJPZamGpI82xY5dYI4Is+dVw1jaRC0eCnOkiv+E75hdLCAfY6Nm25ftj/UgssJka1BwQpvWrsASCjVSUK3aSGBNVf59RzdB7rprtjbHQJsFHZ7gwzkFI2UccLdOdHRQaJjypfhhC39Z7LTa7ErDm5Wlq664QPbxL89csJSsBh4IDAgMBAAECgYA7sofv0vmv7jZGP8Jmp35hHmSAN+SUBTsSL4PGkAcB1LvzXzP15JHMBb2ZTOIpj9mhU1/2xlIWIBis0/8Qq0CovdpS+3AD7jhNjbdA3Rv28qsqa0D/hbpniAkA/ezkpNDF8Ag/gbDv20zB5shj/gpjpv4pPY8LOp1YcfoCJLd6oQJBAOuEnxyq0tXKGqtbbcR449+3cwhJZlwA4jgeVx1e5NReKbtlUcB4N1HDUY2MtwjesTXBZJAwtt811f0xjFC4sxsCQQCgtQJbiKdo05LBbJ2Cc5shWwyAdqpLnW1Sku4aubqfkHCRqs2SeqVK/yhDdjMTni6+GKiK8PpDlRd1yDhUf/M5AkA+UGy47QmzvzGnPR2h6kqAms042BLZLPKt3nk2MDFjbzajen9S6XvZilA9n4meMy24B19QN1NrY5cm0sFJalUZAkAec23o7jHaeQx7vhryVvl0Do6F4PZPsZq/ZLvdMIgeJ/5Me7LMKJUdas+0SLdQ5k4xEvcMrLCfEacKWE/kIwJxAkBGGAsrMuqf6DTZHm5mxiBJxuctymY44V1r7UjB1F0jIE4BhLUKe2PNYCKcr84vwA6etdqPF+MyCmelpcVCAb2y",
-  private-key-algorithm-key "RSA",
-  identity-key "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCT2WphqSPNsWOXWCOCLPnVcNY2kQtHgpzpIr/hO+YXSwgH2OjZtuX7Y/1ILLCZGtQcEKb1q7AEgo1UlCt2khgTVX+fUc3Qe66a7Y2x0CbBR2e4MM5BSNlHHC3TnR0UGiY8qX4YQt/Wey02uxKw5uVpauuuED28S/PXLCUrAYeCAwIDAQAB",
-  identity-algorithm-key "RSA",
-  })
+  destination-key test-destination
+  private-key-key "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJPZamGpI82xY5dYI4Is+dVw1jaRC0eCnOkiv+E75hdLCAfY6Nm25ftj/UgssJka1BwQpvWrsASCjVSUK3aSGBNVf59RzdB7rprtjbHQJsFHZ7gwzkFI2UccLdOdHRQaJjypfhhC39Z7LTa7ErDm5Wlq664QPbxL89csJSsBh4IDAgMBAAECgYA7sofv0vmv7jZGP8Jmp35hHmSAN+SUBTsSL4PGkAcB1LvzXzP15JHMBb2ZTOIpj9mhU1/2xlIWIBis0/8Qq0CovdpS+3AD7jhNjbdA3Rv28qsqa0D/hbpniAkA/ezkpNDF8Ag/gbDv20zB5shj/gpjpv4pPY8LOp1YcfoCJLd6oQJBAOuEnxyq0tXKGqtbbcR449+3cwhJZlwA4jgeVx1e5NReKbtlUcB4N1HDUY2MtwjesTXBZJAwtt811f0xjFC4sxsCQQCgtQJbiKdo05LBbJ2Cc5shWwyAdqpLnW1Sku4aubqfkHCRqs2SeqVK/yhDdjMTni6+GKiK8PpDlRd1yDhUf/M5AkA+UGy47QmzvzGnPR2h6kqAms042BLZLPKt3nk2MDFjbzajen9S6XvZilA9n4meMy24B19QN1NrY5cm0sFJalUZAkAec23o7jHaeQx7vhryVvl0Do6F4PZPsZq/ZLvdMIgeJ/5Me7LMKJUdas+0SLdQ5k4xEvcMrLCfEacKWE/kIwJxAkBGGAsrMuqf6DTZHm5mxiBJxuctymY44V1r7UjB1F0jIE4BhLUKe2PNYCKcr84vwA6etdqPF+MyCmelpcVCAb2y"
+  private-key-algorithm-key "RSA"
+  identity-key "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCT2WphqSPNsWOXWCOCLPnVcNY2kQtHgpzpIr/hO+YXSwgH2OjZtuX7Y/1ILLCZGtQcEKb1q7AEgo1UlCt2khgTVX+fUc3Qe66a7Y2x0CbBR2e4MM5BSNlHHC3TnR0UGiY8qX4YQt/Wey02uxKw5uVpauuuED28S/PXLCUrAYeCAwIDAQAB"
+  identity-algorithm-key "RSA" })
 
 (deftest test-add-profile
   (let [profile-record (save profile-map)]
@@ -73,28 +73,44 @@
 
 (deftest test-load-masques-id-map
   (let [profile (load-masques-id-map (create-masques-id-map profile-map))]
+    (is (= (count (korma/select model-base/profile)) 1))
     (is profile)
     (is (= (alias-key profile) (alias-key profile-map)))
     (is (= (destination-key profile) test-destination))
     (is (= (identity-key profile) (identity-key profile-map)))
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
-    (delete-profile profile)))
+    (let [profile2 (load-masques-id-map (create-masques-id-map profile-map))]
+      (is (= (model-base/id profile) (model-base/id profile2)))
+      (is (= (count (korma/select model-base/profile)) 1)))
+    (delete-profile profile)
+    (is (= (count (korma/select model-base/profile)) 0))))
 
 (deftest test-load-masques-id-file
   (when (.exists test-masques-id-file)
     (io/delete-file test-masques-id-file))
   (create-masques-id-file test-masques-id-file profile-map)
   (let [profile (load-masques-id-file test-masques-id-file)]
+    (is (= (count (korma/select model-base/profile)) 1))
     (is profile)
     (is (= (alias-key profile) (alias-key profile-map)))
     (is (= (destination-key profile) test-destination))
     (is (= (identity-key profile) (identity-key profile-map)))
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
     (delete-profile profile)
-    (io/delete-file test-masques-id-file)))
+    (io/delete-file test-masques-id-file)
+    (is (= (count (korma/select model-base/profile)) 0))))
 
 (deftest test-alias
   (is (= (alias-key profile-map) (alias profile-map)))
   (let [saved-profile (save profile-map)]
     (is (= (alias-key profile-map) (alias (:id saved-profile))))
     (delete-profile saved-profile)))
+
+(deftest test-all-destinations
+  (let [profile (load-masques-id-map (create-masques-id-map profile-map))
+        destinations (all-destinations)]
+    (is destinations)
+    (is (= (count destinations) 1))
+    (is (= destinations [test-destination]))
+    (delete-profile profile)
+    (is (= (count (korma/select model-base/profile)) 0))))

@@ -5,6 +5,11 @@
             [test.init :as test-init])
   (:use drift-db.core))
 
+(defn clear-records
+  "Cleans out the table for the given fixture-map."
+  [fixture-map]
+  (delete (:table fixture-map) [true]))
+
 (defn load-records [fixture-map]
   (apply insert-into
          (:table fixture-map)
@@ -18,6 +23,7 @@
 
 (defn run-fixture [fixture-map function]
   (try
+    (clear-records fixture-map)
     (load-records fixture-map) 
     (function)
     (finally

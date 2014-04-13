@@ -1,6 +1,7 @@
 (ns masques.view.friend.panel
   (:require [clj-internationalization.term :as term]
             [masques.model.profile :as profile-model]
+            [masques.service.calls.unfriend :as unfriend-call]
             [masques.view.friend.my-requests-table-model
              :as my-requests-table-model]
             [masques.view.friend.send-friend-request-panel 
@@ -119,7 +120,9 @@ You can also set the column width. If no width is given, then it is set to 80."
   "Creates a listener for the cancel button in the sent requests table."
   [table]
   (fn [event]
-    (println "cancel pressed.")))
+    (let [button (seesaw-core/to-widget event)
+          request-id (button-table-cell-editor/value-from button)]
+      (unfriend-call/send-unfriend request-id))))
 
 (defn create-sent-requests-table []
   (let [sent-requests-table (seesaw-core/table
@@ -128,9 +131,9 @@ You can also set the column width. If no width is given, then it is set to 80."
     (set-button-table-cell-renderer sent-requests-table 0
       table-renderer/image-cell-renderer 36)
     (set-button-table-cell-renderer sent-requests-table 3
-      sent-friend-request-table-model/cancel-button-cell-renderer)
+      sent-friend-request-table-model/unfriend-button-cell-renderer)
     (button-table-cell-editor/set-cell-editor 
-      sent-requests-table 3 (term/cancel)
+      sent-requests-table 3 (term/unfriend)
       (create-cancel-request-listener sent-requests-table))
     (.setRowHeight sent-requests-table 32)
     (seesaw-core/scrollable sent-requests-table)))
