@@ -30,8 +30,9 @@ share."
   "Creates the data map for a request-friendship action from the given friend
 request share."
   [share]
-  { :message (message share)
-    :profile (profile) })
+  { :data 
+    { :message (message share)
+      :profile (profile) }})
 
 (defn received?
   "Returns true if the friend request was received."

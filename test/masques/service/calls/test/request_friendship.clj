@@ -40,7 +40,8 @@
     (is (= @network-data
            { clj-i2p/service-key service-protocol/service-name
              clj-i2p/service-version-key service-protocol/service-version
-             clj-i2p/data-key { :action request-friendship-action/action
+             :action request-friendship-action/action
+             clj-i2p/data-key { 
                      :message test-message
                      :profile (select-keys (profile-model/current-user)
                                 [profile-model/alias-key

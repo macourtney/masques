@@ -1,9 +1,11 @@
 (ns masques.service.protocol
   (:require [clj-i2p.service :as service]
             [clj-i2p.service-protocol :as service-protocol]
+            [clojure.tools.logging :as logging]
             [masques.service.actions.profile :as profile]
             [masques.service.actions.request-friendship
-              :as request-friendship]))
+              :as request-friendship]
+            [masques.service.request-map-utils :as request-map-utils]))
 
 (def service-name :masques-service)
 (def service-version "1.0.0-SNAPSHOT")
@@ -24,15 +26,12 @@
     "This is a service which handles all Masques requests.")
 
   (handle [service request-map]
-    (let [action (:action request-map)]
+    (let [action (request-map-utils/action request-map)]
       (if-let [run-function (get actions action)]
         (run-function request-map)
-        { :error (str "Unknown action: " action) }))
-    ;(condp = (:action request-map)
-    ;  profile/action (profile/run request-map)
-    ;  request-friendship/action (request-friendship/run request-map)
-    ;  { :error (str "Unknown action: " (:action request-map)) })
-    ))
+        (do
+          (throw (RuntimeException. (str "Unknown action: " action)))
+          { :error (str "Unknown action: " action) })))))
 
 (def masques-service (MasquesService.))
 

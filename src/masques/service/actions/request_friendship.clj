@@ -1,6 +1,6 @@
 (ns masques.service.actions.request-friendship
-  (:refer-clojure :exclude [name])
-  (:require [masques.model.friend-request :as friend-request-model]
+  (:require [clojure.tools.logging :as logging]
+            [masques.model.friend-request :as friend-request-model]
             [masques.model.share :as share]
             [masques.service.request-map-utils :as request-map-utils]))
 
@@ -36,5 +36,4 @@ database."
   "Creates a new friend request. If successful, returns true. Otherwise, throws
 an exception."
   [request-map]
-  { :data
-   { :received? (request-friendship request-map) }})
+  { :data { :received? (request-friendship request-map) }})

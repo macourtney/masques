@@ -178,7 +178,8 @@ cancel button in the given view."
         message-text (seesaw-core/text
                        (find-friend-request-message-text friend-panel-view))
         file (mid-file friend-panel-view)]
-    (request-friendship-call/send-friend-request file message-text))
+    (future
+      (request-friendship-call/send-friend-request file message-text)))
   (send-friend-request-cancel-listener event))
 
 (defn attach-send-friend-request-send-listener
