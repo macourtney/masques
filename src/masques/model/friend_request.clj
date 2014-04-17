@@ -15,6 +15,7 @@
 (def approved-status "approved")
 (def pending-received-status "pending-received")
 (def pending-sent-status "pending-sent")
+(def rejected-status "rejected")
 (def unfriend-status "unfriend")
 
 (defn find-friend-request
@@ -36,8 +37,12 @@ function updates the status for the given request."
   ([request]
     (request-status-key request))
   ([request new-status]
-    (update-record friend-request
-      { id-key (id request) request-status-key new-status })
+    (let [approved-at (when (= new-status approved-status)
+                        (str (clj-time/now)))]
+      (update-record friend-request
+        { id-key (id request)
+          request-status-key new-status
+          request-approved-at-key approved-at }))
     new-status))
 
 (defn set-requested-at [record]
@@ -74,16 +79,21 @@ user."
   [profile]
   (find-first friend-request { profile-id-key (id profile) }))
 
-(defn update-to-send-request
+(defn update-send-request
   "Updates the given request to a send-request. Returns the updated or new share
 unless it is already approved.."
   [message new-profile request]
   (let [request-status (status request)]
     (condp = request-status
-      approved-status nil
-      pending-received-status nil ; This should approve the request.
+      approved-status
+        (share/find-friend-request-share-with-profile new-profile)
+      pending-received-status
+        (do
+          (status request approved-status)
+          (share/create-friend-request-share message new-profile request))
       pending-sent-status
         (share/create-friend-request-share message new-profile request)
+      rejected-status nil
       unfriend-status 
         (do
           (status request pending-sent-status)
@@ -104,18 +114,49 @@ unless it is already approved.."
  ; We need to create a share, attach a friend request and profile to it.
   (when-let [new-profile (profile/load-masques-id-file masques-id-file)]
     (if-let [old-request (find-by-profile new-profile)]
-      (update-to-send-request message new-profile old-request)
+      (update-send-request message new-profile old-request)
       (create-new-send-request message new-profile))))
+
+(defn update-receive-request
+  "Updates the given request to a send-request. Returns the updated or new share
+unless it is already approved.."
+  [message new-profile request]
+  (let [request-status (status request)]
+    (condp = request-status
+      approved-status
+        (share/find-friend-request-share-with-profile new-profile) 
+      pending-received-status
+        (share/create-received-friend-request-share message new-profile request)
+      pending-sent-status
+        (do
+          (status request approved-status)
+          (share/create-received-friend-request-share message new-profile
+                                                      request))
+      rejected-status
+        (do
+          (status request approved-status)
+          (share/create-received-friend-request-share message new-profile
+                                                      request))
+      unfriend-status nil ; Already unfriended.
+      (throw (RuntimeException. (str "Unknown status: " request-status))))))
+
+(defn create-new-receive-request
+  "Creates a new send request from the given message and profile."
+  [message new-profile]
+  (let [new-request (save
+                        { request-status-key pending-received-status
+                          profile-id-key (id new-profile)
+                          requested-at-key (str (clj-time/now)) })]
+      (share/create-received-friend-request-share message new-profile
+                                                  new-request)))
 
 (defn receive-request
   "Creates a new incoming friend request"
   [profile message]
-  (when-let [new-profile (profile/save profile)]
-    (let [new-request (save
-                        { request-status-key pending-received-status
-                          profile-id-key (id new-profile)
-                          requested-at-key (str (clj-time/now)) })]
-      (share/create-received-friend-request-share message new-request))))
+  (when-let [new-profile (profile/load-masques-id-map profile)]
+    (if-let [old-request (find-by-profile new-profile)]
+      (update-receive-request message new-profile old-request)
+      (create-new-receive-request message new-profile))))
 
 (defn count-requests
   "Counts all of the requests which satisfies the given korma where-map."

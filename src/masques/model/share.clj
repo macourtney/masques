@@ -171,12 +171,16 @@ it needs to be created."
 
 (defn create-received-friend-request-share
   "Creates an incoming friend request share."
-  [message friend-request]
-  (create-share
-    { content-type-key friend-content-type
-      message-key message
-      to-profile-key (id (profile-model/current-user))
-      content-id-key (id friend-request) }))
+  [message profile friend-request]
+  (if-let [old-share (find-friend-request-share-with-profile profile)]
+    (do
+      (message-model/update-message (message-id old-share) message)
+      old-share)
+    (create-share
+      { content-type-key friend-content-type
+        message-key message
+        to-profile-key (id (profile-model/current-user))
+        content-id-key (id friend-request) })))
 
 (defn find-friend-request-share
   "Finds the share for the given friend request. Friend request can be either an
