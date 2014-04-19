@@ -61,18 +61,18 @@
                            friend-request-model/pending-sent-status
                          friend-request-model/profile-id-key
                            (id test-profile) })
-        test-share (create-friend-request-share test-message test-profile
+        test-share (create-send-friend-request-share test-message test-profile
                                                 test-request)
         test-message-id (message-id test-share)]
     (is test-share)
     (is (is-friend-request test-share))
     (is (= (content-id-key test-share) (id test-request)))
     (is (= (profile-to-id-key test-share) (id test-profile)))
-    (is (= (id (find-friend-request-share-with-profile test-profile))
+    (is (= (id (find-friend-request-share-with-to-profile test-profile))
            (id test-share)))
     (let [test-message2 "test-message2"
-          test-share2 (create-friend-request-share test-message2 test-profile
-                                                test-request)
+          test-share2 (create-send-friend-request-share
+                        test-message2 test-profile test-request)
           test-message-id2 (message-id test-share2)]
       (is test-share2)
       (is (= (id test-share2) (id test-share)))

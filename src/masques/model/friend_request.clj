@@ -86,18 +86,18 @@ unless it is already approved.."
   (let [request-status (status request)]
     (condp = request-status
       approved-status
-        (share/find-friend-request-share-with-profile new-profile)
+        (share/find-friend-request-share-with-to-profile new-profile)
       pending-received-status
         (do
           (status request approved-status)
-          (share/create-friend-request-share message new-profile request))
+          (share/create-send-friend-request-share message new-profile request))
       pending-sent-status
-        (share/create-friend-request-share message new-profile request)
+        (share/create-send-friend-request-share message new-profile request)
       rejected-status nil
       unfriend-status 
         (do
           (status request pending-sent-status)
-          (share/create-friend-request-share message new-profile request))
+          (share/create-send-friend-request-share message new-profile request))
       (throw (RuntimeException. (str "Unknown status: " request-status))))))
 
 (defn create-new-send-request
@@ -106,7 +106,7 @@ unless it is already approved.."
   (let [new-request (save
                       { request-status-key pending-sent-status
                         profile-id-key (id new-profile) })]
-    (share/create-friend-request-share message new-profile new-request)))
+    (share/create-send-friend-request-share message new-profile new-request)))
 
 (defn send-request
   "Creates a new friend request and attaches a new profile and new share to it."
@@ -124,7 +124,7 @@ unless it is already approved.."
   (let [request-status (status request)]
     (condp = request-status
       approved-status
-        (share/find-friend-request-share-with-profile new-profile) 
+        (share/find-friend-request-share-with-from-profile new-profile) 
       pending-received-status
         (share/create-received-friend-request-share message new-profile request)
       pending-sent-status

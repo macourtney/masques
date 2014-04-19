@@ -17,6 +17,7 @@
 (def content-key :content)
 (def message-key :message)
 (def to-profile-key :to-profile)
+(def from-profile-key :from-profile)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Message.
@@ -75,12 +76,13 @@ it needs to be created."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn attach-from-profile
-  "Attaches the from identity using the logged in user's identity. If
-:profile-from-id is set, then this function simply returns the record."
+  "Sets the profile from id to the profile attached to the given share with the
+key from-profile-key. If no from profile is set on the given share, then this
+function simply returns the share.."
   [share]
-  (if (profile-from-id-key share)
-    (let [current-user-profile (profile-model/current-user)]
-      (assoc share profile-from-id-key (id current-user-profile)))
+  (if-let [from-profile (from-profile-key share)]
+    (let [share (dissoc share from-profile-key)]
+      (assoc share profile-from-id-key (id from-profile)))
     share))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -149,38 +151,48 @@ it needs to be created."
   [share]
   (save (attach-to-identity (attach-from-profile (attach-message-id share)))))
 
-(defn find-friend-request-share-with-profile
-  "Finds the friend request share pointing to the given profile."
+(defn find-friend-request-share-with-to-profile
+  "Finds the friend request share sent to the given profile."
   [profile]
   (find-first share
     { content-type-key friend-content-type
       profile-to-id-key (id profile) }))
 
-(defn create-friend-request-share
+(defn find-friend-request-share-with-from-profile
+  "Finds the friend request share sent from the given profile."
+  [profile]
+  (find-first share
+    { content-type-key friend-content-type
+      profile-from-id-key (id profile) }))
+
+(defn update-message
+  "Updates the given share to have the given message."
+  [share message]
+  (message-model/update-message (message-id share) message)
+  share)
+
+(defn create-send-friend-request-share
   "Creates a friend request share."
   [message profile friend-request]
-  (if-let [old-share (find-friend-request-share-with-profile profile)]
-    (do
-      (message-model/update-message (message-id old-share) message)
-      old-share)
+  (if-let [old-share (find-friend-request-share-with-to-profile profile)]
+    (update-message old-share message)
     (create-share
       { content-type-key friend-content-type
         message-key message
-        to-profile-key profile
+        profile-to-id-key (id profile)
+        profile-from-id-key (id (profile-model/current-user))
         content-id-key (id friend-request) })))
 
 (defn create-received-friend-request-share
   "Creates an incoming friend request share."
   [message profile friend-request]
-  (if-let [old-share (find-friend-request-share-with-profile profile)]
-    (do
-      (message-model/update-message (message-id old-share) message)
-      old-share)
-    (create-share
-      { content-type-key friend-content-type
-        message-key message
-        to-profile-key (id (profile-model/current-user))
-        content-id-key (id friend-request) })))
+  (if-let [old-share (find-friend-request-share-with-from-profile profile)]
+    (update-message old-share message)
+    (create-share { content-type-key friend-content-type
+                    message-key message
+                    profile-to-id-key (id (profile-model/current-user))
+                    profile-from-id-key (id profile)
+                    content-id-key (id friend-request) })))
 
 (defn find-friend-request-share
   "Finds the share for the given friend request. Friend request can be either an

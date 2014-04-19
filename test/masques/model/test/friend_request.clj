@@ -42,7 +42,7 @@
                              requested-at-key (str (clj-time/now))
                              request-approved-at-key (str (clj-time/now))
                              profile-id-key (id test-profile) })
-        test-share (share/create-friend-request-share test-message test-profile
+        test-share (share/create-send-friend-request-share test-message test-profile
                                                       test-request)]
     (let [test-message-2 "test message 2"
           new-status (status test-request approved-status)
@@ -97,7 +97,7 @@
                              requested-at-key (str (clj-time/now))
                              request-approved-at-key (str (clj-time/now))
                              profile-id-key (id test-profile) })
-        test-share (share/create-friend-request-share test-message test-profile
+        test-share (share/create-received-friend-request-share test-message test-profile
                                                       test-request)]
     (let [test-message-2 "test message 2"
           new-status (status test-request approved-status)
