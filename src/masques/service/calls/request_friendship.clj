@@ -19,20 +19,13 @@ share."
   [share]
   (message-model/body (share-model/message-id share)))
 
-(defn profile
-  "Returns a sanitized profile to be passed in the friendship request."
-  []
-  (select-keys (profile-model/current-user)
-    [profile-model/alias-key profile-model/identity-key
-     profile-model/identity-algorithm-key]))
-
 (defn create-data-map
   "Creates the data map for a request-friendship action from the given friend
 request share."
   [share]
   { :data 
     { :message (message share)
-      :profile (profile) }})
+      :profile (profile-model/clean-user-data) }})
 
 (defn received?
   "Returns true if the friend request was received."

@@ -177,7 +177,12 @@ this function simply returns the record."
 (defn find-first
   "Finds the first record which statisfy the given prototype."
   [entity record]
-  (first (find-all entity record)))
+  (when (and entity record)
+    (first
+      (map clean-up-for-clojure
+        (select entity
+          (where (clean-up-for-h2 record))
+          (limit 1))))))
 
 (defn find-by-id [entity id]
   (when id

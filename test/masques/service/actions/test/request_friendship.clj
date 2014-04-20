@@ -14,7 +14,8 @@
     [profile-model/alias-key profile-model/identity-key
      profile-model/identity-algorithm-key]))
 
-(def test-request-map { :data { :message test-message :profile test-profile } })
+(def test-request-map { :from { :destination test-util/test-destination-str }
+                        :data { :message test-message :profile test-profile } })
 
 (deftest run-test
   (is (run test-request-map))
@@ -29,3 +30,7 @@
     (is (= (message-model/body (share-model/message-id friend-request-share))
            test-message))
     (share-model/delete-share friend-request-share)))
+
+(deftest test-read-friend-profile
+  (is (= (read-friend-profile test-request-map)
+         (assoc test-profile :destination test-util/test-destination-str))))

@@ -1,6 +1,7 @@
 (ns masques.service.actions.request-friendship
   (:require [clojure.tools.logging :as logging]
             [masques.model.friend-request :as friend-request-model]
+            [masques.model.profile :as profile-model]
             [masques.model.share :as share]
             [masques.service.request-map-utils :as request-map-utils]))
 
@@ -16,7 +17,9 @@
 (defn read-friend-profile
   "Returns the friend profile which comes from the person requesting frienship."
   [request-map]
-  (:profile (data request-map)))
+  (let [from-destination (request-map-utils/from-destination request-map)]
+    (when-let [profile (:profile (data request-map))]
+      (assoc profile profile-model/destination-key from-destination))))
 
 (defn read-message
   "Reads the friend request message from the given request map."

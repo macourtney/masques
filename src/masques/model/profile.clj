@@ -43,8 +43,10 @@
 
 (defn find-profile
   "Finds the profile with the given id."
-  [id]
-  (find-by-id profile id))
+  [record]
+  (if (integer? record)
+    (find-by-id profile record)
+    (find-first profile record)))
 
 (defn delete-profile
   "Deletes the given profile from the database. The profile should include the

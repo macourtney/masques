@@ -97,6 +97,15 @@ You can also set the column width. If no width is given, then it is set to 80."
     (table-renderer/set-renderer table column-index renderer)
     (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width)))
 
+(defn create-reject-request-listener
+  "Creates a listener for the reject button in the my requests table."
+  [table]
+  (fn [event]
+    (let [button (seesaw-core/to-widget event)
+          request-id (button-table-cell-editor/value-from button)]
+      (future
+        (unfriend-call/send-unfriend request-id)))))
+
 (defn create-my-requests-table []
   (let [my-requests-table (seesaw-core/table
                             :model (my-requests-table-model/create)
@@ -107,6 +116,9 @@ You can also set the column width. If no width is given, then it is set to 80."
       my-requests-table-model/accept-button-cell-renderer)
     (set-button-table-cell-renderer my-requests-table 4
       my-requests-table-model/reject-button-cell-renderer)
+    (button-table-cell-editor/set-cell-editor 
+      my-requests-table 4 (term/reject)
+      (create-reject-request-listener my-requests-table))
     (.setRowHeight my-requests-table 32)
     (seesaw-core/scrollable my-requests-table)))
 

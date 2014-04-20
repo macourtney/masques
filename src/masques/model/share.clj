@@ -19,6 +19,14 @@
 (def to-profile-key :to-profile)
 (def from-profile-key :from-profile)
 
+(defn find-share
+  "Finds the share with the given prototype. If the given record is an int, then
+this function finds the share by id."
+  [record]
+  (if (integer? record)
+    (find-by-id share record)
+    (find-first share record)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Message.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,6 +82,12 @@ it needs to be created."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; From identity
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn from-profile
+  "Returns the from profile attached to the given share."
+  [share]
+  (or (from-profile-key share)
+      (profile-model/find-profile (profile-from-id-key share))))
 
 (defn attach-from-profile
   "Sets the profile from id to the profile attached to the given share with the
@@ -199,10 +213,9 @@ function simply returns the share.."
 integer id or map containing the id of the friend request."
   [friend-request & share-fields]
   (when friend-request
-    (let [friend-request-id (if (map? friend-request)
-                              (:id friend-request)
-                              friend-request)
-          share-fields (if (empty? share-fields) [:id] share-fields)]
+    (let [friend-request-id (id friend-request)
+          ;share-fields (if (empty? share-fields) [:id] share-fields)
+          ]
       (first
         (select share
                 ;(apply fields share-fields) Doesn't work since select is a macro

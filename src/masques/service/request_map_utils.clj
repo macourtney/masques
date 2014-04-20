@@ -9,3 +9,13 @@
   "Returns the action from the given request map."
   [request-map]
   (:action request-map))
+
+(defn from
+  "Returns the from map from the given request map."
+  [request-map]
+  (:from request-map))
+
+(defn from-destination
+  "Returns the destination the request map was sent from."
+  [request-map]
+  (:destination (from request-map)))

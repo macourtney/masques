@@ -45,6 +45,7 @@
                      :message test-message
                      :profile (select-keys (profile-model/current-user)
                                 [profile-model/alias-key
+                                 profile-model/destination-key
                                  profile-model/identity-key
                                  profile-model/identity-algorithm-key]) }
              clj-i2p/from-key
