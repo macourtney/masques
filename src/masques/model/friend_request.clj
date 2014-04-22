@@ -292,8 +292,8 @@ to the given request."
     (status request approved-status)
     (share/find-friend-request-share request)))
 
-(defn accept
-  "Updates a request as accepted."
+(defn send-accept
+  "Updates a request as accepted when send from the currently logged in user."
   [request]
   (when-let [request-id (id request)]
     (when-let [request (find-friend-request request-id)]
@@ -302,10 +302,26 @@ to the given request."
           approved-status nil
           pending-received-status
             (update-to-accepted request)
-          pending-sent-status
-            (update-to-accepted request)
+          pending-sent-status nil
           rejected-status nil ; Already rejected..
           unfriend-status
             (update-to-accepted request) 
+          (throw (RuntimeException.
+                   (str "Unknown status: " request-status))))))))
+
+(defn receive-accept
+  "Updates a request as accepted when received from someone who you sent a
+friend request."
+  [request]
+  (when-let [request-id (id request)]
+    (when-let [request (find-friend-request request-id)]
+      (let [request-status (status request)]
+        (condp = request-status
+          approved-status nil
+          pending-received-status nil
+          pending-sent-status
+            (update-to-accepted request)
+          rejected-status (update-to-accepted request) ; Already rejected..
+          unfriend-status nil
           (throw (RuntimeException.
                    (str "Unknown status: " request-status))))))))

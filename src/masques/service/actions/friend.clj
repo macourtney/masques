@@ -28,7 +28,7 @@ it to the database."
   [request-map]
   (let [friend-profile (read-friend-profile request-map)
         friend-request (friend-request-model/find-by-profile friend-profile)]
-    (friend-request-model/accept friend-request))
+    (friend-request-model/receive-accept friend-request))
   true)
 
 (defn run

@@ -2,12 +2,9 @@
   (:require [clj-internationalization.term :as term]
             [masques.model.friend-request :as friend-request-model]
             [masques.model.profile :as profile-model]
-            [masques.model.share :as share-model]
             [masques.view.utils.korma-table-model :as korma-table-model]
-            [seesaw.core :as seesaw-core]
             [masques.view.utils :as utils])
-  (:import [javax.swing.table TableModel]
-           [javax.swing ImageIcon]))
+  (:import [javax.swing ImageIcon]))
 
 (def request-id-key :request-id)
 

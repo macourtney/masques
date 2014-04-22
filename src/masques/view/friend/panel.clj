@@ -84,6 +84,15 @@ You can also set the column width. If no width is given, then it is set to 80."
     (table-renderer/set-renderer table column-index renderer)
     (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width)))
 
+(defn create-unfriend-request-listener
+  "Creates a listener for the unfriend button in the sent requests table."
+  [table]
+  (fn [event]
+    (let [button (seesaw-core/to-widget event)
+          request-id (button-table-cell-editor/value-from button)]
+      (future
+        (unfriend-call/send-unfriend request-id)))))
+
 (defn create-all-friends-table []
   (let [all-friends-table (seesaw-core/table
                             :model (all-friends-table-model/create)
@@ -96,6 +105,9 @@ You can also set the column width. If no width is given, then it is set to 80."
       all-friends-table-model/shares-button-cell-renderer)
     (set-button-table-cell-renderer all-friends-table 6
       all-friends-table-model/unfriend-button-cell-renderer)
+    (button-table-cell-editor/set-cell-editor 
+      all-friends-table 6 (term/unfriend)
+      (create-unfriend-request-listener all-friends-table))
     (.setRowHeight all-friends-table 32)
     (seesaw-core/scrollable all-friends-table)))
 
@@ -156,14 +168,7 @@ You can also set the column width. If no width is given, then it is set to 80."
 
     :border 15))
 
-(defn create-unfriend-request-listener
-  "Creates a listener for the cancel button in the sent requests table."
-  [table]
-  (fn [event]
-    (let [button (seesaw-core/to-widget event)
-          request-id (button-table-cell-editor/value-from button)]
-      (future
-        (unfriend-call/send-unfriend request-id)))))
+
 
 (defn create-sent-requests-table []
   (let [sent-requests-table (seesaw-core/table
