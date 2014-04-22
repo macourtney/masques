@@ -2,6 +2,7 @@
   (:require [clj-i2p.service :as service]
             [clj-i2p.service-protocol :as service-protocol]
             [clojure.tools.logging :as logging]
+            [masques.service.actions.friend :as friend]
             [masques.service.actions.profile :as profile]
             [masques.service.actions.request-friendship
               :as request-friendship]
@@ -12,7 +13,8 @@
 (def service-version "1.0.0-SNAPSHOT")
 
 (def actions
-  { profile/action profile/run
+  { friend/action friend/run
+    profile/action profile/run
     request-friendship/action request-friendship/run
     unfriend/action unfriend/run })
 

@@ -1,8 +1,6 @@
-(ns masques.view.friend.my-requests-table-model
+(ns masques.view.friend.all-friends-table-model
   (:require [clj-internationalization.term :as term]
-            [masques.model.base :as base-model]
             [masques.model.friend-request :as friend-request-model]
-            [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
             [masques.model.share :as share-model]
             [masques.view.utils.korma-table-model :as korma-table-model]
@@ -15,9 +13,11 @@
 
 (def columns [{ :id :avatar :text "" :class ImageIcon }
               { :id :alias :text (term/alias) :class String }
-              { :id :message :text (term/message) :class String }
-              { :id :accept :text "" }
-              { :id :reject :text "" }])
+              { :id :nick :text (term/nick) :class String }
+              { :id :groups :text (term/groups) :class String }
+              { :id :details :text "" :class Integer }
+              { :id :shares :text "" :class Integer }
+              { :id :unfriend :text "" :class Integer }])
 
 (def columns-map (reduce #(assoc %1 (:id %2) %2) {} columns))
 
@@ -26,7 +26,7 @@
   [column-id]
   (get columns-map column-id))
 
-(deftype MyRequestsTableModel []
+(deftype FriendsTableModel []
   korma-table-model/DbModel
   (column-id [this column-index]
     (:id (nth columns column-index)))
@@ -41,7 +41,7 @@
     (count columns))
   
   (row-count [this]
-    (friend-request-model/count-pending-received-requests))
+    (friend-request-model/count-friends))
   
   (value-at [this row-index column-id]
     (condp = column-id
@@ -51,39 +51,44 @@
       :alias
         (profile-model/alias
           (:profile-id
-            (friend-request-model/pending-received-request row-index)))
-      :message
-        (message-model/body
-          (share-model/message-id-key
-            (share-model/find-friend-request-share
-              (friend-request-model/pending-received-request row-index)
-              (base-model/h2-keyword share-model/message-id-key))))
-      :accept
-        (:id (friend-request-model/pending-received-request row-index))
-      :reject
-        (:id (friend-request-model/pending-received-request row-index))
+            (friend-request-model/approved-received-request row-index)))
+      :nick ""
+      :groups ""
+      :details
+        (:id (friend-request-model/approved-received-request row-index))
+      :shares
+        (:id (friend-request-model/approved-received-request row-index))
+      :unfriend
+        (:id (friend-request-model/approved-received-request row-index))
       nil))
   
   (cell-editable? [this row-index column-id]
-    (contains? #{ :accept :reject } column-id ))
+    (contains? #{ :details :shares :unfriend } column-id ))
   
   (update-value [this _ _ _]))
 
 (defn create
-  "Creates a new table model for use in the my requests table."
+  "Creates a new table model for use in the friends table."
   []
-  (korma-table-model/create (new MyRequestsTableModel)))
+  (korma-table-model/create (new FriendsTableModel)))
 
-(defn accept-button-cell-renderer
-  "A table cell renderer function for the accept button."
+(defn details-button-cell-renderer
+  "A table cell renderer function for the details button."
   [table value isSelected hasFocus row column]
-  (let [button (utils/create-link-button :text (term/accept))]
+  (let [button (utils/create-link-button :text (term/details))]
     (utils/save-component-property button request-id-key value)
     button))
 
-(defn reject-button-cell-renderer
-  "A table cell renderer function for the reject button."
+(defn shares-button-cell-renderer
+  "A table cell renderer function for the shares button."
   [table value isSelected hasFocus row column]
-  (let [button (utils/create-link-button :text (term/reject))]
+  (let [button (utils/create-link-button :text (term/shares))]
+    (utils/save-component-property button request-id-key value)
+    button))
+
+(defn unfriend-button-cell-renderer
+  "A table cell renderer function for the unfriend button."
+  [table value isSelected hasFocus row column]
+  (let [button (utils/create-link-button :text (term/unfriend))]
     (utils/save-component-property button request-id-key value)
     button))

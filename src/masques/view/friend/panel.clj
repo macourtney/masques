@@ -1,7 +1,10 @@
 (ns masques.view.friend.panel
   (:require [clj-internationalization.term :as term]
             [masques.model.profile :as profile-model]
+            [masques.service.calls.friend :as friend-call]
             [masques.service.calls.unfriend :as unfriend-call]
+            [masques.view.friend.all-friends-table-model
+             :as all-friends-table-model]
             [masques.view.friend.my-requests-table-model
              :as my-requests-table-model]
             [masques.view.friend.send-friend-request-panel 
@@ -72,22 +75,6 @@
     
     :vgap 5))
 
-(defn create-all-friends-table []
-  (seesaw-core/scrollable
-    (seesaw-core/table :model [:columns [""  :Alias :Nick :Groups ""]])))
-
-(defn create-all-friends-tab []
-  (seesaw-core/border-panel
-    :north (seesaw-core/border-panel
-             :west (view-utils/create-link-button :id send-friend-request-button-id
-                                       :text (term/plus-send-friend-request))
-             :east (view-utils/create-link-button :id export-mid-button-id
-                                       :text (term/export-mid)))
-    :center (create-all-friends-table)
-
-    :vgap 5
-    :border 15))
-
 (defn set-button-table-cell-renderer
   "Sets the table cell renderer for the given column index on the given table.
 You can also set the column width. If no width is given, then it is set to 80."
@@ -96,6 +83,44 @@ You can also set the column width. If no width is given, then it is set to 80."
   ([table column-index renderer width]
     (table-renderer/set-renderer table column-index renderer)
     (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width)))
+
+(defn create-all-friends-table []
+  (let [all-friends-table (seesaw-core/table
+                            :model (all-friends-table-model/create)
+                            :auto-resize :all-columns)]
+    (set-button-table-cell-renderer all-friends-table 0
+      table-renderer/image-cell-renderer 36)
+    (set-button-table-cell-renderer all-friends-table 4
+      all-friends-table-model/details-button-cell-renderer)
+    (set-button-table-cell-renderer all-friends-table 5
+      all-friends-table-model/shares-button-cell-renderer)
+    (set-button-table-cell-renderer all-friends-table 6
+      all-friends-table-model/unfriend-button-cell-renderer)
+    (.setRowHeight all-friends-table 32)
+    (seesaw-core/scrollable all-friends-table)))
+
+(defn create-all-friends-tab []
+  (seesaw-core/border-panel
+    :north (seesaw-core/border-panel
+             :west (view-utils/create-link-button
+                     :id send-friend-request-button-id
+                     :text (term/plus-send-friend-request))
+             :east (view-utils/create-link-button
+                     :id export-mid-button-id
+                     :text (term/export-mid)))
+    :center (create-all-friends-table)
+
+    :vgap 5
+    :border 15))
+
+(defn create-accept-request-listener
+  "Creates a listener for the reject button in the my requests table."
+  [table]
+  (fn [event]
+    (let [button (seesaw-core/to-widget event)
+          request-id (button-table-cell-editor/value-from button)]
+      (future
+        (friend-call/send-friend request-id)))))
 
 (defn create-reject-request-listener
   "Creates a listener for the reject button in the my requests table."
@@ -116,6 +141,9 @@ You can also set the column width. If no width is given, then it is set to 80."
       my-requests-table-model/accept-button-cell-renderer)
     (set-button-table-cell-renderer my-requests-table 4
       my-requests-table-model/reject-button-cell-renderer)
+    (button-table-cell-editor/set-cell-editor 
+      my-requests-table 3 (term/accept)
+      (create-accept-request-listener my-requests-table))
     (button-table-cell-editor/set-cell-editor 
       my-requests-table 4 (term/reject)
       (create-reject-request-listener my-requests-table))

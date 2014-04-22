@@ -1,4 +1,4 @@
-(ns masques.service.actions.unfriend
+(ns masques.service.actions.friend
   (:refer-clojure :exclude [name])
   (:require [clojure.tools.logging :as logging]
             [masques.model.friend-request :as friend-request-model]
@@ -6,7 +6,7 @@
             [masques.model.share :as share]
             [masques.service.request-map-utils :as request-map-utils]))
 
-(def action "unfriend")
+(def action "friend")
 
 (defn data
   "Returns the data map from the request-map."
@@ -22,13 +22,13 @@ unfriend."
       (select-keys profile
         [profile-model/identity-key profile-model/identity-algorithm-key]))))
 
-(defn reject
-  "Updates the friend request as rejected from the given request-map and saves
+(defn accept
+  "Updates the friend request as accepted from the given request-map and saves
 it to the database."
   [request-map]
   (let [friend-profile (read-friend-profile request-map)
         friend-request (friend-request-model/find-by-profile friend-profile)]
-    (friend-request-model/reject friend-request))
+    (friend-request-model/accept friend-request))
   true)
 
 (defn run
@@ -36,4 +36,4 @@ it to the database."
 returns true. Otherwise, throws an exception."
   [request-map]
   { :data
-   { :received? (reject request-map) }})
+   { :received? (accept request-map) }})

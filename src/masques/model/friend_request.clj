@@ -179,6 +179,12 @@ unless it is already approved.."
   (count-requests
     { (h2-keyword request-status-key) pending-received-status }))
 
+(defn count-friends
+  "Returns the number of accepted friend requests."
+  []
+  (count-requests
+    { (h2-keyword request-status-key) approved-status }))
+
 (defn find-table-request
   "Returns a friend request with just the id and profile id at the given index
 with the given where map."
@@ -208,6 +214,12 @@ with the given where map."
   [index]
   (find-table-request index
     { (h2-keyword request-status-key) pending-received-status }))
+
+(defn approved-received-request
+  "Returns the approved friend request at the given index."
+  [index]
+  (find-table-request index
+    { (h2-keyword request-status-key) approved-status }))
 
 (defn find-to-profile
   "Returns the profile for the given request"
@@ -254,7 +266,7 @@ to the given request."
     (status request rejected-status)
     (share/find-friend-request-share request)))
 
-(defn rejected
+(defn reject
   "Updates a request as rejected."
   [request]
   (when-let [request-id (id request)]
@@ -269,4 +281,31 @@ to the given request."
             (update-to-rejected request)
           rejected-status nil ; Already rejected..
           unfriend-status nil 
-          (throw (RuntimeException. (str "Unknown status: " request-status))))))))
+          (throw (RuntimeException.
+                   (str "Unknown status: " request-status))))))))
+
+(defn update-to-accepted
+  "Updates the given request status to accepted and returns the share attached
+to the given request."
+  [request]
+  (do
+    (status request approved-status)
+    (share/find-friend-request-share request)))
+
+(defn accept
+  "Updates a request as accepted."
+  [request]
+  (when-let [request-id (id request)]
+    (when-let [request (find-friend-request request-id)]
+      (let [request-status (status request)]
+        (condp = request-status
+          approved-status nil
+          pending-received-status
+            (update-to-accepted request)
+          pending-sent-status
+            (update-to-accepted request)
+          rejected-status nil ; Already rejected..
+          unfriend-status
+            (update-to-accepted request) 
+          (throw (RuntimeException.
+                   (str "Unknown status: " request-status))))))))

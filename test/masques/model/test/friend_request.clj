@@ -228,7 +228,7 @@
     (share/delete-share test-share)
     (profile/delete-profile test-profile)))
 
-(deftest test-rejected
+(deftest test-reject
   (let [test-message "test message"
         test-profile (profile/load-masques-id-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
@@ -239,28 +239,65 @@
         test-share (share/create-send-friend-request-share
                      test-message test-profile test-request)]
     (let [new-status (status test-request approved-status)
-          updated-share (rejected (find-friend-request test-request))
+          updated-share (reject (find-friend-request test-request))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) rejected-status)))
     (let [new-status (status test-request pending-received-status)
-          updated-share (rejected (find-friend-request test-request))
+          updated-share (reject (find-friend-request test-request))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) rejected-status)))
     (let [new-status (status test-request pending-sent-status)
-          updated-share (rejected (find-friend-request test-request))
+          updated-share (reject (find-friend-request test-request))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) rejected-status)))
     (let [new-status (status test-request rejected-status)
-          updated-share (rejected (find-friend-request test-request))]
+          updated-share (reject (find-friend-request test-request))]
       (is (not updated-share)))
     (let [new-status (status test-request unfriend-status)
-          updated-share (rejected (find-friend-request test-request))]
+          updated-share (reject (find-friend-request test-request))]
       (is (not updated-share)))
+    (share/delete-share test-share)
+    (profile/delete-profile test-profile)))
+
+(deftest test-accept
+  (let [test-message "test message"
+        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-request (save { created-at-key (str (clj-time/now))
+                             request-status-key approved-status
+                             requested-at-key (str (clj-time/now))
+                             request-approved-at-key (str (clj-time/now))
+                             profile-id-key (id test-profile) })
+        test-share (share/create-send-friend-request-share
+                     test-message test-profile test-request)]
+    (let [new-status (status test-request approved-status)
+          updated-share (accept (find-friend-request test-request))]
+      (is (not updated-share)))
+    (let [new-status (status test-request pending-received-status)
+          updated-share (accept (find-friend-request test-request))
+          updated-request (share/get-content updated-share)]
+      (is updated-share)
+      (is (= (id updated-share) (id test-share)))
+      (is (= (status updated-request) approved-status)))
+    (let [new-status (status test-request pending-sent-status)
+          updated-share (accept (find-friend-request test-request))
+          updated-request (share/get-content updated-share)]
+      (is updated-share)
+      (is (= (id updated-share) (id test-share)))
+      (is (= (status updated-request) approved-status)))
+    (let [new-status (status test-request rejected-status)
+          updated-share (accept (find-friend-request test-request))]
+      (is (not updated-share)))
+    (let [new-status (status test-request unfriend-status)
+          updated-share (accept (find-friend-request test-request))
+          updated-request (share/get-content updated-share)]
+      (is updated-share)
+      (is (= (id updated-share) (id test-share)))
+      (is (= (status updated-request) approved-status)))
     (share/delete-share test-share)
     (profile/delete-profile test-profile)))
