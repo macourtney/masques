@@ -2,11 +2,15 @@
   (:require [seesaw.chooser :as seesaw-chooser]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
-  (:import [javax.swing JFileChooser UIManager]))
+  (:import [javax.swing ImageIcon JFileChooser UIManager]))
 
 (def link-color "#FFAA00")
 
 (def link-button-font { :name "DIALOG" :style :plain :size 12 })
+
+(def under-construction-image
+  (ImageIcon.
+    (ClassLoader/getSystemResource "Road-under-construction-tiny.png")))
 
 (defn create-link-font [size]
   { :name "DIALOG" :style :bold :size size })
@@ -141,6 +145,13 @@ over it. Options:
       (mapcat identity
               (select-keys opts [:background :hover-color :pressed-color])))
     link-button))
+
+(defn create-under-construction-link-button
+  "Creates a borderless button which looks some what like a webpage link, but
+also includes an image icon of a construction worker indicating this button has
+not yet been implemented."
+  [& args]
+  (apply create-link-button :icon under-construction-image args))
 
 (defn add-action-listener-to-button
   "Adds the given listener to the given button saving the listener-remover to

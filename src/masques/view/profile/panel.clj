@@ -19,31 +19,32 @@
   (seesaw-core/vertical-panel
     :items [(seesaw-core/button
               :icon (ImageIcon. (ClassLoader/getSystemResource "profile.png")))
-            (view-utils/create-link-button
+            (view-utils/create-under-construction-link-button
               :id :change-avatar-button
               :text (term/change-avatar))
             [:fill-v 15]
             (term/identity)
-            (view-utils/create-link-button
+            (view-utils/create-under-construction-link-button
               :id :identity-text-button
               :text (term/text))
-            (view-utils/create-link-button
+            (view-utils/create-under-construction-link-button
               :id :identity-qr-code-button
               :text (term/qr-code))
             [:fill-v 15]
             (term/time-zone)
             (seesaw-core/label :id :time-zone-label :text "EST (GMT -5)" :font { :name "DIALOG" :style :plain :size 10 })
-            (view-utils/create-link-button
+            (view-utils/create-under-construction-link-button
               :id :time-zone-change-button
               :text (term/change))
             [:fill-v 15]
             (term/password)
-            (view-utils/create-link-button
+            (view-utils/create-under-construction-link-button
               :id :password-change-button
               :text (term/change))]))
   
 (defn create-profile-save-button []
-  (seesaw-core/button :id :profile-save-button :text (term/save)))
+  (view-utils/create-under-construction-link-button
+    :id :profile-save-button :text (term/save)))
 
 (defn create-save-button-panel []
   (seesaw-core/border-panel

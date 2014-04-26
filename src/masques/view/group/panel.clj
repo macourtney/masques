@@ -6,8 +6,8 @@
 
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 
-(defn create-button [id text]
-  (view-utils/create-link-button
+(defn create-under-construction-button [id text]
+  (view-utils/create-under-construction-link-button
     :id id
     :text text
     :font group-button-font))
@@ -18,22 +18,31 @@
       (seesaw-core/vertical-panel
         :items [(seesaw-core/horizontal-panel
                     :items
-                      [(seesaw-core/combobox :id :group-combobox :preferred-size [250 :by 25])
+                      [(seesaw-core/combobox
+                         :id :group-combobox :preferred-size [250 :by 25])
                        [:fill-h 3]
-                       (create-button :edit-group-button (term/edit))
+                       (create-under-construction-button
+                         :edit-group-button (term/edit))
                        [:fill-h 3]
-                       (create-button :delete-group-button (term/delete))])
-                (seesaw-core/border-panel :west (create-button :create-new-group-button (term/create-new-group)))])))
+                       (create-under-construction-button
+                         :delete-group-button (term/delete))])
+                (seesaw-core/border-panel
+                  :west (create-under-construction-button
+                          :create-new-group-button (term/create-new-group)))])))
 
 (defn create-header []
   (seesaw-core/border-panel
     :west (create-filter)
-    :east (seesaw-core/label :text (term/groups) :foreground "#380B61" :font { :size 48 })))
+    :east (seesaw-core/label :text (term/groups) :foreground "#380B61"
+                             :font { :size 48 })))
 
 (defn create-members-header []
   (seesaw-core/border-panel
-    :west (seesaw-core/border-panel :south (create-button :add-member-button (term/add-member)))
-    :east (seesaw-core/button :id :filter-members-button :text (term/filter))))
+    :west (seesaw-core/border-panel
+            :south (create-under-construction-button
+                     :add-member-button (term/add-member)))
+    :east (create-under-construction-button
+            :filter-members-button (term/filter))))
 
 (defn create-members-table []
   (seesaw-core/scrollable

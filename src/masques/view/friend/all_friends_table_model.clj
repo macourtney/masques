@@ -72,14 +72,16 @@
 (defn details-button-cell-renderer
   "A table cell renderer function for the details button."
   [table value isSelected hasFocus row column]
-  (let [button (utils/create-link-button :text (term/details))]
+  (let [button (utils/create-under-construction-link-button
+                 :text (term/details))]
     (utils/save-component-property button request-id-key value)
     button))
 
 (defn shares-button-cell-renderer
   "A table cell renderer function for the shares button."
   [table value isSelected hasFocus row column]
-  (let [button (utils/create-link-button :text (term/shares))]
+  (let [button (utils/create-under-construction-link-button
+                 :text (term/shares))]
     (utils/save-component-property button request-id-key value)
     button))
 

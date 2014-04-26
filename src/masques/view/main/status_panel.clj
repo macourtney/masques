@@ -9,27 +9,29 @@
 (def panel-width 250)
 
 (def status-background-color (seesaw-color/color 238 238 238))
-(def status-button-font { :name "DIALOG" :style :plain :size 10 })
+(def button-font { :name "DIALOG" :style :plain :size 10 })
 
 (def title-color (seesaw-color/color 100 100 100))
 (def title-font { :name "DIALOG" :style :bold :size 14 })
 
-(defn status-button
+(defn under-construction-button
   "Creates a link button with a font for the status panel."
   [id text]
-  (view-utils/create-link-button :id id :text text :font status-button-font))
+  (view-utils/create-under-construction-link-button
+    :id id :text text :font button-font))
 
 (defn create-update-status []
   (seesaw-core/border-panel
     :north
       (seesaw-core/scrollable
-        (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true
-                          :rows 4)
+        (seesaw-core/text
+          :id :status-text :multi-line? true :wrap-lines? true :rows 4)
         :preferred-size [panel-width :by 75])
     :south
       (seesaw-core/border-panel
-        :west (status-button :update-status-button (term/update-status))
-        :east (status-button :create-new-share-button (term/create-new-share))
+        :west (under-construction-button :update-button (term/update-status))
+        :east (under-construction-button
+                :create-new-share-button (term/create-new-share))
         :hgap 3) 
     :vgap 3))
   
@@ -38,8 +40,8 @@
     :north (seesaw-core/border-panel
              :west (seesaw-core/label :text (term/recent-shares)
                                       :foreground title-color :font title-font)
-             :center (status-button :inbox-button (term/inbox))
-             :east (status-button :filter-button (term/filter))
+             :center (under-construction-button :inbox-button (term/inbox))
+             :east (under-construction-button :filter-button (term/filter))
              :hgap 3)
     :south (seesaw-core/scrollable
              (seesaw-core/listbox :id :recent-shares-listbox
@@ -54,7 +56,7 @@
     :north (seesaw-core/border-panel
              :west (seesaw-core/label :text (term/online-friends)
                                       :foreground title-color :font title-font)
-             :east (status-button :filter-online-friends-button (term/filter))
+             :east (under-construction-button :filter-online-friends-button (term/filter))
              :hgap 3)
     :south (seesaw-core/scrollable
              (seesaw-core/listbox :id :online-friends-listbox

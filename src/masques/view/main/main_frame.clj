@@ -15,7 +15,7 @@
 
 (defn create-footer []
   (seesaw-core/border-panel
-    :west (view-utils/create-link-button
+    :west (view-utils/create-under-construction-link-button
             :id :settings-button
             :text (term/settings)
             :foreground settings-color

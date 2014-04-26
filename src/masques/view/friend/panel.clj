@@ -41,8 +41,8 @@
                                                 :columns 10)
                               [:fill-h 5]
                               (term/alias-or-nick)])
-              :east (view-utils/create-link-button :id :clear-search-button
-                                        :text (term/clear-search)))
+              :east (view-utils/create-under-construction-link-button 
+                      :id :clear-search-button :text (term/clear-search)))
             (seesaw-core/border-panel
               :west (seesaw-core/horizontal-panel
                       :items [(term/group)
@@ -60,8 +60,8 @@
                                 [:fill-h 5]
                                 (seesaw-core/text :id :added-to-2-search-text
                                                   :columns 10)])
-              :east (view-utils/create-link-button :id :search-friends-button
-                                        :text (term/search-friends))
+              :east (view-utils/create-under-construction-link-button
+                      :id :search-friends-button :text (term/search-friends))
               :hgap 15)]
     
     :border [15 (seesaw-border/line-border :thickness 1)]))
@@ -82,7 +82,7 @@ You can also set the column width. If no width is given, then it is set to 80."
     (set-button-table-cell-renderer table column-index renderer 80))
   ([table column-index renderer width]
     (table-renderer/set-renderer table column-index renderer)
-    (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width)))
+    (table-renderer/set-column-width table column-index width)))
 
 (defn create-unfriend-request-listener
   "Creates a listener for the unfriend button in the sent requests table."

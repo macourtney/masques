@@ -26,3 +26,8 @@ table-renderer-fn."
   "Creates a JLabel to display the image given as an ImagaIcon in value."
   [table value isSelected hasFocus row column]
   (JLabel. value))
+
+(defn set-column-width
+  "Sets the width of the column at the given index to the given width."
+  [table column-index width]
+  (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width))
