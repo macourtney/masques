@@ -11,8 +11,9 @@
   (:import [java.awt Color]
            [javax.swing JLabel ImageIcon SwingConstants]))
 
-(def background-color (Color/GRAY))
-(def search-background-color (Color/LIGHT_GRAY))
+(def background-color Color/GRAY)
+(def search-background-color Color/LIGHT_GRAY)
+(def button-hover-color Color/DARK_GRAY)
 
 (def logout-color view-utils/link-color)
 (def logout-font (view-utils/create-link-font 18))
@@ -50,7 +51,8 @@
               :text (term/logout)
               :foreground logout-color
               :font logout-font
-              :background background-color)]
+              :background background-color
+              :hover-color button-hover-color)]
     :background background-color))
 
 (defn search-text-panel []
@@ -99,7 +101,7 @@
     :background background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
-              (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
+              (seesaw-border/line-border :thickness 1 :color Color/LIGHT_GRAY)
               (seesaw-border/line-border :thickness 1 :color background-color))
     :preferred-size [900 :by 115]))
 
@@ -128,8 +130,8 @@ to the panel's name."
                                Color/WHITE
                                view-utils/link-color))))
     (view-utils/add-mouse-over-background-change
-      :widget button :background background-color :hover-color :darkgray
-      :pressed-color :lightgray)
+      :widget button :background background-color 
+      :hover-color button-hover-color :pressed-color :lightgray)
     (view-utils/save-component-property button button-panel-name
                                         (panel-protocol/panel-name panel))
     (seesaw-event/listen button :action-performed panel-button-listener)

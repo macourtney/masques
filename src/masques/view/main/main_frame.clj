@@ -8,7 +8,7 @@
             [seesaw.core :as seesaw-core])
   (:import [java.awt Color]))
 
-(def footer-background-color (Color/GRAY))
+(def footer-background-color Color/GRAY)
 
 (def settings-color "#FFAA00")
 (def settings-font { :name "DIALOG" :style :bold :size 18 })
@@ -21,14 +21,14 @@
             :foreground settings-color
             :font settings-font
             :background footer-background-color
-            :hover-color :darkgray
+            :hover-color Color/DARK_GRAY
             :pressed-color :lightgray)
     :east (seesaw-core/label :text (term/masques-version)
-                             :foreground (Color/WHITE))
+                             :foreground Color/WHITE)
     :background footer-background-color
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 5)
-              (seesaw-border/line-border :thickness 1 :color (Color/LIGHT_GRAY))
+              (seesaw-border/line-border :thickness 1 :color Color/LIGHT_GRAY)
               (seesaw-border/line-border :thickness 1
                                          :color footer-background-color))))
   
