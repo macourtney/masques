@@ -18,7 +18,7 @@
     (masques-core/database-init)
     (drift-runner/update-to-version 0) ; Reset the test database
     (drift-runner/update-to-version Long/MAX_VALUE)
-    (masques-core/run-fn 'masques.model.peer 'init)
+    (masques-core/run-fn 'masques.model.profile 'init)
     (clj-i2p/set-destination test-destination)))
 
 (init-tests)

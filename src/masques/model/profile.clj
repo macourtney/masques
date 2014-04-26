@@ -6,8 +6,7 @@
             [clojure.java.io :as io]
             [config.db-config :as db-config]
             [masques.edn :as edn]
-            [masques.model.avatar :as avatar-model]
-            [masques.model.property :as property])
+            [masques.model.avatar :as avatar-model])
   (:use masques.model.base
         korma.core)
   (:import [org.apache.commons.codec.binary Base64]
@@ -252,10 +251,9 @@ profile, then it is used as the id of the profile to get."
     (all-destinations))
 
   (peers-downloaded? [persister]
-    (property/peers-downloaded?))
+    true)
 
-  (set-peers-downloaded? [persister value]
-    (property/set-peers-downloaded? value)))
+  (set-peers-downloaded? [persister value]))
 
 (defn create-peer-persister
   "Creates a new instance of DbPeerPersister and returns it."
