@@ -21,22 +21,25 @@
 
 (defn create-update-status []
   (seesaw-core/border-panel
-    :north (seesaw-core/scrollable (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true :rows 4) :preferred-size [panel-width :by 75])
+    :north
+      (seesaw-core/scrollable
+        (seesaw-core/text :id :status-text :multi-line? true :wrap-lines? true
+                          :rows 4)
+        :preferred-size [panel-width :by 75])
     :south
       (seesaw-core/border-panel
         :west (status-button :update-status-button (term/update-status))
         :east (status-button :create-new-share-button (term/create-new-share))
-        :hgap 3)
-        
+        :hgap 3) 
     :vgap 3))
   
 (defn create-recent-shares []
   (seesaw-core/border-panel
     :north (seesaw-core/border-panel
-             :west (seesaw-core/label :text (term/recent-shares) :foreground title-color :font title-font)
+             :west (seesaw-core/label :text (term/recent-shares)
+                                      :foreground title-color :font title-font)
              :center (status-button :inbox-button (term/inbox))
-             :east (seesaw-core/button :id :filter-button :text (term/filter) :font status-button-font)
-
+             :east (status-button :filter-button (term/filter))
              :hgap 3)
     :south (seesaw-core/scrollable
              (seesaw-core/listbox :id :recent-shares-listbox
@@ -44,15 +47,14 @@
                  ; :renderer A cell renderer to use. See (seesaw.cells/to-cell-renderer).
              )
              :preferred-size [panel-width :by 200])
-
     :vgap 3))
 
 (defn create-online-friends []
   (seesaw-core/border-panel
     :north (seesaw-core/border-panel
-             :west (seesaw-core/label :text (term/online-friends) :foreground title-color :font title-font)
-             :east (seesaw-core/button :id :filter-online-friends-button :text (term/filter) :font status-button-font)
-
+             :west (seesaw-core/label :text (term/online-friends)
+                                      :foreground title-color :font title-font)
+             :east (status-button :filter-online-friends-button (term/filter))
              :hgap 3)
     :south (seesaw-core/scrollable
              (seesaw-core/listbox :id :online-friends-listbox
@@ -60,7 +62,6 @@
                  ; :renderer A cell renderer to use. See (seesaw.cells/to-cell-renderer).
              )
              :preferred-size [panel-width :by 200])
-
     :vgap 3))
 
 (defn create []
