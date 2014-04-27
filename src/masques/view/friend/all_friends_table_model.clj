@@ -69,11 +69,11 @@
   []
   (korma-table-model/create (new FriendsTableModel)))
 
-(defn details-button-cell-renderer
+(defn profile-button-cell-renderer
   "A table cell renderer function for the details button."
   [table value isSelected hasFocus row column]
   (let [button (utils/create-under-construction-link-button
-                 :text (term/details))]
+                 :text (term/profile))]
     (utils/save-component-property button request-id-key value)
     button))
 

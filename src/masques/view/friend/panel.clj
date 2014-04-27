@@ -70,8 +70,9 @@
   (seesaw-core/border-panel
     :center (create-search-fields-panel)
     :south (seesaw-core/border-panel
-             :west (view-utils/create-link-button :id :advanced-friend-search-button
-                                       :text (term/advanced-friend-search)))
+             :west (view-utils/create-under-construction-link-button
+                     :id :advanced-friend-search-button
+                     :text (term/advanced-friend-search)))
     
     :vgap 5))
 
@@ -100,7 +101,7 @@ You can also set the column width. If no width is given, then it is set to 80."
     (set-button-table-cell-renderer all-friends-table 0
       table-renderer/image-cell-renderer 36)
     (set-button-table-cell-renderer all-friends-table 4
-      all-friends-table-model/details-button-cell-renderer)
+      all-friends-table-model/profile-button-cell-renderer)
     (set-button-table-cell-renderer all-friends-table 5
       all-friends-table-model/shares-button-cell-renderer)
     (set-button-table-cell-renderer all-friends-table 6
