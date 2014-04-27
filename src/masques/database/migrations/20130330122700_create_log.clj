@@ -7,10 +7,10 @@
   []
   (create-table :log
     (id)
-    (date-time :created_at)
+    (date-time :created-at)
     (string :action)
-    (string :name_space)
-    (text :meta_data)
+    (string :name-space)
+    (text :meta-data)
     (text :message)))
   
 (defn down

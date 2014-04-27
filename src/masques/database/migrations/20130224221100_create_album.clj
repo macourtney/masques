@@ -7,9 +7,9 @@
   []
   (create-table :album
     (id)
-    (date-time :created_at)
+    (date-time :created-at)
     (string :name)
-    (integer :size_of_all_files)
+    (integer :size-of-all-files)
     (text :comments)))
   
 (defn down

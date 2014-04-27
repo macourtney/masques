@@ -23,7 +23,8 @@
                  [org.drift-db/drift-db-h2 "1.1.7-SNAPSHOT"]
                  [seesaw "1.4.1"]]
 
-  :plugins [[lein-libdir "0.1.0"]]
+  :plugins [[lein-libdir "0.1.0"]
+            [drift "1.5.1"]]
 
   :resource-paths ["pkg/resources"]
 

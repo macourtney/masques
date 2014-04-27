@@ -7,11 +7,11 @@
   []
   (create-table :file
     (id)
-    (date-time :created_at)
+    (date-time :created-at)
     (string :name)
     (string :path)
-    (integer :album_id)
-    (string :mime_type)
+    (integer :album-id)
+    (string :mime-type)
     (text :comments)
     (integer :size)))
   
