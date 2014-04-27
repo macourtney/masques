@@ -99,6 +99,14 @@ function simply returns the share.."
       (assoc share profile-from-id-key (id from-profile)))
     share))
 
+(defn from-profile-is-current-user?
+  "If the from profile of the given share is the current user then the from
+profile is returned."
+  [share]
+  (let [share-from-profile (from-profile share)]
+    (when (profile-model/current-user? share-from-profile)
+      share-from-profile)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; To identity
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -121,6 +129,14 @@ function simply returns the share.."
     (if-let [to-profile (to-profile share)]
       (assoc sanitized-share profile-to-id-key (id to-profile))
       sanitized-share)))
+
+(defn to-profile-is-current-user?
+  "If the to profile of the given share is the current user then the to profile
+is returned."
+  [share]
+  (let [share-to-profile (to-profile share)]
+    (when (profile-model/current-user? share-to-profile)
+      share-to-profile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Build/Save.
@@ -153,6 +169,16 @@ function simply returns the share.."
 (defn is-from-friend [share-record]
   (println (str "\nTesting if from from friend " share-record))
   true)
+
+(defn other-profile
+  "Returns the to or from profile which is not the current user."
+  [share-record]
+  (if-let [share-to-profile (to-profile share-record)]
+    (when (not (profile-model/current-user? share-to-profile))
+      share-to-profile)
+    (when-let [share-from-profile (from-profile share-record)]
+      (when (not (profile-model/current-user? share-from-profile))
+        share-from-profile))))
 
 (defn delete-share [share-record]
   (when share-record

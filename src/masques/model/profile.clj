@@ -70,6 +70,8 @@ id."
   "Sets the currently logged in user."
   [profile]
   (reset! saved-current-user profile))
+
+
   
 ; SAVE PROFILE
 
@@ -206,6 +208,14 @@ profile, then it is used as the id of the profile to get."
   "Returns the destination attached to the given profile."
   [profile]
   (destination-key profile))
+
+(defn current-user?
+  "Returns true if the given profile is the current user."
+  [profile]
+  (if-let [profile-id (id profile)]
+    (= profile-id (id (current-user)))
+    (and (= (identity profile) (identity (current-user)))
+         (= (identity-algorithm profile) (identity-algorithm (current-user))))))
 
 (defn all-destinations
   "Returns all of the destinations of all the profiles."
