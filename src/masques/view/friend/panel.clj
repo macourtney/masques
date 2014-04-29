@@ -1,5 +1,7 @@
 (ns masques.view.friend.panel
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
+            [masques.model.friend-request :as friend-request-model]
             [masques.model.profile :as profile-model]
             [masques.service.calls.friend :as friend-call]
             [masques.service.calls.unfriend :as unfriend-call]
@@ -90,9 +92,18 @@ You can also set the column width. If no width is given, then it is set to 80."
   [table]
   (fn [event]
     (let [button (seesaw-core/to-widget event)
-          request-id (button-table-cell-editor/value-from button)]
-      (future
-        (unfriend-call/send-unfriend request-id)))))
+          request-id (button-table-cell-editor/value-from button)
+          choice
+          (seesaw-core/input
+             button 
+             (term/are-you-sure-you-want-to-unfriend
+               (profile-model/alias
+                 (friend-request-model/find-to-profile request-id)))
+             :choices [(term/unfriend)])]
+      (logging/info "choice:" choice)
+      (when (= choice (term/unfriend))
+        (future
+          (unfriend-call/send-unfriend request-id))))))
 
 (defn create-all-friends-table []
   (let [all-friends-table (seesaw-core/table
@@ -168,8 +179,6 @@ You can also set the column width. If no width is given, then it is set to 80."
     :center (create-my-requests-table)
 
     :border 15))
-
-
 
 (defn create-sent-requests-table []
   (let [sent-requests-table (seesaw-core/table
