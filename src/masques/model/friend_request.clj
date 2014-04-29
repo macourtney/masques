@@ -29,6 +29,7 @@
 include the id."
   [friend-request-record]
   (profile/delete-profile { :id (profile-id-key friend-request-record) })
+  (share/delete-share (share/find-friend-request-share friend-request-record))
   (delete-record friend-request friend-request-record))
 
 (defn status
@@ -253,7 +254,7 @@ to the given request."
           pending-received-status
             (update-to-unfriend request)
           pending-sent-status
-            (update-to-unfriend request)
+            (delete-friend-request request)
           rejected-status nil
           unfriend-status nil ; Already unfriended.
           (throw (RuntimeException. (str "Unknown status: " request-status))))))))
@@ -276,7 +277,7 @@ to the given request."
           approved-status
             (update-to-rejected request)
           pending-received-status
-            (update-to-rejected request)
+            (delete-friend-request request)
           pending-sent-status
             (update-to-rejected request)
           rejected-status nil ; Already rejected..

@@ -19,6 +19,6 @@
 (defn send-unfriend
   "Sends a unfriend request for the given friend request."
   [request]
-  (when-let [friend-request-share (friend-request-model/unfriend request)]
+  (when-let [friend-request-share (share-model/find-friend-request-share request)]
     (unfriend friend-request-share)
-    friend-request-share))
+    (friend-request-model/unfriend request)))
