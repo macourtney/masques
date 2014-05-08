@@ -85,3 +85,12 @@
     (profile-model/delete-profile test-profile)
     (is (nil? (message-model/find-message test-message-id)))
     (is (nil? (friend-request-model/find-friend-request (id test-request))))))
+
+(deftest test-other-profile
+  (let [other-profile-id 54243]
+    (let [test-share { profile-from-id-key other-profile-id
+                       profile-to-id-key (id (profile-model/current-user)) }]
+      (is (= other-profile-id (other-profile test-share))))
+    (let [test-share { profile-from-id-key (id (profile-model/current-user))
+                       profile-to-id-key other-profile-id }]
+      (is (= other-profile-id (other-profile test-share))))))

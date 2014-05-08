@@ -213,18 +213,17 @@
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) unfriend-status)))
-    (let [new-status (status test-request pending-sent-status)
-          updated-share (unfriend (find-friend-request test-request))
-          updated-request (share/get-content updated-share)]
-      (is updated-share)
-      (is (= (id updated-share) (id test-share)))
-      (is (= (status updated-request) unfriend-status)))
     (let [new-status (status test-request rejected-status)
           updated-share (unfriend (find-friend-request test-request))]
       (is (not updated-share)))
     (let [new-status (status test-request unfriend-status)
           updated-share (unfriend (find-friend-request test-request))]
       (is (not updated-share)))
+    (let [new-status (status test-request pending-sent-status)
+          updated-share (unfriend (find-friend-request test-request))
+          updated-request (share/get-content updated-share)]
+      (is (not updated-share))
+      (is (not (find-friend-request test-request))))
     (share/delete-share test-share)
     (profile/delete-profile test-profile)))
 
@@ -244,16 +243,11 @@
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) rejected-status)))
-    (let [new-status (status test-request pending-received-status)
-          updated-share (reject (find-friend-request test-request))
-          updated-request (share/get-content updated-share)]
-      (is updated-share)
-      (is (= (id updated-share) (id test-share)))
-      (is (= (status updated-request) rejected-status)))
     (let [new-status (status test-request pending-sent-status)
           updated-share (reject (find-friend-request test-request))
           updated-request (share/get-content updated-share)]
       (is updated-share)
+      (is updated-request)
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) rejected-status)))
     (let [new-status (status test-request rejected-status)
@@ -262,6 +256,11 @@
     (let [new-status (status test-request unfriend-status)
           updated-share (reject (find-friend-request test-request))]
       (is (not updated-share)))
+    (let [new-status (status test-request pending-received-status)
+          updated-share (reject (find-friend-request test-request))
+          updated-request (share/get-content updated-share)]
+      (is (not updated-share))
+      (is (not (find-friend-request test-request))))
     (share/delete-share test-share)
     (profile/delete-profile test-profile)))
 

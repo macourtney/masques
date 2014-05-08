@@ -173,12 +173,9 @@ is returned."
 (defn other-profile
   "Returns the to or from profile which is not the current user."
   [share-record]
-  (if-let [share-to-profile (to-profile share-record)]
-    (when (not (profile-model/current-user? share-to-profile))
-      share-to-profile)
-    (when-let [share-from-profile (from-profile share-record)]
-      (when (not (profile-model/current-user? share-from-profile))
-        share-from-profile))))
+  (or
+    (profile-model/not-current-user? (profile-to-id-key share-record))
+    (profile-model/not-current-user? (profile-from-id-key share-record))))
 
 (defn delete-share [share-record]
   (when share-record

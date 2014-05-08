@@ -163,9 +163,12 @@
   "Returns the id of the given record or if the given record is not a map then
 this function simply returns the record."
   [record]
-  (if (map? record)
-    (or (:ID record) (:id record))
-    record))
+  (cond
+    (map? record) (or (:ID record) (:id record))
+    (integer? record) record
+    (nil? record) nil
+    :else (throw (RuntimeException. (str "Don't know how to get an id from a "
+                                         (class record))))))
 
 (defn find-all
   "Finds records which statisfy the given prototype."

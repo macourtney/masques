@@ -1,4 +1,5 @@
 (ns masques.model.test.profile
+  (:refer-clojure :exclude [identity alias])
   (:require test.init
             [clj-i2p.core :as clj-i2p]
             [clojure.java.io :as io]
@@ -25,55 +26,51 @@
   identity-algorithm-key "RSA" })
 
 (deftest test-add-profile
-  (let [profile-record (save profile-map)]
+  (let [initial-profile-count (count (all-profile-ids))
+        profile-record (save profile-map)]
     (is profile-record)
     (is (:id profile-record))
     (is (= (alias-key profile-record) (alias-key profile-map)))
-    (is (instance? org.joda.time.DateTime (:created-at profile-record)))))
+    (is (instance? org.joda.time.DateTime (:created-at profile-record)))
+    (delete-profile profile-record)
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-build-profile
-  (let [built-profile (build (:id (save profile-map)))]
-    ;(println "\n\nBUILT PROFILE\n\n" built-profile)
+  (let [initial-profile-count (count (all-profile-ids))
+        profile-record (save profile-map)
+        built-profile (build (:id profile-record))]
     (is built-profile)
     (is (map? (:avatar built-profile)))
     (is (= (:id (:avatar built-profile)) (:avatar-file-id built-profile)))
-    (is (= (:path (:avatar built-profile)) (:avatar-path profile-map)))))
-
-(deftest test-create-user-profile
-  (let [test-alias "Ted"
-        user-profile (create-user test-alias)]
-    (is user-profile)
-    (is (= (alias-key user-profile) test-alias))
-    (delete-profile user-profile)))
-
-(deftest test-init
-  (is (nil? (current-user)))
-  (init)
-  (let [old-user (current-user)]
-    (logout)
-    (is (nil? (current-user)))
-    (delete-profile old-user)))
+    (is (= (:path (:avatar built-profile)) (:avatar-path profile-map)))
+    (delete-profile profile-record)
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-create-masques-id-map
-  (is (not (nil? (clj-i2p/base-64-destination))))
-  (is (= (create-masques-id-map profile-map)
-         { alias-key (alias-key profile-map)
-           identity-key (identity-key profile-map)
-           identity-algorithm-key (identity-algorithm-key profile-map)
-           destination-key (clj-i2p/base-64-destination)})))
+  (let [initial-profile-count (count (all-profile-ids))]
+    (is (not (nil? (clj-i2p/base-64-destination))))
+    (is (= (create-masques-id-map profile-map)
+           { alias-key (alias-key profile-map)
+             identity-key (identity-key profile-map)
+             identity-algorithm-key (identity-algorithm-key profile-map)
+             destination-key (clj-i2p/base-64-destination)}))
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-create-masques-id-file
-  (when (.exists test-masques-id-file)
-    (io/delete-file test-masques-id-file))
-  (create-masques-id-file test-masques-id-file profile-map)
-  (is (.exists test-masques-id-file))
-  (is (= (read-masques-id-file test-masques-id-file) 
-         (create-masques-id-map profile-map)))
-  (io/delete-file test-masques-id-file))
+  (let [initial-profile-count (count (all-profile-ids))]
+    (when (.exists test-masques-id-file)
+      (io/delete-file test-masques-id-file))
+    (create-masques-id-file test-masques-id-file profile-map)
+    (is (.exists test-masques-id-file))
+    (is (= (read-masques-id-file test-masques-id-file) 
+           (create-masques-id-map profile-map)))
+    (io/delete-file test-masques-id-file)
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-load-masques-id-map
-  (let [profile (load-masques-id-map (create-masques-id-map profile-map))]
-    (is (= (count (korma/select model-base/profile)) 1))
+  (let [initial-profile-count (count (all-profile-ids))
+        profile (load-masques-id-map (create-masques-id-map profile-map))]
+    (is (= (count (all-profile-ids)) (inc initial-profile-count)))
     (is profile)
     (is (= (alias-key profile) (alias-key profile-map)))
     (is (= (destination-key profile) test-destination))
@@ -81,36 +78,41 @@
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
     (let [profile2 (load-masques-id-map (create-masques-id-map profile-map))]
       (is (= (model-base/id profile) (model-base/id profile2)))
-      (is (= (count (korma/select model-base/profile)) 1)))
+      (is (= (count (all-profile-ids)) (inc initial-profile-count))))
     (delete-profile profile)
-    (is (= (count (korma/select model-base/profile)) 0))))
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-load-masques-id-file
-  (when (.exists test-masques-id-file)
-    (io/delete-file test-masques-id-file))
-  (create-masques-id-file test-masques-id-file profile-map)
-  (let [profile (load-masques-id-file test-masques-id-file)]
-    (is (= (count (korma/select model-base/profile)) 1))
-    (is profile)
-    (is (= (alias-key profile) (alias-key profile-map)))
-    (is (= (destination-key profile) test-destination))
-    (is (= (identity-key profile) (identity-key profile-map)))
-    (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
-    (delete-profile profile)
-    (io/delete-file test-masques-id-file)
-    (is (= (count (korma/select model-base/profile)) 0))))
+  (let [initial-profile-count (count (all-profile-ids))]
+    (when (.exists test-masques-id-file)
+      (io/delete-file test-masques-id-file))
+    (create-masques-id-file test-masques-id-file profile-map)
+    (let [profile (load-masques-id-file test-masques-id-file)]
+      (is (= (count (all-profile-ids)) (inc initial-profile-count)))
+      (is profile)
+      (is (= (alias-key profile) (alias-key profile-map)))
+      (is (= (destination-key profile) test-destination))
+      (is (= (identity-key profile) (identity-key profile-map)))
+      (is (= (identity-algorithm-key profile)
+             (identity-algorithm-key profile-map)))
+      (delete-profile profile)
+      (io/delete-file test-masques-id-file))
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-alias
-  (is (= (alias-key profile-map) (alias profile-map)))
-  (let [saved-profile (save profile-map)]
-    (is (= (alias-key profile-map) (alias (:id saved-profile))))
-    (delete-profile saved-profile)))
+  (let [initial-profile-count (count (all-profile-ids))]
+    (is (= (alias-key profile-map) (alias profile-map)))
+    (let [saved-profile (save profile-map)]
+      (is (= (alias-key profile-map) (alias (:id saved-profile))))
+      (delete-profile saved-profile))
+    (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-all-destinations
-  (let [profile (load-masques-id-map (create-masques-id-map profile-map))
-        destinations (all-destinations)]
-    (is destinations)
-    (is (= (count destinations) 1))
-    (is (= destinations [test-destination]))
-    (delete-profile profile)
-    (is (= (count (korma/select model-base/profile)) 0))))
+  (let [initial-profile-count (count (all-profile-ids))]
+    (let [profile (load-masques-id-map (create-masques-id-map profile-map))
+          destinations (all-destinations)]
+      (is destinations)
+      (is (= (count destinations) (inc initial-profile-count)))
+      (is (= (filter clojure.core/identity destinations) [test-destination]))
+      (delete-profile profile))
+    (is (= (count (all-profile-ids)) initial-profile-count))))

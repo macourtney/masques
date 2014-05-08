@@ -28,7 +28,6 @@
   "Deletes the given friend request from the database. The friend request should
 include the id."
   [friend-request-record]
-  (profile/delete-profile { :id (profile-id-key friend-request-record) })
   (share/delete-share (share/find-friend-request-share friend-request-record))
   (delete-record friend-request friend-request-record))
 

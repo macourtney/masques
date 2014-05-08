@@ -53,6 +53,29 @@ id."
   [profile-record]
   (delete-record profile profile-record))
 
+(defn alias
+  "Returns the alias for the given profile. If an integer is passed for the
+profile, then it is used as the id of the profile to get."
+  [profile]
+  (if (integer? profile)
+    (alias (find-profile profile))
+    (alias-key profile)))
+
+(defn destination
+  "Returns the destination attached to the given profile."
+  [profile]
+  (destination-key profile))
+
+(defn identity
+  "Returns the identity for the given profile."
+  [profile]
+  (identity-key profile))
+
+(defn identity-algorithm
+  "Returns the identity algorithm used for the given profile."
+  [profile]
+  (identity-algorithm-key profile))
+
 ; CURRENT USER
 
 (defn current-user
@@ -71,8 +94,20 @@ id."
   [profile]
   (reset! saved-current-user profile))
 
+(defn current-user?
+  "Returns true if the given profile is the current user."
+  [profile]
+  (if-let [profile-id (id profile)]
+    (= profile-id (id (current-user)))
+    (and (= (identity profile) (identity (current-user)))
+         (= (identity-algorithm profile) (identity-algorithm (current-user))))))
 
-  
+(defn not-current-user?
+  "Returns the given profile if it is not the current user."
+  [profile]
+  (when (and profile (not (current-user? profile)))
+    profile))
+
 ; SAVE PROFILE
 
 (defn name-avatar [profile-record]
@@ -162,16 +197,6 @@ used."
   [file]
   (edn/read file))
 
-(defn identity
-  "Returns the identity for the given profile."
-  [profile]
-  (identity-key profile))
-
-(defn identity-algorithm
-  "Returns the identity algorithm used for the given profile."
-  [profile]
-  (identity-algorithm-key profile))
-
 (defn find-by-identity
   "Finds the profile with the given identity or identity map."
   ([identity-map]
@@ -196,32 +221,16 @@ send-request in friend_request instead."
   [file]
   (load-masques-id-map (read-masques-id-file file)))
 
-(defn alias
-  "Returns the alias for the given profile. If an integer is passed for the
-profile, then it is used as the id of the profile to get."
-  [profile]
-  (if (integer? profile)
-    (alias (find-profile profile))
-    (alias-key profile)))
-
-(defn destination
-  "Returns the destination attached to the given profile."
-  [profile]
-  (destination-key profile))
-
-(defn current-user?
-  "Returns true if the given profile is the current user."
-  [profile]
-  (if-let [profile-id (id profile)]
-    (= profile-id (id (current-user)))
-    (and (= (identity profile) (identity (current-user)))
-         (= (identity-algorithm profile) (identity-algorithm (current-user))))))
-
 (defn all-destinations
   "Returns all of the destinations of all the profiles."
   []
   (map destination-key
        (select profile (fields [(h2-keyword destination-key)]))))
+
+(defn all-profile-ids
+  "Returns all of the ids of all the profiles."
+  []
+  (map id (select profile (fields [id-key]))))
 
 (deftype DbPeerPersister []
   persister-protocol/PeerPersister
