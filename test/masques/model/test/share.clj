@@ -87,10 +87,10 @@
     (is (nil? (friend-request-model/find-friend-request (id test-request))))))
 
 (deftest test-other-profile
-  (let [other-profile-id 54243]
-    (let [test-share { profile-from-id-key other-profile-id
+  (let [saved-other-profile (profile-model/save profile-map)]
+    (let [test-share { profile-from-id-key (id saved-other-profile)
                        profile-to-id-key (id (profile-model/current-user)) }]
-      (is (= other-profile-id (other-profile test-share))))
+      (is (= saved-other-profile (other-profile test-share))))
     (let [test-share { profile-from-id-key (id (profile-model/current-user))
-                       profile-to-id-key other-profile-id }]
-      (is (= other-profile-id (other-profile test-share))))))
+                       profile-to-id-key (id saved-other-profile) }]
+      (is (= saved-other-profile (other-profile test-share))))))

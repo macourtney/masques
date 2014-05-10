@@ -8,11 +8,6 @@
               :as request-friendship-action]
             [masques.service.core :as service-core]))
 
-(defn find-to-profile
-  "Finds the to-profile attached to the given share."
-  [share]
-  (share-model/to-profile share))
-
 (defn message
   "Returns the message body of the message attached to the given friend request
 share."
@@ -40,10 +35,10 @@ request share."
 (defn request-friendship
   "Sends off a friend request for the given friend request share."
   [share]
-  (let [to-profile (find-to-profile share)]
+  (let [other-profile (share-model/other-profile share)]
     (when (received?
             (service-core/send-message
-              (profile-model/destination to-profile)
+              (profile-model/destination other-profile)
               request-friendship-action/action
               (create-data-map share)))
       (update-friend-request share))))

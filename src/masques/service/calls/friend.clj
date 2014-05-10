@@ -10,9 +10,9 @@
   "Sends off an unfriend for the given friend request share."
   [friend-request-share]
   (when friend-request-share
-    (let [from-profile (share-model/from-profile friend-request-share)]
+    (let [other-profile (share-model/other-profile friend-request-share)]
       (service-core/send-message
-        (profile-model/destination from-profile)
+        (profile-model/destination other-profile)
         friend-action/action
         { :data { :profile (profile-model/clean-user-data) } }))))
 

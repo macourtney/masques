@@ -135,7 +135,7 @@
       (is (= (id updated-share) (id test-share)))
       (is (= (message/body (share/message-id updated-share))
              test-message-5))
-      (is (= (status updated-request) approved-status)))
+      (is (= (status updated-request) pending-received-status)))
     (let [test-message-6 "test message 6"
           new-status (status test-request unfriend-status)
           updated-share (update-receive-request test-message-6 test-profile
