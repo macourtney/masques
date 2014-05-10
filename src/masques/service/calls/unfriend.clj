@@ -10,9 +10,7 @@
   "Sends off an unfriend for the given friend request share."
   [friend-request-share]
   (when friend-request-share
-    (logging/info "friend-request-share:" friend-request-share)
     (when-let [other-profile (share-model/other-profile friend-request-share)]
-      (logging/info "other-profile:" other-profile)
       (service-core/send-message
         (profile-model/destination other-profile)
         unfriend-action/action

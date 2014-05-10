@@ -4,6 +4,7 @@
             [clj-i2p.core :as clj-i2p]
             [clj-i2p.peer-service.persister-protocol :as persister-protocol]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as logging]
             [config.db-config :as db-config]
             [masques.edn :as edn]
             [masques.model.avatar :as avatar-model])
@@ -43,9 +44,10 @@
 (defn find-profile
   "Finds the profile with the given id."
   [record]
-  (if (integer? record)
-    (find-by-id profile record)
-    (find-first profile record)))
+  (when record
+    (if (integer? record)
+      (find-by-id profile record)
+      (find-first profile record))))
 
 (defn delete-profile
   "Deletes the given profile from the database. The profile should include the
@@ -212,7 +214,12 @@ used."
 and returns the new id. This function should not be directly called."
   [masques-id-map]
   (when masques-id-map
-    (or (find-by-identity masques-id-map) (save masques-id-map))))
+    (if-let [old-identity (find-by-identity masques-id-map)]
+      (if (not (destination old-identity))
+        (save
+          (assoc old-identity destination-key (destination masques-id-map)))
+        old-identity)
+      (save masques-id-map))))
 
 (defn load-masques-id-file
   "Creates a profile from the given masques id file, saves it to the database
