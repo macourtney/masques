@@ -134,7 +134,7 @@ unless it is already approved.."
                                                       request))
       rejected-status
         (do
-          (status request approved-status)
+          (status request pending-received-status)
           (share/create-received-friend-request-share message new-profile
                                                       request))
       unfriend-status nil ; Already unfriended.
