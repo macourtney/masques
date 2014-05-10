@@ -25,8 +25,8 @@
   (:import [javax.swing JOptionPane]
            [java.io File]))
 
-(def export-mid-button-id :export-mid-button)
-(def export-mid-button-listener-key :export-mid-button-listener)
+(def export-masque-button-id :export-masque-button)
+(def export-masque-button-listener-key :export-masque-button-listener)
 
 (def send-friend-request-button-id :send-friend-request-button)
 (def send-friend-request-button-listener-key
@@ -132,8 +132,8 @@ You can also set the column width. If no width is given, then it is set to 80."
                      :id send-friend-request-button-id
                      :text (term/plus-send-friend-request))
              :east (view-utils/create-link-button
-                     :id export-mid-button-id
-                     :text (term/export-mid)))
+                     :id export-masque-button-id
+                     :text (term/export-masque)))
     :center (create-all-friends-table)
 
     :vgap 5
@@ -238,21 +238,21 @@ You can also set the column width. If no width is given, then it is set to 80."
     (friend-utils/save-panel friend-panel-view friend-panel)
     (show-main-panel friend-panel-view)))
 
-(defn find-export-mid-button
-  "Finds the export mid button in the given view."
+(defn find-export-masque-button
+  "Finds the export masque button in the given view."
   [view]
-  (view-utils/find-component view export-mid-button-id))
+  (view-utils/find-component view export-masque-button-id))
 
 (defn find-send-friend-request-button
   "Finds the send friend request button in the given view."
   [view]
   (view-utils/find-component view send-friend-request-button-id))
 
-(defn add-action-listener-to-export-mid-button
+(defn add-action-listener-to-export-masque-button
   "Adds the given action listener to the export mid button."
   [view listener]
   (view-utils/add-action-listener-to-button
-    (find-export-mid-button view) listener export-mid-button-listener-key))
+    (find-export-masque-button view) listener export-masque-button-listener-key))
 
 (defn add-extension-if-missing
   "Addes the .masque extension if it is missing to the given file."
@@ -279,9 +279,9 @@ chooses."
                         friend-utils/masque-file-filters))
 
 (defn attach-export-masque-listener
-  "Attaches the export mid listener to the export mid button in the given view."
+  "Attaches the export mid listener to the export masque button in the given view."
   [view]
-  (add-action-listener-to-export-mid-button view export-masque-listener))
+  (add-action-listener-to-export-masque-button view export-masque-listener))
 
 (defn add-action-listener-to-send-friend-request-button
   "Adds the given action listener to the send friend request button."
