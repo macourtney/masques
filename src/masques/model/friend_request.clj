@@ -79,6 +79,14 @@ user."
   [profile]
   (find-first friend-request { profile-id-key (id profile) }))
 
+(defn rejected?
+  "Returns true if the profile in the given masque file has already rejected the
+current user."
+  [masque-file]
+  (when-let [new-profile (profile/load-masque-file masque-file)]
+    (when-let [old-request (find-by-profile new-profile)]
+      (= (status old-request) rejected-status))))
+
 (defn update-send-request
   "Updates the given request to a send-request. Returns the updated or new share
 unless it is already approved.."
@@ -110,9 +118,9 @@ unless it is already approved.."
 
 (defn send-request
   "Creates a new friend request and attaches a new profile and new share to it."
-  [masques-id-file message]
+  [masque-file message]
  ; We need to create a share, attach a friend request and profile to it.
-  (when-let [new-profile (profile/load-masques-id-file masques-id-file)]
+  (when-let [new-profile (profile/load-masque-file masque-file)]
     (if-let [old-request (find-by-profile new-profile)]
       (update-send-request message new-profile old-request)
       (create-new-send-request message new-profile))))
@@ -153,7 +161,7 @@ unless it is already approved.."
 (defn receive-request
   "Creates a new incoming friend request"
   [profile message]
-  (when-let [new-profile (profile/load-masques-id-map profile)]
+  (when-let [new-profile (profile/load-masque-map profile)]
     (if-let [old-request (find-by-profile new-profile)]
       (update-receive-request message new-profile old-request)
       (create-new-receive-request message new-profile))))

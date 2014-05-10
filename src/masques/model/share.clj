@@ -236,9 +236,7 @@ is returned."
 integer id or map containing the id of the friend request."
   [friend-request & share-fields]
   (when friend-request
-    (let [friend-request-id (id friend-request)
-          ;share-fields (if (empty? share-fields) [:id] share-fields)
-          ]
+    (let [friend-request-id (id friend-request)]
       (first
         (select share
                 ;(apply fields share-fields) Doesn't work since select is a macro

@@ -10,11 +10,10 @@
         masques.view.friend.sent-friend-request-table-model))
 
 (deftest test-create
-  (profile/create-masques-id-file test-util/test-masques-id-file
-                                  test-util/profile-map)
+  (profile/create-masque-file test-util/test-masque-file test-util/profile-map)
   (let [test-message "test message"
         request-share
-          (friend-request/send-request test-util/test-masques-id-file test-message)
+          (friend-request/send-request test-util/test-masque-file test-message)
         test-model (create)]
     (is test-model)
 
@@ -28,4 +27,4 @@
     (is (.getValueAt test-model 0 2) test-message)
     
     (share/delete-share request-share))
-  (io/delete-file test-util/test-masques-id-file))
+  (io/delete-file test-util/test-masque-file))

@@ -54,8 +54,8 @@
 
 (deftest test-create-friend-request-share
   (let [test-message "test-message"
-        test-profile (profile-model/load-masques-id-map
-                  (profile-model/create-masques-id-map profile-map))
+        test-profile (profile-model/load-masque-map
+                  (profile-model/create-masque-map profile-map))
         test-request (friend-request-model/save
                        { friend-request-model/request-status-key
                            friend-request-model/pending-sent-status

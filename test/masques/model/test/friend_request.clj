@@ -36,7 +36,7 @@
 
 (deftest test-update-send-request
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))
@@ -91,7 +91,7 @@
 
 (deftest test-update-receive-request
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))
@@ -146,9 +146,9 @@
 
 (deftest test-send-request
   (is (= 0 (count-pending-sent-requests)))
-  (profile/create-masques-id-file test-util/test-masques-id-file
+  (profile/create-masque-file test-util/test-masque-file
                                   test-util/profile-map)
-  (let [friend-request-share (send-request test-util/test-masques-id-file
+  (let [friend-request-share (send-request test-util/test-masque-file
                                            "test message")
         friend-request (share/get-content friend-request-share)]
     (is friend-request)
@@ -166,7 +166,7 @@
         (is (= (id to-profile) profile-id))))
     (delete-friend-request friend-request)
     (share/delete-share friend-request-share))
-  (io/delete-file test-util/test-masques-id-file))
+  (io/delete-file test-util/test-masque-file))
 
 (deftest test-receive-request
   (is (= 0 (count-pending-received-requests)))
@@ -193,7 +193,7 @@
 
 (deftest test-unfriend
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))
@@ -229,7 +229,7 @@
 
 (deftest test-reject
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))
@@ -266,7 +266,7 @@
 
 (deftest test-send-accept
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))
@@ -300,7 +300,7 @@
 
 (deftest test-receive-accept
   (let [test-message "test message"
-        test-profile (profile/load-masques-id-map test-util/profile-map)
+        test-profile (profile/load-masque-map test-util/profile-map)
         test-request (save { created-at-key (str (clj-time/now))
                              request-status-key approved-status
                              requested-at-key (str (clj-time/now))

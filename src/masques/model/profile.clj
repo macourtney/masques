@@ -174,10 +174,10 @@ profile, then it is used as the id of the profile to get."
   []
   (set-current-user nil))
 
-(defn create-masques-id-map
+(defn create-masque-map
   "Creates a masques id map from the given profile. If the profile is not given,
 then the current logged in profile is used."
-  ([] (create-masques-id-map (current-user)))
+  ([] (create-masque-map (current-user)))
   ([profile]
     (let [destination-map (if (clj-i2p/base-64-destination)
                             { destination-key (clj-i2p/base-64-destination) }
@@ -186,15 +186,15 @@ then the current logged in profile is used."
         (select-keys profile [alias-key identity-key identity-algorithm-key])
         destination-map))))
            
-(defn create-masques-id-file
+(defn create-masque-file
   "Given a file and a profile, this function saves the profile as a masques id
 to the file. If a profile is not given, then the currently logged in profile is
 used."
-  ([file] (create-masques-id-file file (current-user)))
+  ([file] (create-masque-file file (current-user)))
   ([file profile]
-    (edn/write file (create-masques-id-map profile))))
+    (edn/write file (create-masque-map profile))))
 
-(defn read-masques-id-file 
+(defn read-masque-file 
   "Reads the given masques id file and returns the masques id map."
   [file]
   (edn/read file))
@@ -209,24 +209,24 @@ used."
         (where { (h2-keyword identity-key) identity
                  (h2-keyword identity-algorithm-key) identity-algorithm })))))
 
-(defn load-masques-id-map
+(defn load-masque-map
   "Creates a profile from the given masques id map, saves it to the database,
 and returns the new id. This function should not be directly called."
-  [masques-id-map]
-  (when masques-id-map
-    (if-let [old-identity (find-by-identity masques-id-map)]
+  [masque-map]
+  (when masque-map
+    (if-let [old-identity (find-by-identity masque-map)]
       (if (not (destination old-identity))
         (save
-          (assoc old-identity destination-key (destination masques-id-map)))
+          (assoc old-identity destination-key (destination masque-map)))
         old-identity)
-      (save masques-id-map))))
+      (save masque-map))))
 
-(defn load-masques-id-file
+(defn load-masque-file
   "Creates a profile from the given masques id file, saves it to the database
 and returns the new id. Do not call this function directly. Use the
 send-request in friend_request instead."
   [file]
-  (load-masques-id-map (read-masques-id-file file)))
+  (load-masque-map (read-masque-file file)))
 
 (defn all-destinations
   "Returns all of the destinations of all the profiles."

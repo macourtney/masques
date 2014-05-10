@@ -6,7 +6,7 @@
 (def friend-panel-key :friend-panel)
 (def show-panel-fn-key :show-panel-fn)
 
-(def mid-file-filters [["Masques Id File" ["mid"]]
+(def masque-file-filters [["Masque File" ["masque"]]
                        ["Folders" (fn [file] (.isDirectory file))]])
 
 (defn find-friend-panel

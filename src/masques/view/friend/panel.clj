@@ -1,6 +1,7 @@
 (ns masques.view.friend.panel
   (:require [clj-internationalization.term :as term]
             [clojure.tools.logging :as logging]
+            [clojure.tools.string-utils :as string-utils]
             [masques.model.friend-request :as friend-request-model]
             [masques.model.profile :as profile-model]
             [masques.service.calls.friend :as friend-call]
@@ -21,7 +22,8 @@
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
-  (:import [javax.swing JOptionPane]))
+  (:import [javax.swing JOptionPane]
+           [java.io File]))
 
 (def export-mid-button-id :export-mid-button)
 (def export-mid-button-listener-key :export-mid-button-listener)
@@ -222,7 +224,8 @@ You can also set the column width. If no width is given, then it is set to 80."
   view)
 
 (defn show-send-friend-request-panel [view]
-  (seesaw-core/show-card! (friend-utils/find-friend-panel view) send-friend-request-panel-key)
+  (seesaw-core/show-card! (friend-utils/find-friend-panel view)
+                          send-friend-request-panel-key)
   view)
 
 (defn create [friend-panel]
@@ -251,27 +254,34 @@ You can also set the column width. If no width is given, then it is set to 80."
   (view-utils/add-action-listener-to-button
     (find-export-mid-button view) listener export-mid-button-listener-key))
 
-(defn export-mid-success
-  [file-chooser mid-file]
-  (if (.exists mid-file)
-    (when (= (term/overwrite)
-             (seesaw-core/input (term/file-already-exists-overwrite)
-                                :choices [(term/overwrite)
-                                          (term/do-not-overwrite)]))
-      (profile-model/create-masques-id-file mid-file))
-    (profile-model/create-masques-id-file mid-file)))
+(defn add-extension-if-missing
+  "Addes the .masque extension if it is missing to the given file."
+  [file]
+  (File. (.getParentFile file)
+         (string-utils/add-ending-if-absent (.getName file) ".masque")))
 
-(defn export-mid-listener
+(defn export-masque-success
+  [file-chooser masque-file]
+  (let [masque-file (add-extension-if-missing masque-file)]
+    (if (.exists masque-file)
+      (when (= (term/overwrite)
+               (seesaw-core/input (term/file-already-exists-overwrite)
+                                  :choices [(term/overwrite)
+                                            (term/do-not-overwrite)]))
+        (profile-model/create-masque-file masque-file))
+      (profile-model/create-masque-file masque-file))))
+
+(defn export-masque-listener
   "The export mid listener which exports the masques id to a directory the user
 chooses."
   [event]
-  (view-utils/save-file (seesaw-core/to-widget event) export-mid-success
-                        friend-utils/mid-file-filters))
+  (view-utils/save-file (seesaw-core/to-widget event) export-masque-success
+                        friend-utils/masque-file-filters))
 
-(defn attach-export-mid-listener
+(defn attach-export-masque-listener
   "Attaches the export mid listener to the export mid button in the given view."
   [view]
-  (add-action-listener-to-export-mid-button view export-mid-listener))
+  (add-action-listener-to-export-mid-button view export-masque-listener))
 
 (defn add-action-listener-to-send-friend-request-button
   "Adds the given action listener to the send friend request button."
@@ -300,7 +310,7 @@ listeners and loading initial data."
   [view show-panel-fn]
   (friend-utils/save-show-panel-fn view show-panel-fn)
   (send-friend-request-panel/initialize view)
-  (attach-export-mid-listener view)
+  (attach-export-masque-listener view)
   (attach-send-friend-request-listener view))
 
 (defn show

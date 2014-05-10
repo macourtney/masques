@@ -1,6 +1,8 @@
 (ns masques.view.friend.send-friend-request-panel
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
             [masques.model.friend-request :as friend-request-model]
+            [masques.model.profile :as profile-model]
             [masques.service.calls.request-friendship
              :as request-friendship-call]
             [masques.view.friend.utils :as friend-utils]
@@ -9,10 +11,10 @@
             [seesaw.chooser :as seesaw-chooser]
             [seesaw.core :as seesaw-core]))
 
-(def load-mid-file-button-file-key :load-mid-file-button-file)
-(def load-mid-file-button-id :load-mid-file-button)
-(def load-mid-file-button-listener-key :load-mid-file-button-listener)
-(def load-mid-file-text-id :load-mid-file-text)
+(def load-masque-file-button-file-key :load-masque-file-button-file)
+(def load-masque-file-button-id :load-masque-file-button)
+(def load-masque-file-button-listener-key :load-masque-file-button-listener)
+(def load-masque-file-text-id :load-masque-file-text)
 
 (def friend-request-message-text-id :friend-request-message-text-id)
 
@@ -31,12 +33,12 @@
                       :multi-line? true
                       :wrap-lines? true)))
 
-(defn create-load-mid-file-panel []
+(defn create-load-masque-file-panel []
   (seesaw-core/horizontal-panel
-    :items [(view-utils/create-link-button :id load-mid-file-button-id
-                                :text (term/load-mid-file))
+    :items [(view-utils/create-link-button :id load-masque-file-button-id
+                                :text (term/load-masque-file))
             [:fill-h 3]
-            (seesaw-core/text :id load-mid-file-text-id :editable? false)]))
+            (seesaw-core/text :id load-masque-file-text-id :editable? false)]))
 
 (defn create-send-friend-button-panel []
   (seesaw-core/horizontal-panel
@@ -57,7 +59,7 @@
             [:fill-v 3]
             (create-friend-request-message-text)
             [:fill-v 5]
-            (create-load-mid-file-panel)
+            (create-load-masque-file-panel)
             [:fill-v 5]
             (create-send-friend-button-panel)]))
 
@@ -80,46 +82,46 @@
   [view]
   (view-utils/find-component view send-friend-request-send-button-id))
 
-(defn find-load-mid-file-button
+(defn find-load-masque-file-button
   "Finds the load mid file button from the given view."
   [view]
-  (view-utils/find-component view load-mid-file-button-id))
+  (view-utils/find-component view load-masque-file-button-id))
 
-(defn find-load-mid-file-text
+(defn find-load-masque-file-text
   "Finds the load mid file text field from the given view."
   [view]
-  (view-utils/find-component view load-mid-file-text-id))
+  (view-utils/find-component view load-masque-file-text-id))
 
 (defn find-friend-request-message-text
   "Finds the friend request message text in the given view."
   [view]
   (view-utils/find-component view friend-request-message-text-id))
 
-(defn add-action-listener-to-load-mid-file-button
+(defn add-action-listener-to-load-masque-file-button
   "Adds the given listener to the mid file button."
   [view listener]
   (view-utils/add-action-listener-to-button
-    (find-load-mid-file-button view)
+    (find-load-masque-file-button view)
     listener 
-    load-mid-file-button-listener-key))
+    load-masque-file-button-listener-key))
 
-(defn load-mid-file-success
+(defn load-masque-file-success
   "Saves the file to a property on the load mid file button and adds the mid 
 file text to the text field."
   [view file-chooser file]
   (view-utils/save-component-property
-    (find-load-mid-file-button view) load-mid-file-button-file-key file)
-  (seesaw-core/config! (find-load-mid-file-text view) :text (.getName file))
+    (find-load-masque-file-button view) load-masque-file-button-file-key file)
+  (seesaw-core/config! (find-load-masque-file-text view) :text (.getName file))
   (seesaw-core/config! (find-send-friend-request-send-button view)
                        :enabled? true))
 
-(defn mid-file
+(defn masque-file
   "Finds the mid file saved after loading the mid file."
   [view]
-  (view-utils/retrieve-component-property (find-load-mid-file-button view)
-                                          load-mid-file-button-file-key))
+  (view-utils/retrieve-component-property (find-load-masque-file-button view)
+                                          load-masque-file-button-file-key))
 
-(defn load-mid-file-listener
+(defn load-masque-file-listener
   "Opens a file chooser to choose a mid file and loads it into the view for
 later importing into the friend request model."
   [event]
@@ -129,13 +131,13 @@ later importing into the friend request model."
     (seesaw-chooser/choose-file
       :type :open
       :selection-mode :files-only
-      :filters friend-utils/mid-file-filters
-      :success-fn (partial load-mid-file-success friend-panel-view))))
+      :filters friend-utils/masque-file-filters
+      :success-fn (partial load-masque-file-success friend-panel-view))))
 
-(defn attach-load-mid-file-listener
-  "Attaches the load mid file listener to the load mid file button."
+(defn attach-load-masque-file-listener
+  "Attaches the load mid file listener to the load masque file button."
   [view]
-  (add-action-listener-to-load-mid-file-button view load-mid-file-listener))
+  (add-action-listener-to-load-masque-file-button view load-masque-file-listener))
 
 (defn add-action-listener-to-send-friend-request-cancel-button
   "Adds the given listener to the send friend request cancel button."
@@ -177,9 +179,13 @@ cancel button in the given view."
                               (seesaw-core/to-widget event)))
         message-text (seesaw-core/text
                        (find-friend-request-message-text friend-panel-view))
-        file (mid-file friend-panel-view)]
-    (future
-      (request-friendship-call/send-friend-request file message-text)))
+        file (masque-file friend-panel-view)]
+    (if (friend-request-model/rejected? file)
+      (seesaw-core/alert
+        (term/sorry-already-rejected
+          (profile-model/alias (profile-model/load-masque-file file))))
+      (future
+        (request-friendship-call/send-friend-request file message-text))))
   (send-friend-request-cancel-listener event))
 
 (defn attach-send-friend-request-send-listener
@@ -192,6 +198,6 @@ cancel button in the given view."
 (defn initialize
   "Initializes the send friend request panel."
   [view]
-  (attach-load-mid-file-listener view)
+  (attach-load-masque-file-listener view)
   (attach-send-friend-request-cancel-listener view)
   (attach-send-friend-request-send-listener view))

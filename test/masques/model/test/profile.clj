@@ -11,9 +11,6 @@
         masques.model.profile)
   (:import [java.io PushbackReader]))
 
-(def test-masques-id-file
-  (io/file test-util/test-support-files-directory "ted.mid"))
-
 (def test-destination "gfgHVoVFMYpBJwuL04mRa-~vQBt-p5lYfyVW2JatrzuJBy3Z7DgkxF68zDQe4M9uD-zOoBCBWctioFoUjnzPbDbflacwPvLnNxN-2GB64b73vDNPKkffM1JXLn6cRLWurxTYVeXaZns7ZmVj969XM3tOwEny1JZbMm-24YIaUwb66vkLeM33uanMer~II--OuikXx654ZkMXAORoJSu3hb04Q2s8sMR6-dnABeijfKShzINDg-JZSCRxWIay~VidFF6nhpi-BO3HPHPfGYTPkN5-w08z0IEaTeoBLNBBfVrmXwy2xPQWK1px2IRMpf0J~EiOf300Gin9xEoAhjEeL0LtUshT4bX2J1c~WiMHNGRJfjw4YspNVr8sDLOcVziOshLORlYDwkV6~ZNmovRQdcnwQ9OZzfM16fYib7Xb2wVtk-5TGIJOJiaegazOIb7Ze71N~EGX6epvwU1m2eGZ2I6oe~i2MOekHmnqhvolC1MQTUNGi-temb17xaeomMAdAAAA")
 
 (def profile-map {
@@ -49,45 +46,45 @@
 (deftest test-create-masques-id-map
   (let [initial-profile-count (count (all-profile-ids))]
     (is (not (nil? (clj-i2p/base-64-destination))))
-    (is (= (create-masques-id-map profile-map)
+    (is (= (create-masque-map profile-map)
            { alias-key (alias-key profile-map)
              identity-key (identity-key profile-map)
              identity-algorithm-key (identity-algorithm-key profile-map)
              destination-key (clj-i2p/base-64-destination)}))
     (is (= (count (all-profile-ids)) initial-profile-count))))
 
-(deftest test-create-masques-id-file
+(deftest test-create-masque-file
   (let [initial-profile-count (count (all-profile-ids))]
-    (when (.exists test-masques-id-file)
-      (io/delete-file test-masques-id-file))
-    (create-masques-id-file test-masques-id-file profile-map)
-    (is (.exists test-masques-id-file))
-    (is (= (read-masques-id-file test-masques-id-file) 
-           (create-masques-id-map profile-map)))
-    (io/delete-file test-masques-id-file)
+    (when (.exists test-util/test-masque-file)
+      (io/delete-file test-util/test-masque-file))
+    (create-masque-file test-util/test-masque-file profile-map)
+    (is (.exists test-util/test-masque-file))
+    (is (= (read-masque-file test-util/test-masque-file) 
+           (create-masque-map profile-map)))
+    (io/delete-file test-util/test-masque-file)
     (is (= (count (all-profile-ids)) initial-profile-count))))
 
-(deftest test-load-masques-id-map
+(deftest test-load-masque-map
   (let [initial-profile-count (count (all-profile-ids))
-        profile (load-masques-id-map (create-masques-id-map profile-map))]
+        profile (load-masque-map (create-masque-map profile-map))]
     (is (= (count (all-profile-ids)) (inc initial-profile-count)))
     (is profile)
     (is (= (alias-key profile) (alias-key profile-map)))
     (is (= (destination-key profile) test-destination))
     (is (= (identity-key profile) (identity-key profile-map)))
     (is (= (identity-algorithm-key profile) (identity-algorithm-key profile-map)))
-    (let [profile2 (load-masques-id-map (create-masques-id-map profile-map))]
+    (let [profile2 (load-masque-map (create-masque-map profile-map))]
       (is (= (model-base/id profile) (model-base/id profile2)))
       (is (= (count (all-profile-ids)) (inc initial-profile-count))))
     (delete-profile profile)
     (is (= (count (all-profile-ids)) initial-profile-count))))
 
-(deftest test-load-masques-id-file
+(deftest test-load-masque-file
   (let [initial-profile-count (count (all-profile-ids))]
-    (when (.exists test-masques-id-file)
-      (io/delete-file test-masques-id-file))
-    (create-masques-id-file test-masques-id-file profile-map)
-    (let [profile (load-masques-id-file test-masques-id-file)]
+    (when (.exists test-util/test-masque-file)
+      (io/delete-file test-util/test-masque-file))
+    (create-masque-file test-util/test-masque-file profile-map)
+    (let [profile (load-masque-file test-util/test-masque-file)]
       (is (= (count (all-profile-ids)) (inc initial-profile-count)))
       (is profile)
       (is (= (alias-key profile) (alias-key profile-map)))
@@ -96,7 +93,7 @@
       (is (= (identity-algorithm-key profile)
              (identity-algorithm-key profile-map)))
       (delete-profile profile)
-      (io/delete-file test-masques-id-file))
+      (io/delete-file test-util/test-masque-file))
     (is (= (count (all-profile-ids)) initial-profile-count))))
 
 (deftest test-alias
@@ -109,7 +106,7 @@
 
 (deftest test-all-destinations
   (let [initial-profile-count (count (all-profile-ids))]
-    (let [profile (load-masques-id-map (create-masques-id-map profile-map))
+    (let [profile (load-masque-map (create-masque-map profile-map))
           destinations (all-destinations)]
       (is destinations)
       (is (= (count destinations) (inc initial-profile-count)))

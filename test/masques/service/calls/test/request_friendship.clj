@@ -29,10 +29,10 @@
 (deftest request-friendship-test
   (is (nil? @network-destination))
   (is (nil? @network-data))
-  (profile-model/create-masques-id-file test-util/test-masques-id-file
-                                        test-util/profile-map)
+  (profile-model/create-masque-file test-util/test-masque-file
+                                    test-util/profile-map)
   (let [test-message "test message"
-        request-share (send-friend-request test-util/test-masques-id-file
+        request-share (send-friend-request test-util/test-masque-file
                                            test-message)]
     (is (friend-request-model/requested-at
           (share-model/get-content request-share)))
@@ -51,4 +51,4 @@
              clj-i2p/from-key
              { clj-i2p/destination-key test-util/test-destination-str } }))
     (share-model/delete-share request-share))
-  (io/delete-file test-util/test-masques-id-file))
+  (io/delete-file test-util/test-masque-file))
