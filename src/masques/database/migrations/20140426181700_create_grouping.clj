@@ -6,7 +6,7 @@
   []
   (create-table :grouping
     (id)
-    (integer :user-generated { :length 1 })
+    (boolean :user-generated)
     (string :name)
     (date-time :created-at)))
 

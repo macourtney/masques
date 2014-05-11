@@ -118,10 +118,10 @@
   (string/replace has-hyphens "-" "_"))
 
 (defn clojure-keyword [h2-keyword]
-  (keyword (lower-case (replace-underscores-with-hyphens (remove-colon (str h2-keyword))))))
+  (keyword (lower-case (replace-underscores-with-hyphens (name h2-keyword)))))
 
 (defn h2-keyword [clojure-keyword]
-  (keyword (upper-case (replace-hyphens-with-underscores (remove-colon (str clojure-keyword))))))
+  (keyword (upper-case (replace-hyphens-with-underscores (name clojure-keyword)))))
 
 (defn clean-field-data [record field-name]
   "Prepares H2 data, from the database, for the rest of our clojure application."
@@ -239,7 +239,7 @@ use as a prototype of the records to count."
 (defentity album
   (prepare prepare-album-for-h2)
   (transform transform-album-for-clojure)
-  (table :ALBUM))
+  (table (h2-keyword :album)))
 
 ; FILE
 (defn prepare-file-for-h2 [record]
@@ -247,7 +247,7 @@ use as a prototype of the records to count."
 (defentity file
   (prepare prepare-file-for-h2)
   (transform clean-up-for-clojure)
-  (table :FILE))
+  (table (h2-keyword :file)))
 
 ; FRIEND_REQUEST
 (defn prepare-friend-request-for-h2 [record]
@@ -255,7 +255,7 @@ use as a prototype of the records to count."
 (defentity friend-request 
   (prepare prepare-friend-request-for-h2)
   (transform clean-up-for-clojure)
-  (table :FRIEND_REQUEST))
+  (table (h2-keyword :friend-request)))
 
 ; GROUPING
 (defn prepare-grouping-for-h2 [record]
@@ -263,7 +263,7 @@ use as a prototype of the records to count."
 (defentity grouping 
   (transform clean-up-for-clojure)
   (prepare prepare-grouping-for-h2)
-  (table :GROUPING))
+  (table (h2-keyword :grouping)))
 
 ; GROUPING_PROFILE
 (defn prepare-grouping-profile-for-h2 [record]
@@ -271,7 +271,7 @@ use as a prototype of the records to count."
 (defentity grouping-profile
   (transform clean-up-for-clojure)
   (prepare prepare-grouping-profile-for-h2)
-  (table :GROUPING_PROFILE))
+  (table (h2-keyword :grouping-profile)))
 
 ; LOG
 (defn prepare-log-for-h2 [record]
@@ -279,7 +279,7 @@ use as a prototype of the records to count."
 (defentity log
   (prepare prepare-log-for-h2)
   (transform clean-up-for-clojure)
-  (table :LOG))
+  (table (h2-keyword :log)))
 
 ; MESSAGE
 (defn prepare-message-for-h2 [record]
@@ -287,7 +287,7 @@ use as a prototype of the records to count."
 (defentity message
   (prepare prepare-message-for-h2)
   (transform clean-up-for-clojure)
-  (table :MESSAGE))
+  (table (h2-keyword :message)))
 
 ; PROFILE
 (defn prepare-profile-for-h2 [record]
@@ -295,7 +295,7 @@ use as a prototype of the records to count."
 (defentity profile
   (transform clean-up-for-clojure)
   (prepare prepare-profile-for-h2)
-  (table :PROFILE))
+  (table (h2-keyword :profile)))
 
 ; SHARE
 (defn prepare-share-for-h2 [record]
@@ -303,7 +303,7 @@ use as a prototype of the records to count."
 (defentity share
   (transform clean-up-for-clojure)
   (prepare prepare-share-for-h2)
-  (table :SHARE))
+  (table (h2-keyword :share)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Other randomness, used in models.
