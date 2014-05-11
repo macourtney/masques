@@ -1,6 +1,10 @@
 (ns masques.view.group.panel
   (:require [clj-internationalization.term :as term]
+            [masques.model.grouping :as grouping-model]
+            [masques.view.group.all-groups-combobox-model
+              :as all-groups-combobox-model]
             [masques.view.utils :as view-utils]
+            [masques.view.utils.list-renderer :as list-renderer]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core]))
 
@@ -12,14 +16,31 @@
     :text text
     :font group-button-font))
 
+(defn create-group-combobox
+  "Creates the combobox which displays all of the groups in the system."
+  []
+  (let [group-combobox (seesaw-core/combobox
+                         :id :group-combobox
+                         :preferred-size [250 :by 25]
+                         :model (all-groups-combobox-model/create))]
+    (seesaw-core/selection! group-combobox
+                            (select-keys
+                              (grouping-model/find-grouping
+                                (grouping-model/find-everyone-id))
+                              [:id grouping-model/display-key]))
+    (list-renderer/set-renderer
+      group-combobox 
+      (list-renderer/create-record-text-cell-renderer
+        grouping-model/display-key))
+    group-combobox))
+
 (defn create-filter []
   (seesaw-core/border-panel
     :north
       (seesaw-core/vertical-panel
         :items [(seesaw-core/horizontal-panel
                     :items
-                      [(seesaw-core/combobox
-                         :id :group-combobox :preferred-size [250 :by 25])
+                      [(create-group-combobox)
                        [:fill-h 3]
                        (create-under-construction-button
                          :edit-group-button (term/edit))

@@ -299,5 +299,5 @@ already registered."
     (let [user-name (db-config/current-username)]
       (if-let [new-profile (create-user user-name)]
         (set-current-user new-profile)
-        (throw (RuntimeException.
-                 (str "Could not create user: " user-name)))))))
+        (throw
+          (RuntimeException. (str "Could not create user: " user-name)))))))

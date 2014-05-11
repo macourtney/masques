@@ -1,8 +1,7 @@
 (ns masques.initialization
   (:require [clj-i2p.server :as clj-i2p-server]
             [masques.interceptor :as interceptor]
-            ;[masques.model.identity :as identity-model]
-            ;[masques.model.peer :as peer-model]
+            [masques.model.grouping :as grouping-model]
             [masques.model.profile :as profile-model]
             [masques.service.protocol :as service-protocol]))
 
@@ -12,6 +11,7 @@ should already be initialized. This function should be called after a successful
 login."
   []
   (profile-model/init)
+  (grouping-model/init)
   (service-protocol/init)
   (interceptor/init)
   (clj-i2p-server/init))

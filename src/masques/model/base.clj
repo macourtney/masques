@@ -187,7 +187,11 @@ this function simply returns the record."
           (where (clean-up-for-h2 record))
           (limit 1))))))
 
-(defn find-by-id [entity id]
+;(korma/fields (h2-keyword profile-id-key))
+
+(defn find-by-id
+  "Returns the record for the given entity with the given id."
+  [entity id]
   (when id
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
 

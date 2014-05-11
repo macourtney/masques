@@ -8,6 +8,7 @@
     (id)
     (boolean :user-generated)
     (string :name)
+    (string :display)
     (date-time :created-at)))
 
 (defn down
