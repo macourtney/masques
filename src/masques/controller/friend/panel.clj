@@ -21,7 +21,9 @@
 
   (show [this view args] (panel-view/show view args))
 
-  (hide [this view]))
+  (hide [this view])
+  
+  (destroy [this view]))
 
 (defn create []
   (FriendPanel.))

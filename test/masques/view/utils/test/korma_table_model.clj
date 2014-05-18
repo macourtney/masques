@@ -1,4 +1,4 @@
-(ns masques.view.utils.test.korma-data-model
+(ns masques.view.utils.test.korma-table-model
   (:use clojure.test
         masques.view.utils.korma-table-model))
 

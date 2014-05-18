@@ -50,3 +50,7 @@
     (display-panel/init (view-main-frame/find-display-panel main-frame))
     (controller-utils/show (load-default-panels main-frame))))
 
+(defn destroy
+  "Should be called right before the main frame is destroyed."
+  [main-frame]
+  (view-main-frame/destroy main-frame))

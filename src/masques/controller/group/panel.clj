@@ -23,7 +23,10 @@
 
   (show [this view args])
 
-  (hide [this view]))
+  (hide [this view])
+  
+  (destroy [this view]
+    (panel-view/destroy view)))
 
 (defn create []
   (GroupPanel.))

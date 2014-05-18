@@ -23,7 +23,9 @@
 
   (show [this view args])
 
-  (hide [this view]))
+  (hide [this view])
+  
+  (destroy [this view]))
 
 (defn create []
   (StreamPanel.))

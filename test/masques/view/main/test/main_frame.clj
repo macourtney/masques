@@ -10,4 +10,5 @@
     (seesaw-core/show! main-frame)
     (Thread/sleep env/view-sleep-time)
     (seesaw-core/hide! main-frame)
+    (destroy main-frame)
     (seesaw-core/dispose! main-frame)))

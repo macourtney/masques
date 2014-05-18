@@ -10,7 +10,6 @@
 
 (deftest test-add-grouping
   (let [grouping-record (save grouping-map)]
-    (println grouping-record)
     (is grouping-record)
     (is (:id grouping-record))
     (is (= (:name grouping-record) "tester grouping"))

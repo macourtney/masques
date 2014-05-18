@@ -1,14 +1,18 @@
 (ns masques.view.group.panel
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
             [masques.model.grouping :as grouping-model]
             [masques.view.group.all-groups-combobox-model
               :as all-groups-combobox-model]
             [masques.view.utils :as view-utils]
+            [masques.view.utils.korma-combobox-model :as korma-combobox-model]
             [masques.view.utils.list-renderer :as list-renderer]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core]))
 
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
+
+(def group-combobox-id :group-combobox)
 
 (defn create-under-construction-button [id text]
   (view-utils/create-under-construction-link-button
@@ -20,7 +24,7 @@
   "Creates the combobox which displays all of the groups in the system."
   []
   (let [group-combobox (seesaw-core/combobox
-                         :id :group-combobox
+                         :id group-combobox-id
                          :preferred-size [250 :by 25]
                          :model (all-groups-combobox-model/create))]
     (seesaw-core/selection! group-combobox
@@ -93,3 +97,13 @@
     :center (create-body)
 
     :border 11))
+
+(defn find-group-combobox
+  "Finds the group combobox in the given group panel."
+  [panel]
+  (view-utils/find-component panel group-combobox-id))
+
+(defn destroy
+  "Should be called right before the panel is destroyed."
+  [panel]
+  (korma-combobox-model/destroy-model (find-group-combobox panel)))

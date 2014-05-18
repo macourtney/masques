@@ -1,5 +1,6 @@
 (ns masques.model.grouping
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
             [korma.core :as korma])
   (:use masques.model.base
         korma.core))
@@ -26,6 +27,16 @@
 
 (defn get-profiles [grouping-id]
   (into [] (select grouping-profile (where {:GROUPING_ID grouping-id}))))
+
+(defn add-grouping-change-listener
+  "Adds the given group change listener."
+  [listener]
+  (add-change-listener grouping listener))
+
+(defn remove-grouping-change-listener
+  "Removes the given group change listener."
+  [listener]
+  (remove-change-listener grouping listener))
 
 (defn attach-profiles [album-record file-records]
   (assoc album-record :files file-records))

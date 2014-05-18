@@ -24,7 +24,9 @@ arguments.")
 
   (show [this view args] "Called right before the panel is shown.")
 
-  (hide [this view] "Called right after the panel is hidden."))
+  (hide [this view] "Called right after the panel is hidden.")
+  
+  (destroy [this view] "Called right before the panel is destroyed."))
 
 (defn find-panel-name
   "Returns the name of the given panel. If the given panel does not satisfy

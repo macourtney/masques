@@ -1,5 +1,6 @@
 (ns masques.view.main.main-frame
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
             [masques.view.main.display-panel :as display-panel]
             [masques.view.main.status-panel :as status-panel]
             [masques.view.main.tool-bar :as tool-bar]
@@ -68,3 +69,8 @@
   [main-frame panel args]
   (tool-bar/select-icon-button (find-tool-bar main-frame) panel)
   (display-panel/show-panel (find-display-panel main-frame) panel (or args [])))
+
+(defn destroy
+  "Call this function right before the main frame will be destroyed."
+  [main-frame]
+  (display-panel/destroy-all-panels (find-display-panel main-frame)))

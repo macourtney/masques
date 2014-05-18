@@ -1,5 +1,6 @@
 (ns masques.view.main.display-panel
-  (:require [masques.controller.main.panel-protocol :as panel-protocol]
+  (:require [clojure.tools.logging :as logging]
+            [masques.controller.main.panel-protocol :as panel-protocol]
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
@@ -7,6 +8,8 @@
 (def display-card-panel-id "display-card-panel")
 (def panel-map-id :panel-map)
 (def displayed-panel-id :displayed-panel)
+(def panel-id :panel)
+(def view-id :view)
 
 (defn create-card-panel []
   (seesaw-core/card-panel :id display-card-panel-id :items []))
@@ -24,7 +27,9 @@
 (defn find-panel-map
   "Returns the panel map attached to the given display panel or an empty map."
   [display-panel]
-  (or (view-utils/retrieve-component-property (find-card-panel display-panel) panel-map-id) {}))
+  (or (view-utils/retrieve-component-property
+        (find-card-panel display-panel) panel-map-id)
+      {}))
 
 (defn find-panel-view
   "Returns the view for the given panel (or panel id)."
@@ -45,7 +50,7 @@
     (find-card-panel display-panel)
     panel-map-id
     (assoc (find-panel-map display-panel) (panel-protocol/panel-name panel)
-           { :panel panel :view panel-view })))
+           { panel-id panel view-id panel-view })))
 
 (defn find-displayed-panel
   "Returns the id of the currently displayed panel."
@@ -103,3 +108,10 @@
       (panel-protocol/show panel panel-view args)
       (.show (.getLayout card-panel) card-panel (name (panel-protocol/find-panel-name panel)))
       (update-displayed-panel display-panel panel))))
+
+(defn destroy-all-panels
+  "Calls destroy for all panels in the display panel."
+  [display-panel]
+  (doseq [panel-map (vals (find-panel-map display-panel))]
+    (when (and panel-map (panel-id panel-map))
+      (panel-protocol/destroy (panel-id panel-map) (view-id panel-map)))))

@@ -156,6 +156,136 @@
     (reduce h2-field-name clean-data (keys clean-data))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Listener helpers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Called after a record has been inserted into the database.
+(def insert-listeners (atom {}))
+; Called after a record has been updated in the database.
+(def update-listeners (atom {}))
+; Called after a record has been deleted in the database.
+(def delete-listeners (atom {}))
+; Called after a record has been changed in any way in the database.
+(def change-listeners (atom {}))
+
+(defn listener-set-for-entity
+  "Returns the listener set for the given entity in the given listeners atom."
+  [listeners-map entity]
+  (or (get listeners-map entity) #{}))
+
+(defn add-listener-to-listeners-map
+  "Adds the given listener to the given listeners map under the given entity"
+  [listeners-map entity listener]
+  (if (and entity listener)
+    (assoc listeners-map entity
+           (conj (listener-set-for-entity listeners-map entity) listener))
+    listeners-map))
+
+(defn remove-listener-from-listeners-map
+  "Removes the given listener from the given listeners map under the given
+entity"
+  [listeners-map entity listener]
+  (let [listener-set (disj (listener-set-for-entity listeners-map entity) listener)]
+    (if (empty? listener-set)
+      (dissoc listeners-map entity)
+      (assoc listeners-map entity listener-set))))
+
+(defn add-listener
+  "Adds the given listener to the given listeners atom as a listener for the
+given entity."
+  [listeners-atom entity listener]
+  (reset! listeners-atom
+          (add-listener-to-listeners-map @listeners-atom entity listener)))
+
+(defn remove-listener
+  "Removes the given listener from the given listeners atom as a listener for the
+given entity."
+  [listeners-atom entity listener]
+  (reset! listeners-atom
+          (remove-listener-from-listeners-map @listeners-atom entity listener)))
+
+(defn all-listeners
+  "Returns all of the listeners in the given atom for the given entity."
+  [listeners-atom entity]
+  (listener-set-for-entity @listeners-atom entity))
+
+(defn notify-listeners
+  "Notifies all of the listeners for the given entity in the given listeners
+atom of an update for a record with the given id."
+  [listeners-atom entity id]
+  (doseq [listener (all-listeners listeners-atom entity)]
+    (listener id)))
+
+(defn add-insert-listener
+  "Adds the given listener to the list of insert listeners for the given
+entity."
+  [entity listener]
+  (add-listener insert-listeners entity listener))
+
+(defn remove-insert-listener
+  "Removes the given listener from the list of insert listeners for the given
+entity."
+  [entity listener]
+  (remove-listener insert-listeners entity listener))
+
+(defn notify-of-insert
+  "Notifies all of the insert listeners and change listeners for the given
+entity that a new record was inserted with the given id."
+  [entity id]
+  (notify-listeners insert-listeners entity id)
+  (notify-listeners change-listeners entity id))
+
+(defn add-update-listener
+  "Adds the given listener to the list of update listeners for the given
+entity."
+  [entity listener]
+  (add-listener update-listeners entity listener))
+
+(defn remove-update-listener
+  "Removes the given listener from the list of update listeners for the given
+entity."
+  [entity listener]
+  (remove-listener update-listeners entity listener))
+
+(defn notify-of-update
+  "Notifies all of the update listeners and change listeners for the given
+entity that a new record with the given id was updated."
+  [entity id]
+  (notify-listeners update-listeners entity id)
+  (notify-listeners change-listeners entity id))
+
+(defn add-delete-listener
+  "Adds the given listener to the list of delete listeners for the given
+entity."
+  [entity listener]
+  (add-listener delete-listeners entity listener))
+
+(defn remove-delete-listener
+  "Removes the given listener from the list of delete listeners for the given
+entity."
+  [entity listener]
+  (remove-listener delete-listeners entity listener))
+
+(defn notify-of-delete
+  "Notifies all of the update listeners and change listeners for the given
+entity that a new record with the given id was updated."
+  [entity id]
+  (notify-listeners delete-listeners entity id)
+  (notify-listeners change-listeners entity id))
+
+(defn add-change-listener
+  "Adds the given listener to the list of change listeners for the given
+entity."
+  [entity listener]
+  (add-listener change-listeners entity listener))
+
+(defn remove-change-listener
+  "Removes the given listener from the list of change listeners for the given
+entity."
+  [entity listener]
+  (remove-listener change-listeners entity listener))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SQL/ORM helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -187,8 +317,6 @@ this function simply returns the record."
           (where (clean-up-for-h2 record))
           (limit 1))))))
 
-;(korma/fields (h2-keyword profile-id-key))
-
 (defn find-by-id
   "Returns the record for the given entity with the given id."
   [entity id]
@@ -198,12 +326,14 @@ this function simply returns the record."
 (defn insert-record [entity record]
   (let [new-id-map (insert entity (values (clean-up-for-h2 record)))
         id (or (first (vals new-id-map)) (id record))]
+    (notify-of-insert entity id)
     (find-by-id entity id)))
 
 (defn update-record [entity record]
   (update entity
     (set-fields (clean-up-for-h2 record))
     (where {:ID (id record)}))
+  (notify-of-update entity (id record))
   (find-by-id entity (id record)))
 
 (defn insert-or-update [entity record]
@@ -214,7 +344,8 @@ this function simply returns the record."
 (defn delete-record [entity record]
   (when-let [id (if (map? record) (id record) record)]
     (delete entity
-      (where { :ID id }))))
+      (where { :ID id }))
+    (notify-of-delete entity id)))
 
 (defn count-records
   "Returns the number of records for the given entity. You can pass a record to
@@ -312,9 +443,6 @@ use as a prototype of the records to count."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Other randomness, used in models.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn remove-listener [listeners listener-to-remove]
-  (remove #(= listener-to-remove %) listeners))
 
 (defn as-boolean [value]
   (and value (not (= value 0))))

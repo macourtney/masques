@@ -51,7 +51,9 @@
   (show [this view args]
     (fill-profile view))
 
-  (hide [this view]))
+  (hide [this view])
+  
+  (destroy [this view]))
 
 (defn create []
   (ProfilePanel.))
