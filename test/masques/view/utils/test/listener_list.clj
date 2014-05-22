@@ -14,7 +14,7 @@
   (let [listener-list (create)]
     (is (empty? (listeners listener-list)))
     (add-listener listener-list test-listener)
-    (is (= (listeners listener-list) #{test-listener}))
+    (is (= (listeners listener-list) (list test-listener)))
     (is (not @called?))
     (notify-all-listeners listener-list test-notifier)
     (is @called?)

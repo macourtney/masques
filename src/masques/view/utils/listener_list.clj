@@ -8,25 +8,30 @@
     "Removes the given listener from this listener list.")
   
   (listeners [this]
-    "Returns all of the listeners in this list."))
+    "Returns all of the listeners in this list.")
+  
+  (count-listeners [this] "Returns the number of listeners in this list."))
 
 (deftype ListenerListImpl [listener-list]
   ListenerList
   (add-listener [this listener]
     (reset! listener-list
-            (conj @listener-list listener)))
+            (cons listener @listener-list)))
   
   (remove-listener [this listener]
     (reset! listener-list
-            (disj @listener-list listener)))
+            (filter #(not (= listener %)) @listener-list)))
   
   (listeners [this]
-    @listener-list))
+    @listener-list)
+  
+  (count-listeners [this]
+    (count @listener-list)))
 
 (defn create
   "Creates a new ListDataListenerList which holds a list of list data listeners."
   []
-  (ListenerListImpl. (atom #{})))
+  (ListenerListImpl. (atom '())))
 
 (defn notify-all-listeners
   "Notifies all of the listeners in the given ListenerList using the
