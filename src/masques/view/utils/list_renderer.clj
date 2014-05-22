@@ -1,4 +1,5 @@
 (ns masques.view.utils.list-renderer
+  (:require [seesaw.core :as seesaw-core])
   (:import [javax.swing JLabel ListCellRenderer]))
 
 (deftype ListRenderer [list-renderer-fn]
@@ -18,7 +19,7 @@ list-renderer-fn. List-renderer-fn must take the parameters:
   "Sets the list cell renderer for the given list to the given
 list-renderer-fn."
   [list list-renderer-fn]
-  (.setRenderer list (create list-renderer-fn)))
+  (seesaw-core/config! list :renderer (create list-renderer-fn)))
 
 (defn image-cell-renderer
   "Creates a JLabel to display the image given as an ImagaIcon in value."
