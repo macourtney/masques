@@ -11,7 +11,9 @@
 (defn create
   "Creates a new ListCellRenderer which simply forwards requests to the given
 list-renderer-fn. List-renderer-fn must take the parameters:
-[list value index isSelected cellHasFocus]"
+[list value index isSelected cellHasFocus]
+
+Deprecated: Seesaw already does this. See seesaw.cells"
   [list-renderer-fn]
   (ListRenderer. list-renderer-fn))
 
