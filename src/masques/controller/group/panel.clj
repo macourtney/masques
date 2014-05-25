@@ -19,7 +19,7 @@
 
   (display-text [this] (term/groups))
 
-  (init [this view show-panel-fn])
+  (init [this view show-panel-fn] (panel-view/initialize view show-panel-fn))
 
   (show [this view args])
 

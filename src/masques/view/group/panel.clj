@@ -10,12 +10,45 @@
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core]))
 
+(def group-panel-id :group-panel)
+
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 
 (def group-combobox-id :group-combobox)
 
+(def group-manager-panel-id :group-manager-panel)
+(def group-edit-panel-id :group-edit-panel)
+
+(def delete-group-button-id :delete-group-button)
+(def delete-group-button-listener-key :delete-group-button-listener)
+
+
+(def create-new-group-button-id :create-new-group-button)
+(def create-new-group-button-listener-key :create-new-group-button-listener)
+
+(def group-editor-text-id :group-editor-text)
+
+(def cancel-edit-button-id :cancel-edit-button)
+(def cancel-edit-button-listener-key :cancel-edit-button-listener)
+
+(def save-edit-button-id :save-edit-button)
+(def save-edit-button-listener-key :save-edit-button-listener)
+
+(def group-filter-card-id :group-filter-card)
+(def group-editor-card-id :group-editor-card)
+
+(def group-editor-type-key :group-editor-type)
+(def create-group :create-group)
+(def edit-group :edit-group)
+
 (defn create-under-construction-button [id text]
   (view-utils/create-under-construction-link-button
+    :id id
+    :text text
+    :font group-button-font))
+
+(defn create-button [id text]
+  (view-utils/create-link-button
     :id id
     :text text
     :font group-button-font))
@@ -49,15 +82,33 @@
                        (create-under-construction-button
                          :edit-group-button (term/edit))
                        [:fill-h 3]
-                       (create-under-construction-button
-                         :delete-group-button (term/delete))])
+                       (create-button delete-group-button-id (term/delete))])
                 (seesaw-core/border-panel
-                  :west (create-under-construction-button
-                          :create-new-group-button (term/create-new-group)))])))
+                  :west (create-button
+                          create-new-group-button-id
+                          (term/create-new-group)))])))
+
+(defn create-group-editor []
+  (seesaw-core/horizontal-panel
+    :id group-edit-panel-id
+    :items [(seesaw-core/vertical-panel
+              :items [[:fill-v 15]
+                      (seesaw-core/text :id group-editor-text-id)
+                      [:fill-v 15]])
+            [:fill-h 3]
+            (create-button save-edit-button-id (term/save))
+            [:fill-h 3]
+            (create-button cancel-edit-button-id (term/cancel))]))
+
+(defn create-group-manager []
+  (seesaw-core/card-panel
+    :id group-manager-panel-id
+    :items [[(create-filter) group-filter-card-id]
+            [(create-group-editor) group-editor-card-id]]))
 
 (defn create-header []
   (seesaw-core/border-panel
-    :west (create-filter)
+    :west (create-group-manager)
     :east (seesaw-core/label :text (term/groups) :foreground "#380B61"
                              :font { :size 48 })))
 
@@ -91,12 +142,17 @@
 
 (defn create []
   (seesaw-core/border-panel
-    :id "group-panel"
+    :id group-panel-id
 
     :north (create-header)
     :center (create-body)
 
     :border 11))
+
+(defn find-group-panel
+  "Finds the group combobox in the given group panel."
+  [view]
+  (view-utils/find-component view group-panel-id))
 
 (defn find-group-combobox
   "Finds the group combobox in the given group panel."
@@ -107,3 +163,160 @@
   "Should be called right before the panel is destroyed."
   [panel]
   (korma-combobox-model/destroy-model (find-group-combobox panel)))
+
+(defn find-create-new-group-button
+  "Finds the create new group button in the given view."
+  [view]
+  (view-utils/find-component view create-new-group-button-id))
+
+(defn find-cancel-edit-button
+  "Finds the cancel edit button in the given view."
+  [view]
+  (view-utils/find-component view cancel-edit-button-id))
+
+(defn find-save-edit-button
+  "Finds the save edit button in the given view."
+  [view]
+  (view-utils/find-component view save-edit-button-id))
+
+(defn find-delete-group-button
+  "Finds the delete group button in the given view."
+  [view]
+  (view-utils/find-component view delete-group-button-id))
+
+(defn find-group-manager-panel
+  "Finds the group manager panel."
+  [view]
+  (view-utils/find-component view group-manager-panel-id))
+
+(defn find-group-edit-panel
+  "Finds the group editor panel."
+  [view]
+  (view-utils/find-component view group-edit-panel-id))
+
+(defn find-group-editor-text
+  "Finds the group editor text field."
+  [view]
+  (view-utils/find-component view group-editor-text-id))
+
+(defn selected-group
+  "Returns the selected group in the group combobox."
+  [view]
+  (seesaw-core/selection (find-group-combobox view)))
+
+(defn show-group-editor-panel
+  "Shows the group editor panel."
+  [view]
+  (seesaw-core/show-card!
+    (find-group-manager-panel view) group-editor-card-id)
+  view)
+
+(defn show-group-filter-panel
+  "Shows the group filter panel."
+  [view]
+  (seesaw-core/show-card!
+    (find-group-manager-panel view) group-filter-card-id)
+  view)
+
+(defn create-group-listener
+  "Shows the create group panel."
+  [event]
+  (view-utils/save-component-property  
+    (find-group-edit-panel
+      (show-group-editor-panel
+        (find-group-manager-panel
+          (view-utils/top-level-ancestor (seesaw-core/to-widget event)))))
+    group-editor-type-key create-group))
+
+(defn attach-create-group-listener
+  "Attaches the create group listener to the create group button in the given
+view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-create-new-group-button view) create-group-listener
+    create-new-group-button-listener-key))
+
+(defn cancel-edit-listener
+  "Shows the create group panel."
+  [event]
+  (view-utils/remove-component-property
+    (find-group-edit-panel
+      (show-group-filter-panel
+        (find-group-manager-panel
+          (view-utils/top-level-ancestor event))))
+    group-editor-type-key))
+
+(defn attach-cancel-edit-listener
+  "Attaches the cancel edit listener to the cancel edit button in the given
+view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-cancel-edit-button view) cancel-edit-listener
+    cancel-edit-button-listener-key))
+
+(defn create-new-group
+  "Creates a new group from the text in the given group edit panel."
+  [group-edit-panel]
+  (let [group-name (seesaw-core/text
+                     (find-group-editor-text group-edit-panel))]
+    (when (not-empty group-name)
+      (grouping-model/create-user-group group-name))))
+
+(defn edit-group
+  "Updates the name of a group given the text and the group to edit saved in the
+given group edit panel."
+  [group-edit-panel]
+  (println "Editing Group."))
+
+(defn save-edit-listener
+  "Saves or edits a group using the text in the group text editor panel."
+  [event]
+  (let [group-edit-panel (find-group-edit-panel
+                              (find-group-panel
+                                (view-utils/top-level-ancestor event)))]
+    (when-let [editor-type (view-utils/retrieve-component-property
+                             group-edit-panel group-editor-type-key)]
+      (condp = editor-type
+        create-group (create-new-group group-edit-panel)
+        edit-group (edit-group group-edit-panel)
+        (throw (RuntimeException. (str "Unknown editor type: " editor-type))))))
+  (cancel-edit-listener event))
+
+(defn attach-save-edit-listener
+  "Attaches the cancel edit listener to the cancel edit button in the given
+view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-save-edit-button view) save-edit-listener
+    save-edit-button-listener-key))
+
+(defn delete-group-listener
+  "Deletes the group selected in the group combobox."
+  [event]
+  (let [group-panel (find-group-panel (view-utils/top-level-ancestor event))]
+    (when-let [current-selected-group (selected-group group-panel)]
+      (if (grouping-model/contains-any-profile? current-selected-group)
+        (seesaw-core/alert group-panel (term/cannot-delete-group-with-friends))
+        (when (= (term/delete)
+               (seesaw-core/input
+                 (term/are-you-sure-you-want-to-delete-group
+                   (grouping-model/display current-selected-group))
+                 :choices [(term/delete) (term/do-not-delete)]))
+          (grouping-model/delete-grouping current-selected-group))))))
+
+(defn attach-delete-group-listener
+  "Attaches the delete group listener to the delete group button in the given
+view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-delete-group-button view) delete-group-listener
+    delete-group-button-listener-key))
+
+(defn initialize
+  "Called when the panel is created to initialize the view by attaching
+listeners and loading initial data."
+  [view show-panel-fn]
+  (attach-create-group-listener view)
+  (attach-cancel-edit-listener view)
+  (attach-save-edit-listener view)
+  (attach-delete-group-listener view))

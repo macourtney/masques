@@ -39,24 +39,32 @@ given parent component."
     (let [select-vector (if (vector? id) id [(to-select-id id)])]
       (seesaw-core/select parent-component select-vector))))
 
-(defn save-component-property [component key value]
+(defn save-component-property
+  "Saves the given key and value as a property on the given component."
+  [component key value]
   (.putClientProperty component key value)
   value)
 
-(defn retrieve-component-property [component key]
+(defn retrieve-component-property
+  "Retrieves the value of the property with the given key on the given
+component."
+  [component key]
   (.getClientProperty component key))
 
-(defn remove-component-property [component key]
+(defn remove-component-property
+  "Removes the property with the given key from the given component."
+  [component key]
   (let [value (retrieve-component-property component key)]
     (save-component-property component key nil)
     value))
     
 (defn top-level-ancestor
 "Returns the top-level ancestor of the given component (either the containing
-Window or Applet), or null if the component is null or has not been added to any
-container."
+Window or Applet), or nil if the component is nil or has not been added to any
+container. If the component is really an event, it will be converted to a
+component using the to-widget function."
   [component]
-  (when component
+  (when-let [component (seesaw-core/to-widget component)]
     (.getTopLevelAncestor component)))
 
 (defn choose-file
@@ -92,8 +100,6 @@ the user does not select one."
       :selection-mode :files-only
       :filters filters
       :success-fn success-fn)))
-
-()
 
 (defn add-mouse-over-background-change
   "Adds mouse listeners to change the background of a widget when the mouse is

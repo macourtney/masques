@@ -342,7 +342,7 @@ this function simply returns the record."
     (insert-record entity record)))
 
 (defn delete-record [entity record]
-  (when-let [id (if (map? record) (id record) record)]
+  (when-let [id (id record)]
     (delete entity
       (where { :ID id }))
     (notify-of-delete entity id)))
