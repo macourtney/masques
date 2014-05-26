@@ -61,7 +61,7 @@ used for both the display and name of the newly created group."
 
 (defn with-profiles [id]
   (let [grouping-record (find-by-id grouping id)]
-	(attach-profiles grouping-record (get-profiles id))))
+    (attach-profiles grouping-record (get-profiles id))))
 
 (defn count-groups
   "Counts all of the groups."
