@@ -3,216 +3,239 @@
   (:use clojure.test
         masques.model.base))
 
-(deftest test-listener-set-for-entity
-  (is (= (listener-set-for-entity {} friend-request) #{}))
-  (let [test-listener-set #{ :foo }]
-    (is (= (listener-set-for-entity
-             { friend-request test-listener-set } friend-request)
-           test-listener-set))))
+(deftest test-interceptor-set-for-entity
+  (is (= (interceptor-set-for-entity {} friend-request) #{}))
+  (let [test-interceptor-set #{ :foo }]
+    (is (= (interceptor-set-for-entity
+             { friend-request test-interceptor-set } friend-request)
+           test-interceptor-set))))
 
-(deftest test-add-listener-to-listeners-map
-  (let [test-listener (fn [_])
-        updated-listeners-map
-          (add-listener-to-listeners-map {} friend-request test-listener)]
-    (is (= updated-listeners-map { friend-request #{ test-listener } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        updated-listeners-map (add-listener-to-listeners-map
-                                { profile #{ test-listener2 } } 
-                                friend-request test-listener)]
-    (is (= updated-listeners-map
-           { friend-request #{ test-listener }
-             profile #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        updated-listeners-map (add-listener-to-listeners-map
-                                { friend-request #{ test-listener2 } } 
-                                friend-request test-listener)]
-    (is (= updated-listeners-map
-           { friend-request #{ test-listener test-listener2 } })))
-  (let [updated-listeners-map
-          (add-listener-to-listeners-map {} friend-request nil)]
-    (is (= updated-listeners-map {})))
-  (let [test-listener (fn [_])
-        updated-listeners-map
-          (add-listener-to-listeners-map {} nil test-listener)]
-    (is (= updated-listeners-map {})))
-  (let [test-listener (fn [_])
-        updated-listeners-map
-          (add-listener-to-listeners-map nil friend-request test-listener)]
-    (is (= updated-listeners-map { friend-request #{ test-listener } }))))
+(deftest test-add-interceptor-to-interceptors-map
+  (let [test-interceptor (fn [action record] (action record))
+        updated-interceptors-map (add-interceptor-to-interceptors-map
+                                   {} friend-request test-interceptor)]
+    (is (= updated-interceptors-map { friend-request #{ test-interceptor } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        updated-interceptors-map (add-interceptor-to-interceptors-map
+                                   { profile #{ test-interceptor2 } } 
+                                   friend-request test-interceptor)]
+    (is (= updated-interceptors-map
+           { friend-request #{ test-interceptor }
+             profile #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        updated-interceptors-map (add-interceptor-to-interceptors-map
+                                   { friend-request #{ test-interceptor2 } } 
+                                   friend-request test-interceptor)]
+    (is (= updated-interceptors-map
+           { friend-request #{ test-interceptor test-interceptor2 } })))
+  (let [updated-interceptors-map
+          (add-interceptor-to-interceptors-map {} friend-request nil)]
+    (is (= updated-interceptors-map {})))
+  (let [test-interceptor (fn [action record] (action record))
+        updated-interceptors-map
+          (add-interceptor-to-interceptors-map {} nil test-interceptor)]
+    (is (= updated-interceptors-map {})))
+  (let [test-interceptor (fn [action record] (action record))
+        updated-interceptors-map (add-interceptor-to-interceptors-map
+                                   nil friend-request test-interceptor)]
+    (is (= updated-interceptors-map { friend-request #{ test-interceptor } }))))
 
-(deftest test-remove-listener-from-listeners-map
-  (let [test-listener (fn [_])
-        updated-listeners-map
-          (remove-listener-from-listeners-map
-            { friend-request #{ test-listener } } friend-request test-listener)]
-    (is (= updated-listeners-map {})))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        updated-listeners-map
-          (remove-listener-from-listeners-map
-            { friend-request #{ test-listener test-listener2 } } friend-request
-            test-listener)]
-    (is (= updated-listeners-map { friend-request #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        updated-listeners-map
-          (remove-listener-from-listeners-map
-            { friend-request #{ test-listener2 } } friend-request
-            test-listener)]
-    (is (= updated-listeners-map { friend-request #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        updated-listeners-map
-          (remove-listener-from-listeners-map
-            { profile #{ test-listener2 } } friend-request test-listener)]
-    (is (= updated-listeners-map { profile #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        updated-listeners-map
-          (remove-listener-from-listeners-map {} friend-request test-listener)]
-    (is (= updated-listeners-map {}))))
+(deftest test-remove-interceptor-from-interceptors-map
+  (let [test-interceptor (fn [action record] (action record))
+        updated-interceptors-map
+          (remove-interceptor-from-interceptors-map
+            { friend-request #{ test-interceptor } }
+            friend-request test-interceptor)]
+    (is (= updated-interceptors-map {})))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        updated-interceptors-map
+          (remove-interceptor-from-interceptors-map
+            { friend-request #{ test-interceptor test-interceptor2 } }
+            friend-request test-interceptor)]
+    (is (= updated-interceptors-map { friend-request #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        updated-interceptors-map
+          (remove-interceptor-from-interceptors-map
+            { friend-request #{ test-interceptor2 } } friend-request
+            test-interceptor)]
+    (is (= updated-interceptors-map { friend-request #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        updated-interceptors-map
+          (remove-interceptor-from-interceptors-map
+            { profile #{ test-interceptor2 } } friend-request test-interceptor)]
+    (is (= updated-interceptors-map { profile #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        updated-interceptors-map (remove-interceptor-from-interceptors-map
+                                   {} friend-request test-interceptor)]
+    (is (= updated-interceptors-map {}))))
 
-(deftest test-add-listener
-  (let [test-listener (fn [_])
-        listener-atom (atom {})]
-    (add-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom { friend-request #{ test-listener } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        listener-atom (atom { profile #{ test-listener2 } })]
-    (add-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom
-           { friend-request #{ test-listener }
-             profile #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        listener-atom (atom { friend-request #{ test-listener2 } })]
-    (add-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom
-           { friend-request #{ test-listener test-listener2 } })))
-  (let [listener-atom (atom {})]
-    (add-listener listener-atom friend-request nil)
-    (is (= @listener-atom {})))
-  (let [listener-atom (atom {})
-        test-listener (fn [_])]
-    (add-listener listener-atom nil test-listener)
-    (is (= @listener-atom {}))))
+(deftest test-add-interceptor
+  (let [test-interceptor (fn [action record] (action record))
+        interceptor-atom (atom {})]
+    (add-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom { friend-request #{ test-interceptor } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        interceptor-atom (atom { profile #{ test-interceptor2 } })]
+    (add-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom
+           { friend-request #{ test-interceptor }
+             profile #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        interceptor-atom (atom { friend-request #{ test-interceptor2 } })]
+    (add-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom
+           { friend-request #{ test-interceptor test-interceptor2 } })))
+  (let [interceptor-atom (atom {})]
+    (add-interceptor interceptor-atom friend-request nil)
+    (is (= @interceptor-atom {})))
+  (let [interceptor-atom (atom {})
+        test-interceptor (fn [action record] (action record))]
+    (add-interceptor interceptor-atom nil test-interceptor)
+    (is (= @interceptor-atom {}))))
 
-(deftest test-remove-listener
-  (let [test-listener (fn [_])
-        listener-atom (atom { friend-request #{ test-listener } })]
-    (remove-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom {})))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        listener-atom (atom { friend-request 
-                                #{ test-listener test-listener2 } })]
-    (remove-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom { friend-request #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        listener-atom (atom { friend-request #{ test-listener2 } })]
-    (remove-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom { friend-request #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        test-listener2 (fn [_])
-        listener-atom (atom { profile #{ test-listener2 } })]
-    (remove-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom { profile #{ test-listener2 } })))
-  (let [test-listener (fn [_])
-        listener-atom (atom {})]
-    (remove-listener listener-atom friend-request test-listener)
-    (is (= @listener-atom {}))))
+(deftest test-remove-interceptor
+  (let [test-interceptor (fn [action record] (action record))
+        interceptor-atom (atom { friend-request #{ test-interceptor } })]
+    (remove-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom {})))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        interceptor-atom (atom { friend-request 
+                                #{ test-interceptor test-interceptor2 } })]
+    (remove-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom { friend-request #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        interceptor-atom (atom { friend-request #{ test-interceptor2 } })]
+    (remove-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom { friend-request #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        test-interceptor2 (fn [action record] (action record))
+        interceptor-atom (atom { profile #{ test-interceptor2 } })]
+    (remove-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom { profile #{ test-interceptor2 } })))
+  (let [test-interceptor (fn [action record] (action record))
+        interceptor-atom (atom {})]
+    (remove-interceptor interceptor-atom friend-request test-interceptor)
+    (is (= @interceptor-atom {}))))
 
-(deftest test-notify-listeners
-  (let [test-id 12345]
+(deftest test-call-interceptors
+  (let [test-record { id-key 12345 }]
     (let [notify-atom (atom nil)
-          test-listener (fn [id] (reset! notify-atom id))
-          listener-atom (atom {})]
-      (add-listener listener-atom friend-request test-listener)
-      (notify-listeners listener-atom friend-request test-id)
-      (is (= @notify-atom test-id)))
-    (notify-listeners (atom { friend-request #{} }) friend-request test-id)
-    (notify-listeners (atom {}) friend-request test-id)))
+          test-interceptor (fn [action record]
+                          (reset! notify-atom record)
+                          (action record))]
+      (call-interceptors [test-interceptor] identity test-record)
+      (is (= @notify-atom test-record)))
+    (call-interceptors [] identity test-record)))
 
-(deftest test-change-listener
-  (let [test-listener (fn [_])]
-    (is (= {} @change-listeners))
-    (add-change-listener friend-request test-listener)
-    (is (= { friend-request #{ test-listener } } @change-listeners))
-    (remove-change-listener friend-request test-listener)
-    (is (= {} @change-listeners)))
-  (add-change-listener friend-request nil)
-  (is (= {} @change-listeners))
-  (remove-change-listener friend-request nil)
-  (is (= {} @change-listeners)))
+(deftest test-change-interceptor
+  (let [test-interceptor (fn [action record] (action record))]
+    (is (= {} @change-interceptors))
+    (add-change-interceptor friend-request test-interceptor)
+    (is (= { friend-request #{ test-interceptor } } @change-interceptors))
+    (remove-change-interceptor friend-request test-interceptor)
+    (is (= {} @change-interceptors)))
+  (add-change-interceptor friend-request nil)
+  (is (= {} @change-interceptors))
+  (remove-change-interceptor friend-request nil)
+  (is (= {} @change-interceptors)))
 
-(deftest test-insert-listener
-  (let [test-id 12345
+(deftest test-insert-interceptor
+  (let [test-record { id-key 12345 }
         insert-notify-atom (atom nil)
-        test-insert-listener (fn [id] (reset! insert-notify-atom id))
+        test-insert-interceptor (fn [action record]
+                                  (reset! insert-notify-atom id)
+                                  (action record))
         change-notify-atom (atom nil)
-        test-change-listener (fn [id] (reset! change-notify-atom id))]
-    (is (= {} @insert-listeners))
-    (is (= {} @change-listeners))
-    (add-insert-listener friend-request test-insert-listener)
-    (is (= { friend-request #{ test-insert-listener } } @insert-listeners))
-    (add-change-listener friend-request test-change-listener)
-    (notify-of-insert friend-request test-id)
-    (is (= test-id @insert-notify-atom))
-    (is (= test-id @change-notify-atom))
-    (remove-change-listener friend-request test-change-listener)
-    (remove-insert-listener friend-request test-insert-listener)
-    (is (= {} @insert-listeners))
-    (is (= {} @change-listeners)))
-  (add-insert-listener friend-request nil)
-  (is (= {} @insert-listeners))
-  (remove-insert-listener friend-request nil)
-  (is (= {} @insert-listeners)))
+        test-change-interceptor (fn [action record]
+                                  (reset! change-notify-atom id)
+                                  (action record))]
+    (is (= {} @insert-interceptors))
+    (is (= {} @change-interceptors))
+    (add-insert-interceptor friend-request test-insert-interceptor)
+    (is (= { friend-request #{ test-insert-interceptor } }
+           @insert-interceptors))
+    (add-change-interceptor friend-request test-change-interceptor)
+    (run-insert friend-request identity test-record)
+    (is (= test-record @insert-notify-atom))
+    (is (= test-record @change-notify-atom))
+    (remove-change-interceptor friend-request test-change-interceptor)
+    (remove-insert-interceptor friend-request test-insert-interceptor)
+    (is (= {} @insert-interceptors))
+    (is (= {} @change-interceptors)))
+  (add-insert-interceptor friend-request nil)
+  (is (= {} @insert-interceptors))
+  (remove-insert-interceptor friend-request nil)
+  (is (= {} @insert-interceptors)))
 
-(deftest test-insert-listener
-  (let [test-id 12345
+(deftest test-insert-interceptor
+  (let [test-record { id-key 12345 }
         update-notify-atom (atom nil)
-        test-update-listener (fn [id] (reset! update-notify-atom id))
+        test-update-interceptor (fn [action record]
+                                  (reset! update-notify-atom record)
+                                  (action record))
         change-notify-atom (atom nil)
-        test-change-listener (fn [id] (reset! change-notify-atom id))]
-    (is (= {} @update-listeners))
-    (is (= {} @change-listeners))
-    (add-update-listener friend-request test-update-listener)
-    (is (= { friend-request #{ test-update-listener } } @update-listeners))
-    (add-change-listener friend-request test-change-listener)
-    (notify-of-update friend-request test-id)
-    (is (= test-id @update-notify-atom))
-    (is (= test-id @change-notify-atom))
-    (remove-change-listener friend-request test-change-listener)
-    (remove-update-listener friend-request test-update-listener)
-    (is (= {} @update-listeners))
-    (is (= {} @change-listeners)))
-  (add-update-listener friend-request nil)
-  (is (= {} @update-listeners))
-  (remove-update-listener friend-request nil)
-  (is (= {} @update-listeners)))
+        test-change-interceptor (fn [action record]
+                                  (reset! change-notify-atom record)
+                                  (action record))]
+    (is (= {} @update-interceptors))
+    (is (= {} @change-interceptors))
+    (add-update-interceptor friend-request test-update-interceptor)
+    (is (= { friend-request #{ test-update-interceptor } }
+           @update-interceptors))
+    (add-change-interceptor friend-request test-change-interceptor)
+    (run-update friend-request identity test-record)
+    (is (= test-record @update-notify-atom))
+    (is (= test-record @change-notify-atom))
+    (remove-change-interceptor friend-request test-change-interceptor)
+    (remove-update-interceptor friend-request test-update-interceptor)
+    (is (= {} @update-interceptors))
+    (is (= {} @change-interceptors)))
+  (add-update-interceptor friend-request nil)
+  (is (= {} @update-interceptors))
+  (remove-update-interceptor friend-request nil)
+  (is (= {} @update-interceptors)))
 
-(deftest test-delete-listener
-  (let [test-id 12345
+(deftest test-delete-interceptor
+  (let [test-record { id-key 12345 }
         delete-notify-atom (atom nil)
-        test-delete-listener (fn [id] (reset! delete-notify-atom id))
+        test-delete-interceptor (fn [action record]
+                                  (reset! delete-notify-atom record)
+                                  (action record))
         change-notify-atom (atom nil)
-        test-change-listener (fn [id] (reset! change-notify-atom id))]
-    (is (= {} @delete-listeners))
-    (is (= {} @change-listeners))
-    (add-delete-listener friend-request test-delete-listener)
-    (is (= { friend-request #{ test-delete-listener } } @delete-listeners))
-    (add-change-listener friend-request test-change-listener)
-    (notify-of-delete friend-request test-id)
-    (is (= test-id @delete-notify-atom))
-    (is (= test-id @change-notify-atom))
-    (remove-change-listener friend-request test-change-listener)
-    (remove-delete-listener friend-request test-delete-listener)
-    (is (= {} @delete-listeners))
-    (is (= {} @change-listeners)))
-  (add-delete-listener friend-request nil)
-  (is (= {} @delete-listeners))
-  (remove-delete-listener friend-request nil)
-  (is (= {} @delete-listeners)))
+        test-change-interceptor (fn [action record]
+                                  (reset! change-notify-atom record)
+                                  (action record))]
+    (is (= {} @delete-interceptors))
+    (is (= {} @change-interceptors))
+    (add-delete-interceptor friend-request test-delete-interceptor)
+    (is (= { friend-request #{ test-delete-interceptor } }
+           @delete-interceptors))
+    (add-change-interceptor friend-request test-change-interceptor)
+    (run-delete friend-request identity test-record)
+    (is (= test-record @delete-notify-atom))
+    (is (= test-record @change-notify-atom))
+    (remove-change-interceptor friend-request test-change-interceptor)
+    (remove-delete-interceptor friend-request test-delete-interceptor)
+    (is (= {} @delete-interceptors))
+    (is (= {} @change-interceptors)))
+  (add-delete-interceptor friend-request nil)
+  (is (= {} @delete-interceptors))
+  (remove-delete-interceptor friend-request nil)
+  (is (= {} @delete-interceptors)))
+
+(deftest test-index-of
+  (let [test-record { :id 1 }
+        test-record-2 { :id 2 }]
+    (is (nil? (index-of test-record [])))
+    (is (= (index-of test-record [test-record]) 0))
+    (is (= (index-of test-record [test-record-2 test-record]) 1))
+    (is (nil? (index-of test-record [test-record-2])))))

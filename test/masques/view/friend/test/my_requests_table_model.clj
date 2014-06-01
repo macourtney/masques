@@ -10,7 +10,7 @@
         masques.view.friend.my-requests-table-model))
 
 (deftest test-create
-  (let [test-profile (profile/save test-util/profile-map) 
+  (let [test-profile (profile/find-profile (profile/save test-util/profile-map)) 
         test-message "test message"
         request-share
           (friend-request/receive-request test-profile test-message)

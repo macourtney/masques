@@ -1,6 +1,7 @@
 (ns masques.model.test.share
   (:require test.init)
-  (:require [masques.model.friend-request :as friend-request-model]
+  (:require [clojure.tools.logging :as logging]
+            [masques.model.friend-request :as friend-request-model]
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model])
   (:use clojure.test
@@ -28,10 +29,12 @@
   profile-model/identity-algorithm-key "RSA" })
 
 (defn share-test-fixture [function]
-  (binding [test-message-record (message-model/save test-message-record)]
-    (binding [test-share-record (save (assoc test-share-record :message-id
-                                        (:id test-message-record)))
-              test-friend-request (save test-friend-request)]
+  (binding [test-message-record (message-model/find-message
+                                  (message-model/save test-message-record))]
+    (binding [test-share-record (find-share
+                                  (save (assoc test-share-record :message-id
+                                               (:id test-message-record))))
+              test-friend-request (find-share (save test-friend-request))]
       (function)
       (delete-share test-friend-request)
       (delete-share test-share-record))
@@ -55,14 +58,16 @@
 (deftest test-create-friend-request-share
   (let [test-message "test-message"
         test-profile (profile-model/load-masque-map
-                  (profile-model/create-masque-map profile-map))
-        test-request (friend-request-model/save
-                       { friend-request-model/request-status-key
-                           friend-request-model/pending-sent-status
-                         friend-request-model/profile-id-key
-                           (id test-profile) })
-        test-share (create-send-friend-request-share test-message test-profile
-                                                test-request)
+                         (profile-model/create-masque-map profile-map))
+        test-request (friend-request-model/find-friend-request
+                       (friend-request-model/save
+                         { friend-request-model/request-status-key
+                             friend-request-model/pending-sent-status
+                           friend-request-model/profile-id-key
+                             (id test-profile) }))
+        test-share (find-share
+                     (create-send-friend-request-share test-message test-profile
+                                                       test-request))
         test-message-id (message-id test-share)]
     (is test-share)
     (is (is-friend-request test-share))
@@ -87,7 +92,8 @@
     (is (nil? (friend-request-model/find-friend-request (id test-request))))))
 
 (deftest test-other-profile
-  (let [saved-other-profile (profile-model/save profile-map)]
+  (let [saved-other-profile (profile-model/find-profile
+                              (profile-model/save profile-map))]
     (let [test-share { profile-from-id-key (id saved-other-profile)
                        profile-to-id-key (id (profile-model/current-user)) }]
       (is (= saved-other-profile (other-profile test-share))))

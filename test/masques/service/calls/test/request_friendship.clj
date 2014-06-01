@@ -32,13 +32,15 @@
   (profile-model/create-masque-file test-util/test-masque-file
                                     test-util/profile-map)
   (let [test-message "test message"
-        request-share (send-friend-request test-util/test-masque-file
-                                           test-message)]
+        request-share
+          (send-friend-request test-util/test-masque-file test-message)]
     (is (friend-request-model/requested-at
           (share-model/get-content request-share)))
     (is (= @network-destination test-util/test-destination))
     (is (= @network-data
-           { clj-i2p/service-key service-protocol/service-name
+           { clj-i2p/from-key
+               { clj-i2p/destination-key test-util/test-destination-str }
+             clj-i2p/service-key service-protocol/service-name
              clj-i2p/service-version-key service-protocol/service-version
              :action request-friendship-action/action
              clj-i2p/data-key { 
@@ -47,8 +49,6 @@
                                 [profile-model/alias-key
                                  profile-model/destination-key
                                  profile-model/identity-key
-                                 profile-model/identity-algorithm-key]) }
-             clj-i2p/from-key
-             { clj-i2p/destination-key test-util/test-destination-str } }))
+                                 profile-model/identity-algorithm-key]) } }))
     (share-model/delete-share request-share))
   (io/delete-file test-util/test-masque-file))

@@ -8,7 +8,7 @@
 (def dest "./test/support_files/test_result.txt")
 
 (deftest test-add-file-record
-  (let [file-record (save { :path avatar-image })]
+  (let [file-record (find-file (save { :path avatar-image }))]
     (is file-record)
     (is (:id file-record))
     (is (= (:path file-record) avatar-image))

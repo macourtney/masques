@@ -31,7 +31,7 @@ then a message is created and returned. If the message is map, then the id is
 used to get a fresh copy from the database."
   [message]
   (cond
-    (string? message) (create-message message)
+    (string? message) (find-message (create-message message))
     (map? message) (find-message (id message))
     :else (throw (RuntimeException. (str "Unknown message type: " message) ))))
 

@@ -173,15 +173,20 @@ is returned."
 (defn other-profile
   "Returns the to or from profile which is not the current user."
   [share-record]
-  (profile-model/find-profile
-    (or (profile-model/not-current-user? (profile-to-id-key share-record))
-        (profile-model/not-current-user? (profile-from-id-key share-record)))))
+  (let [share-record (if (integer? share-record)
+                       (find-share share-record)
+                       share-record)]
+    (profile-model/find-profile
+      (or (profile-model/not-current-user? (profile-to-id-key share-record))
+          (profile-model/not-current-user?
+            (profile-from-id-key share-record))))))
 
 (defn delete-share [share-record]
   (when share-record
-    (message-model/delete-message (message-id share-record))
-    (delete-content share-record)
-    (delete-record share share-record)))
+    (let [share-record (find-share (id share-record))]
+      (message-model/delete-message (message-id share-record))
+      (delete-content share-record)
+      (delete-record share share-record))))
 
 (defn create-share
   "Creates a share which is sent out to a peer."

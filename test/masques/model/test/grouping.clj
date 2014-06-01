@@ -3,22 +3,27 @@
   (:use clojure.test
         masques.model.base
         masques.model.grouping)
-  #_(:require [masques.model.grouping-profile :as grouping-profile-model]))
+  (:require [korma.core :as korma]))
 
 
-(def grouping-map {:name "tester grouping"})
+(def grouping-map {name-key "tester grouping"})
 
 (deftest test-add-grouping
-  (let [grouping-record (save grouping-map)]
+  (let [grouping-record (find-grouping (save grouping-map))]
     (is grouping-record)
-    (is (:id grouping-record))
-    (is (= (:name grouping-record) "tester grouping"))
-    (is (instance? org.joda.time.DateTime (:created-at grouping-record)))))
+    (is (id grouping-record))
+    (is (= (name-key grouping-record) "tester grouping"))
+    (is (instance? org.joda.time.DateTime (created-at-key grouping-record)))
+    (delete-grouping grouping-record)))
 
-#_(deftest test-add-album-with-files
-  (let [file-1 (file-model/save {:name "thing one" :album-id (:id album-record)})
-        file-2 (file-model/save {:name "thing two" :album-id (:id album-record)})
-        album-and-files (with-files (:id album-record))]
-    (is file-1)
-    (is file-2)
-    (is (:files album-and-files))))
+(deftest test-init
+  (is (= 0 (count-groups)))
+  (init)
+  (is (= 5 (count-groups)))
+  (doseq [group (korma/select grouping)]
+    (delete-grouping group)))
+
+(deftest test-combobox-index-of
+  (let [grouping-record (save grouping-map)]
+    (is (= (combobox-index-of grouping-record) 0))
+    (delete-grouping grouping-record)))

@@ -89,7 +89,8 @@
 )
 
 (deftest test-find-all
-  (let [test-message (message-model/create-message "test message")
+  (let [test-message (message-model/find-message
+                       (message-model/create-message "test message"))
         all-messages (model/find-all model/message
                                      { :id (model/id test-message) })]
     (is all-messages)

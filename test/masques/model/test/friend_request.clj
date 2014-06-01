@@ -25,23 +25,19 @@
   (is (instance? org.joda.time.DateTime (:created-at request-record))))
 
 (deftest test-save-request
-  (let [request-record (save request-map)]
-    (request-tester request-record)
-    (delete-friend-request request-record)))
-
-(deftest test-find-request
-  (let [request-record (save request-map)]
+  (let [request-record (find-friend-request (save request-map))]
     (request-tester request-record)
     (delete-friend-request request-record)))
 
 (deftest test-update-send-request
   (let [test-message "test message"
         test-profile (profile/load-masque-map test-util/profile-map)
-        test-request (save { created-at-key (str (clj-time/now))
-                             request-status-key approved-status
-                             requested-at-key (str (clj-time/now))
-                             request-approved-at-key (str (clj-time/now))
-                             profile-id-key (id test-profile) })
+        test-request (find-friend-request
+                       (save { created-at-key (str (clj-time/now))
+                               request-status-key approved-status
+                               requested-at-key (str (clj-time/now))
+                               request-approved-at-key (str (clj-time/now))
+                               profile-id-key (id test-profile) }))
         test-share (share/create-send-friend-request-share
                      test-message test-profile test-request)]
     (let [test-message-2 "test message 2"
@@ -148,8 +144,9 @@
   (is (= 0 (count-pending-sent-requests)))
   (profile/create-masque-file test-util/test-masque-file
                                   test-util/profile-map)
-  (let [friend-request-share (send-request test-util/test-masque-file
-                                           "test message")
+  (let [friend-request-share (share/find-share
+                               (send-request test-util/test-masque-file
+                                             "test message"))
         friend-request (share/get-content friend-request-share)]
     (is friend-request)
     (is (= 1 (count-pending-sent-requests)))
@@ -171,8 +168,9 @@
 (deftest test-receive-request
   (is (= 0 (count-pending-received-requests)))
   (let [test-message "test message"
-        friend-request-share (receive-request
-                               test-util/profile-map test-message)
+        friend-request-share (share/find-share
+                               (receive-request
+                                 test-util/profile-map test-message))
         friend-request (share/get-content friend-request-share)]
     (is friend-request)
     (is (= 1 (count-pending-received-requests)))
@@ -220,7 +218,8 @@
           updated-share (unfriend (find-friend-request test-request))]
       (is (not updated-share)))
     (let [new-status (status test-request pending-sent-status)
-          updated-share (unfriend (find-friend-request test-request))
+          updated-share (share/find-share
+                          (unfriend (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is (not updated-share))
       (is (not (find-friend-request test-request))))
@@ -257,7 +256,8 @@
           updated-share (reject (find-friend-request test-request))]
       (is (not updated-share)))
     (let [new-status (status test-request pending-received-status)
-          updated-share (reject (find-friend-request test-request))
+          updated-share (share/find-share
+                          (reject (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is (not updated-share))
       (is (not (find-friend-request test-request))))

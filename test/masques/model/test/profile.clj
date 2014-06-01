@@ -24,9 +24,9 @@
 
 (deftest test-add-profile
   (let [initial-profile-count (count (all-profile-ids))
-        profile-record (save profile-map)]
+        profile-record (find-profile (save profile-map))]
     (is profile-record)
-    (is (:id profile-record))
+    (is (model-base/id profile-record))
     (is (= (alias-key profile-record) (alias-key profile-map)))
     (is (instance? org.joda.time.DateTime (:created-at profile-record)))
     (delete-profile profile-record)
@@ -34,11 +34,11 @@
 
 (deftest test-build-profile
   (let [initial-profile-count (count (all-profile-ids))
-        profile-record (save profile-map)
-        built-profile (build (:id profile-record))]
+        profile-record (find-profile (save profile-map))
+        built-profile (build (model-base/id profile-record))]
     (is built-profile)
     (is (map? (:avatar built-profile)))
-    (is (= (:id (:avatar built-profile)) (:avatar-file-id built-profile)))
+    (is (= (model-base/id (:avatar built-profile)) (:avatar-file-id built-profile)))
     (is (= (:path (:avatar built-profile)) (:avatar-path profile-map)))
     (delete-profile profile-record)
     (is (= (count (all-profile-ids)) initial-profile-count))))
@@ -66,7 +66,8 @@
 
 (deftest test-load-masque-map
   (let [initial-profile-count (count (all-profile-ids))
-        profile (load-masque-map (create-masque-map profile-map))]
+        profile (find-profile 
+                  (load-masque-map (create-masque-map profile-map)))]
     (is (= (count (all-profile-ids)) (inc initial-profile-count)))
     (is profile)
     (is (= (alias-key profile) (alias-key profile-map)))
@@ -84,7 +85,7 @@
     (when (.exists test-util/test-masque-file)
       (io/delete-file test-util/test-masque-file))
     (create-masque-file test-util/test-masque-file profile-map)
-    (let [profile (load-masque-file test-util/test-masque-file)]
+    (let [profile (find-profile (load-masque-file test-util/test-masque-file))]
       (is (= (count (all-profile-ids)) (inc initial-profile-count)))
       (is profile)
       (is (= (alias-key profile) (alias-key profile-map)))
@@ -100,7 +101,7 @@
   (let [initial-profile-count (count (all-profile-ids))]
     (is (= (alias-key profile-map) (alias profile-map)))
     (let [saved-profile (save profile-map)]
-      (is (= (alias-key profile-map) (alias (:id saved-profile))))
+      (is (= (alias-key profile-map) (alias (model-base/id saved-profile))))
       (delete-profile saved-profile))
     (is (= (count (all-profile-ids)) initial-profile-count))))
 

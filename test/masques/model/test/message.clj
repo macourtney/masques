@@ -15,18 +15,16 @@
     (is (= (count-records message) 0))))
 
 (deftest test-create-message
-  (is (= (count-records message) 0))
-  (let [test-message (create-message "test message")]
-    (is (= (count-records message) 1))
-    (let [test-message-str2 "test message 2"
-          updated-message (update-message test-message test-message-str2)]
-      (is (= (count-records message) 1))
-      (is updated-message)
-      (is (= (body updated-message) test-message-str2)))
-    (delete-record message test-message)
-    (is (= (count-records message) 0))))
-
-find-or-create
+  (let [original-count (count-records message)]
+    (let [test-message (create-message "test message")]
+      (is (= (count-records message) (inc original-count)))
+      (let [test-message-str2 "test message 2"
+            updated-message (update-message test-message test-message-str2)]
+        (is (= (count-records message) (inc original-count)))
+        (is updated-message)
+        (is (= (body updated-message) test-message-str2)))
+      (delete-record message test-message)
+      (is (= (count-records message) original-count)))))
 
 (deftest test-find-or-create
   (is (= (count-records message) 0))

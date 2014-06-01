@@ -46,15 +46,35 @@ used for both the display and name of the newly created group."
 (defn get-profiles [grouping-id]
   (into [] (select grouping-profile (where {:GROUPING_ID grouping-id}))))
 
-(defn add-grouping-change-listener
-  "Adds the given group change listener."
-  [listener]
-  (add-change-listener grouping listener))
+(defn add-grouping-delete-interceptor
+  "Adds the given group delete interceptor."
+  [interceptor]
+  (add-delete-interceptor grouping interceptor))
 
-(defn remove-grouping-change-listener
-  "Removes the given group change listener."
-  [listener]
-  (remove-change-listener grouping listener))
+(defn remove-grouping-delete-interceptor
+  "Removes the given group delete interceptor."
+  [interceptor]
+  (remove-delete-interceptor grouping interceptor))
+
+(defn add-grouping-insert-interceptor
+  "Adds the given group insert interceptor."
+  [interceptor]
+  (add-insert-interceptor grouping interceptor))
+
+(defn remove-grouping-insert-interceptor
+  "Removes the given group insert interceptor."
+  [interceptor]
+  (remove-insert-interceptor grouping interceptor))
+
+(defn add-grouping-update-interceptor
+  "Adds the given group update interceptor."
+  [interceptor]
+  (add-update-interceptor grouping interceptor))
+
+(defn remove-grouping-update-interceptor
+  "Removes the given group update interceptor."
+  [interceptor]
+  (remove-update-interceptor grouping interceptor))
 
 (defn attach-profiles [album-record file-records]
   (assoc album-record :files file-records))
@@ -80,7 +100,19 @@ used for both the display and name of the newly created group."
       grouping
       (korma/fields id-key (h2-keyword display-key))
       (korma/limit 1)
-      (korma/offset index))))
+      (korma/offset index)
+      (korma/order (h2-keyword display-key) :ASC))))
+
+(defn combobox-index-of
+  "Returns the index of the given grouping record in the list of combobox
+groups."
+  [record]
+  (index-of
+    record
+    (korma/select
+      grouping
+      (korma/fields id-key)
+      (korma/order (h2-keyword display-key) :ASC))))
 
 (defn find-everyone-id
   "Returns the id for the everyone group."

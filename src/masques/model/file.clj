@@ -9,6 +9,12 @@
 (defn file-size [path]
   "todo")
 
+(defn find-file
+  "Returns the file with the given id."
+  [file-id]
+  (when file-id
+    (find-by-id file (id file-id))))
+
 (defn save [record]
   (insert-or-update file record))
 

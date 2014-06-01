@@ -25,28 +25,12 @@
 
 (def saved-current-user (atom nil))
 
-(def peer-update-listeners (atom []))
-
-(def peer-delete-listeners (atom []))
-
-(defn add-peer-update-listener [listener]
-  (swap! peer-update-listeners conj listener))
-
-(defn remove-peer-update-listener [listener]
-  (swap! peer-update-listeners remove-listener listener))
-
-(defn add-peer-delete-listener [listener]
-  (swap! peer-delete-listeners conj listener))
-
-(defn remove-peer-delete-listener [listener]
-  (swap! peer-delete-listeners remove-listener listener))
-
 (defn find-profile
   "Finds the profile with the given id."
   [record]
   (when record
-    (if (integer? record)
-      (find-by-id profile record)
+    (if-let [profile-id (id record)]
+      (find-by-id profile profile-id)
       (find-first profile record))))
 
 (defn delete-profile
@@ -122,11 +106,15 @@ profile, then it is used as the id of the profile to get."
 
 (defn save-avatar [profile-record]
   (if (avatar-path-key profile-record)
-    (merge profile-record { :avatar-file-id (:id (insert-avatar profile-record)) })
+    (assoc profile-record :avatar-file-id (id (insert-avatar profile-record)))
     profile-record))
 
-(defn save [record]
-  (insert-or-update profile (dissoc (save-avatar record) :avatar avatar-path-key)))
+(defn save
+  "Saves the given profile record. Also, saves any avatar associated with the
+profile record."
+  [record]
+  (insert-or-update
+    profile (dissoc (save-avatar record) :avatar avatar-path-key)))
 
 (defn save-current-user [record]
   (when-not (find-by-id profile current-user-id)
@@ -239,7 +227,7 @@ send-request in friend_request instead."
   []
   (map id (select profile (fields [id-key]))))
 
-(deftype DbPeerPersister []
+(deftype DbPeerPersister [peer-update-listeners peer-delete-listeners]
   persister-protocol/PeerPersister
   (insert-peer [persister peer])
 
@@ -262,16 +250,18 @@ send-request in friend_request instead."
   (all-notified-peers [persister])
 
   (add-peer-update-listener [persister listener]
-    (add-peer-update-listener listener))
+    (swap! peer-update-listeners conj listener))
 
   (remove-peer-update-listener [persister listener]
-    (remove-peer-update-listener listener))
+    (swap! peer-update-listeners
+           (fn [listeners] (remove #(not (= % listener)) listeners))))
 
   (add-peer-delete-listener [persister listener]
-    (add-peer-delete-listener listener))
+    (swap! peer-delete-listeners conj listener))
 
   (remove-peer-delete-listener [persister listener]
-    (remove-peer-delete-listener listener))
+    (swap! peer-delete-listeners
+           (fn [listeners] (remove #(not (= % listener)) listeners))))
 
   (default-destinations [persister]
     (all-destinations))
@@ -284,7 +274,7 @@ send-request in friend_request instead."
 (defn create-peer-persister
   "Creates a new instance of DbPeerPersister and returns it."
   []
-  (DbPeerPersister.))
+  (DbPeerPersister. (atom []) (atom [])))
 
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the

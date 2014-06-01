@@ -2,6 +2,12 @@
   (:use masques.model.base
         korma.core))
 
+(defn find-album
+  "Returns the album with the given id."
+  [album-id]
+  (when album-id
+    (find-by-id album (id album-id))))
+
 (defn save [record]
   (insert-or-update album record))
 

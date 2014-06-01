@@ -7,8 +7,8 @@
             [drift-db.core :as drift-db]
             [masques.core :as masques-core]
             [korma.db :as korma-db] )
-  (:import [java.sql Clob])
-  (:import [java.util.UUID]))
+  (:import [java.sql Clob]
+           [java.util.UUID]))
 
 ; The id key as a valid h2 keyword.
 (def id-key :ID)
@@ -160,130 +160,149 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Called after a record has been inserted into the database.
-(def insert-listeners (atom {}))
+(def insert-interceptors (atom {}))
 ; Called after a record has been updated in the database.
-(def update-listeners (atom {}))
+(def update-interceptors (atom {}))
 ; Called after a record has been deleted in the database.
-(def delete-listeners (atom {}))
+(def delete-interceptors (atom {}))
 ; Called after a record has been changed in any way in the database.
-(def change-listeners (atom {}))
+(def change-interceptors (atom {}))
 
-(defn listener-set-for-entity
-  "Returns the listener set for the given entity in the given listeners atom."
-  [listeners-map entity]
-  (or (get listeners-map entity) #{}))
+(defn interceptor-set-for-entity
+  "Returns the interceptor set for the given entity in the given interceptors
+atom."
+  [interceptors-map entity]
+  (or (get interceptors-map entity) #{}))
 
-(defn add-listener-to-listeners-map
-  "Adds the given listener to the given listeners map under the given entity"
-  [listeners-map entity listener]
-  (if (and entity listener)
-    (assoc listeners-map entity
-           (conj (listener-set-for-entity listeners-map entity) listener))
-    listeners-map))
-
-(defn remove-listener-from-listeners-map
-  "Removes the given listener from the given listeners map under the given
+(defn add-interceptor-to-interceptors-map
+  "Adds the given interceptor to the given interceptors map under the given
 entity"
-  [listeners-map entity listener]
-  (let [listener-set (disj (listener-set-for-entity listeners-map entity) listener)]
-    (if (empty? listener-set)
-      (dissoc listeners-map entity)
-      (assoc listeners-map entity listener-set))))
+  [interceptors-map entity interceptor]
+  (if (and entity interceptor)
+    (assoc interceptors-map entity
+           (conj (interceptor-set-for-entity interceptors-map entity) interceptor))
+    interceptors-map))
 
-(defn add-listener
-  "Adds the given listener to the given listeners atom as a listener for the
+(defn remove-interceptor-from-interceptors-map
+  "Removes the given interceptor from the given interceptors map under the given
+entity"
+  [interceptors-map entity interceptor]
+  (let [interceptor-set
+          (disj (interceptor-set-for-entity interceptors-map entity)
+                interceptor)]
+    (if (empty? interceptor-set)
+      (dissoc interceptors-map entity)
+      (assoc interceptors-map entity interceptor-set))))
+
+(defn add-interceptor
+  "Adds the given interceptor to the given interceptor atom as a interceptor for
+the given entity."
+  [interceptors-atom entity interceptor]
+  (reset! interceptors-atom
+          (add-interceptor-to-interceptors-map @interceptors-atom entity
+                                               interceptor)))
+
+(defn remove-interceptor
+  "Removes the given interceptor from the given interceptors atom as a
+interceptor for the given entity."
+  [interceptors-atom entity interceptor]
+  (reset! interceptors-atom
+          (remove-interceptor-from-interceptors-map @interceptors-atom entity
+                                                    interceptor)))
+
+(defn all-interceptors
+  "Returns all of the interceptors in the given atom for the given entity."
+  [interceptors-atom entity]
+  (interceptor-set-for-entity @interceptors-atom entity))
+
+(defn create-interceptor-chain
+  "Creates the chain of interceptors to notify."
+  [action interceptors]
+  (reduce #(partial %2 %1) action interceptors))
+
+(defn call-interceptors
+  "Generates an interceptor chain for the given interceptors and action then
+calls the chain with the given record."
+  [interceptors action record]
+  ((create-interceptor-chain action interceptors) record))
+
+(defn add-insert-interceptor
+  "Adds the given interceptor to the list of insert interceptors for the given
+entity."
+  [entity interceptor]
+  (add-interceptor insert-interceptors entity interceptor))
+
+(defn remove-insert-interceptor
+  "Removes the given interceptor from the list of insert interceptors for the
 given entity."
-  [listeners-atom entity listener]
-  (reset! listeners-atom
-          (add-listener-to-listeners-map @listeners-atom entity listener)))
+  [entity interceptor]
+  (remove-interceptor insert-interceptors entity interceptor))
 
-(defn remove-listener
-  "Removes the given listener from the given listeners atom as a listener for the
+(defn run-insert
+  "Concates all of the insert and change interceptors for the given entity and
+calls them with the given action and record."
+  [entity action record]
+  (call-interceptors
+    (concat
+      (all-interceptors insert-interceptors entity)
+      (all-interceptors change-interceptors entity))
+    action record))
+
+(defn add-update-interceptor
+  "Adds the given interceptor to the list of update interceptors for the given
+entity."
+  [entity interceptor]
+  (add-interceptor update-interceptors entity interceptor))
+
+(defn remove-update-interceptor
+  "Removes the given interceptor from the list of update interceptors for the
 given entity."
-  [listeners-atom entity listener]
-  (reset! listeners-atom
-          (remove-listener-from-listeners-map @listeners-atom entity listener)))
+  [entity interceptor]
+  (remove-interceptor update-interceptors entity interceptor))
 
-(defn all-listeners
-  "Returns all of the listeners in the given atom for the given entity."
-  [listeners-atom entity]
-  (listener-set-for-entity @listeners-atom entity))
+(defn run-update
+  "Concates all of the update and change interceptors for the given entity and
+calls them with the given action and record."
+  [entity action record]
+  (call-interceptors
+    (concat
+      (all-interceptors update-interceptors entity)
+      (all-interceptors change-interceptors entity))
+    action record))
 
-(defn notify-listeners
-  "Notifies all of the listeners for the given entity in the given listeners
-atom of an update for a record with the given id."
-  [listeners-atom entity id]
-  (doseq [listener (all-listeners listeners-atom entity)]
-    (listener id)))
-
-(defn add-insert-listener
-  "Adds the given listener to the list of insert listeners for the given
+(defn add-delete-interceptor
+  "Adds the given interceptor to the list of delete interceptors for the given
 entity."
-  [entity listener]
-  (add-listener insert-listeners entity listener))
+  [entity interceptor]
+  (add-interceptor delete-interceptors entity interceptor))
 
-(defn remove-insert-listener
-  "Removes the given listener from the list of insert listeners for the given
+(defn remove-delete-interceptor
+  "Removes the given interceptor from the list of delete interceptors for the
+given entity."
+  [entity interceptor]
+  (remove-interceptor delete-interceptors entity interceptor))
+
+(defn run-delete
+  "Concates all of the delete and change interceptors for the given entity and
+calls them with the given action and record."
+  [entity action record]
+  (call-interceptors
+    (concat
+      (all-interceptors delete-interceptors entity)
+      (all-interceptors change-interceptors entity))
+    action record))
+
+(defn add-change-interceptor
+  "Adds the given interceptor to the list of change interceptors for the given
 entity."
-  [entity listener]
-  (remove-listener insert-listeners entity listener))
+  [entity interceptor]
+  (add-interceptor change-interceptors entity interceptor))
 
-(defn notify-of-insert
-  "Notifies all of the insert listeners and change listeners for the given
-entity that a new record was inserted with the given id."
-  [entity id]
-  (notify-listeners insert-listeners entity id)
-  (notify-listeners change-listeners entity id))
-
-(defn add-update-listener
-  "Adds the given listener to the list of update listeners for the given
-entity."
-  [entity listener]
-  (add-listener update-listeners entity listener))
-
-(defn remove-update-listener
-  "Removes the given listener from the list of update listeners for the given
-entity."
-  [entity listener]
-  (remove-listener update-listeners entity listener))
-
-(defn notify-of-update
-  "Notifies all of the update listeners and change listeners for the given
-entity that a new record with the given id was updated."
-  [entity id]
-  (notify-listeners update-listeners entity id)
-  (notify-listeners change-listeners entity id))
-
-(defn add-delete-listener
-  "Adds the given listener to the list of delete listeners for the given
-entity."
-  [entity listener]
-  (add-listener delete-listeners entity listener))
-
-(defn remove-delete-listener
-  "Removes the given listener from the list of delete listeners for the given
-entity."
-  [entity listener]
-  (remove-listener delete-listeners entity listener))
-
-(defn notify-of-delete
-  "Notifies all of the update listeners and change listeners for the given
-entity that a new record with the given id was updated."
-  [entity id]
-  (notify-listeners delete-listeners entity id)
-  (notify-listeners change-listeners entity id))
-
-(defn add-change-listener
-  "Adds the given listener to the list of change listeners for the given
-entity."
-  [entity listener]
-  (add-listener change-listeners entity listener))
-
-(defn remove-change-listener
-  "Removes the given listener from the list of change listeners for the given
-entity."
-  [entity listener]
-  (remove-listener change-listeners entity listener))
+(defn remove-change-interceptor
+  "Removes the given interceptor from the list of change interceptors for the
+given entity."
+  [entity interceptor]
+  (remove-interceptor change-interceptors entity interceptor))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SQL/ORM helpers.
@@ -323,29 +342,58 @@ this function simply returns the record."
   (when id
     (clean-up-for-clojure (first (select entity (where {:ID id}))))))
 
-(defn insert-record [entity record]
-  (let [new-id-map (insert entity (values (clean-up-for-h2 record)))
-        id (or (first (vals new-id-map)) (id record))]
-    (notify-of-insert entity id)
-    (find-by-id entity id)))
+(defn create-insert-action
+  "Creates an insert action which inserts a record into the database for the
+given entity."
+  [entity]
+  (fn [record]
+    (let [new-id-map (insert entity (values (clean-up-for-h2 record)))]
+      (or (first (vals new-id-map)) (id record)))))
 
-(defn update-record [entity record]
-  (update entity
-    (set-fields (clean-up-for-h2 record))
-    (where {:ID (id record)}))
-  (notify-of-update entity (id record))
-  (find-by-id entity (id record)))
+(defn insert-record
+  "Inserts the given record into the database for the given entity"
+  [entity record]
+  (run-insert entity (create-insert-action entity) record))
 
-(defn insert-or-update [entity record]
+(defn create-update-action
+  "Creates an update action which updates a record in the database for the
+given entity."
+  [entity]
+  (fn [record]
+    (let [record-id (id record)]
+      (update entity
+        (set-fields (clean-up-for-h2 record))
+        (where { id-key record-id }))
+      record-id)))
+
+(defn update-record
+  "Updates the given record in the database for the given entity"
+  [entity record]
+  (run-update entity (create-update-action entity) record))
+
+(defn insert-or-update
+  "Inserts or updates the given record for the given entity. If the record has
+an id, then this function performs an update. Otherwise, this function performs
+an insert."
+  [entity record]
   (if (id record)
     (update-record entity record)
     (insert-record entity record)))
 
-(defn delete-record [entity record]
-  (when-let [id (id record)]
-    (delete entity
-      (where { :ID id }))
-    (notify-of-delete entity id)))
+(defn create-delete-action
+  "Creates an delete action which deletes a record in the database for the
+given entity."
+  [entity]
+  (fn [record]
+    (let [record-id (id record)]
+      (delete entity (where { id-key record-id }))
+      record-id)))
+
+(defn delete-record
+  "Deletes the given record in the database for the given entity"
+  [entity record]
+  (when (id record)
+    (run-delete entity (create-delete-action entity) record)))
 
 (defn count-records
   "Returns the number of records for the given entity. You can pass a record to
@@ -444,6 +492,23 @@ use as a prototype of the records to count."
 ; Other randomness, used in models.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn as-boolean [value]
+(defn as-boolean
+  "Converts the given int value as a boolean. Returns false if value is nil or
+0."
+  [value]
   (and value (not (= value 0))))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Swing model support
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn index-of
+  "Returns the index of the given record-id in the given list of records."
+  [record-id records]
+  (when-let [record-id (id record-id)]
+    (some
+      (fn [record-pair]
+        (when (= (first record-pair) record-id)
+          (second record-pair)))
+      (map #(list %1 %2) (map id records) (range)))))

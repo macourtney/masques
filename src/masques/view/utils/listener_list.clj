@@ -1,4 +1,5 @@
-(ns masques.view.utils.listener-list)
+(ns masques.view.utils.listener-list
+  (:require [clojure.tools.logging :as logging]))
 
 (defprotocol ListenerList
   (add-listener [this listener]
@@ -39,4 +40,3 @@ given notifier function which should simply take a listener to update."
   [listener-list notifier]
   (doseq [listener (listeners listener-list)]
     (notifier listener)))
-
