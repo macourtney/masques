@@ -7,7 +7,8 @@
             [masques.model.share :as share]
             [masques.test.util :as test-util])
   (:use clojure.test
-        masques.view.friend.my-requests-table-model))
+        masques.view.friend.my-requests-table-model)
+  (:import [javax.swing ImageIcon]))
 
 (deftest test-create
   (let [test-profile (profile/find-profile (profile/save test-util/profile-map)) 
@@ -17,14 +18,15 @@
         test-model (create)]
     (is test-model)
 
-    (is (.getColumnClass test-model 0) Object)
-    (is (.getColumnClass test-model 1) String)
-    (is (.getColumnCount test-model) (count columns))
-    (is (.getColumnName test-model 1) (term/alias))
+    (is (= (.getColumnClass test-model 0) ImageIcon))
+    (is (= (.getColumnClass test-model 1) String))
+    (is (= (.getColumnCount test-model) (count columns)))
+    (is (= (.getColumnName test-model 1) (term/alias)))
 
-    (is (.getRowCount test-model) 1)
-    (is (.getValueAt test-model 0 1) (profile/alias-key test-util/profile-map))
-    (is (.getValueAt test-model 0 2) test-message)
+    (is (= (.getRowCount test-model) 1))
+    (is (= (.getValueAt test-model 0 1)
+           (profile/alias-key test-util/profile-map)))
+    (is (= (.getValueAt test-model 0 2) test-message))
     
     (share/delete-share request-share)
     (profile/delete-profile test-profile)))

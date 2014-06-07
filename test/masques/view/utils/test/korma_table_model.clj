@@ -29,16 +29,17 @@
   (column-count [this]
     (count test-columns))
   
-  (row-count [this]
-    (count test-rows))
-  
-  (value-at [this row-index column]
-    ((keyword column) (nth test-rows row-index)))
-  
   (cell-editable? [this row-index column]
     false)
   
-  (update-value [this _ _ _]))
+  ColumnValueList
+  (row-count [this] (count test-rows))
+  
+  (value-at [this row-index column-id]
+    ((keyword column-id) (nth test-rows row-index)))
+  
+  (update-value [this _ _ _]
+    ))
 
 (deftest test-create
   (let [korma-table-model (create (new TestTableModel))]

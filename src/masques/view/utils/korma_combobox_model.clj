@@ -1,7 +1,6 @@
 (ns masques.view.utils.korma-combobox-model
   (:require [clojure.tools.logging :as logging]
-            [masques.view.utils.listener-list
-             :as listener-list]
+            [masques.view.utils.listener-list :as listener-list]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing ComboBoxModel]
            [javax.swing.event ListDataEvent]))

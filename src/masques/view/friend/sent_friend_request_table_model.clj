@@ -12,42 +12,28 @@
 
 (def request-id-key :request-id)
 
-(def id-key :id)
-(def text-key :text)
-(def class-key :class)
-
 (def alias-column-id :alias)
 (def avatar-column-id :avatar)
 (def message-column-id :message)
 (def unfriend-column-id :unfriend)
 
-(def columns [{ id-key avatar-column-id text-key "" }
-              { id-key alias-column-id text-key (term/alias) class-key String }
-              { id-key message-column-id text-key (term/message)
-                class-key String }
-              { id-key unfriend-column-id text-key "" }])
-
-(def columns-map (reduce #(assoc %1 (id-key %2) %2) {} columns))
-
-(defn find-column
-  "Finds the column with the given column-id"
-  [column-id]
-  (get columns-map column-id))
+(def columns [{ korma-table-model/id-key avatar-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer }
+              { korma-table-model/id-key alias-column-id
+                korma-table-model/text-key (term/alias)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key message-column-id
+                korma-table-model/text-key (term/message)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key unfriend-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }])
 
 (deftype SentFriendRequestTableModel []
-  korma-table-model/DbModel
-  (column-id [this column-index]
-    (id-key (nth columns column-index)))
 
-  (column-name [this column-id]
-    (text-key (find-column column-id)))
-  
-  (column-class [this column-id]
-    (class-key (find-column column-id)))
-  
-  (column-count [this]
-    (count columns))
-
+  korma-table-model/ColumnValueList
   (row-count [this]
     (friend-request-model/count-pending-sent-requests))
   
@@ -67,16 +53,14 @@
               (friend-request-model/pending-sent-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
       unfriend-column-id
-        (id-key (friend-request-model/pending-sent-request row-index))
+        (korma-table-model/id-key (friend-request-model/pending-sent-request row-index))
       nil))
-  
-  (cell-editable? [this row-index column-id]
-    (= unfriend-column-id column-id))
   
   (update-value [this _ _ _]))
 
 (defn create []
-  (korma-table-model/create (new SentFriendRequestTableModel)))
+  (korma-table-model/create-from-columns
+    columns (new SentFriendRequestTableModel)))
 
 (defn unfriend-button-cell-renderer
   "A table cell renderer function for the unfriend button."

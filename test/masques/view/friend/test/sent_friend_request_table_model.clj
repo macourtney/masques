@@ -18,7 +18,7 @@
         test-model (create)]
     (is test-model)
 
-    (is (= (.getColumnClass test-model 0) Object))
+    (is (= (.getColumnClass test-model 0) Integer))
     (is (= (.getColumnClass test-model 1) String))
     (is (= (.getColumnCount test-model) (count columns)))
     (is (= (.getColumnName test-model 1) (term/alias)))

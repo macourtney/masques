@@ -8,66 +8,73 @@
 
 (def request-id-key :request-id)
 
-(def columns [{ :id :avatar :text "" :class ImageIcon }
-              { :id :alias :text (term/alias) :class String }
-              { :id :nick :text (term/nick) :class String }
-              { :id :groups :text (term/groups) :class String }
-              { :id :details :text "" :class Integer }
-              { :id :shares :text "" :class Integer }
-              { :id :unfriend :text "" :class Integer }])
+(def alias-column-id :alias)
+(def avatar-column-id :avatar)
+(def details-column-id :details)
+(def groups-column-id :groups)
+(def nick-column-id :nick)
+(def shares-column-id :shares)
+(def unfriend-column-id :unfriend)
 
-(def columns-map (reduce #(assoc %1 (:id %2) %2) {} columns))
-
-(defn find-column
-  "Finds the column with the given column-id"
-  [column-id]
-  (get columns-map column-id))
+(def columns [{ korma-table-model/id-key avatar-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key ImageIcon }
+              { korma-table-model/id-key alias-column-id
+                korma-table-model/text-key (term/alias)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key nick-column-id
+                korma-table-model/text-key (term/nick)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key groups-column-id
+                korma-table-model/text-key (term/groups)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key details-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }
+              { korma-table-model/id-key shares-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }
+              { korma-table-model/id-key unfriend-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }])
 
 (deftype FriendsTableModel []
-  korma-table-model/DbModel
-  (column-id [this column-index]
-    (:id (nth columns column-index)))
 
-  (column-name [this column-id]
-    (:text (find-column column-id)))
-  
-  (column-class [this column-id]
-    (:class (find-column column-id)))
-  
-  (column-count [this]
-    (count columns))
-  
+  korma-table-model/ColumnValueList
   (row-count [this]
     (friend-request-model/count-friends))
   
   (value-at [this row-index column-id]
     (condp = column-id
-      :avatar
+      avatar-column-id
         (ImageIcon.
           (ClassLoader/getSystemResource "profile.png"))
-      :alias
+      alias-column-id
         (profile-model/alias
           (:profile-id
             (friend-request-model/approved-received-request row-index)))
-      :nick ""
-      :groups ""
-      :details
-        (:id (friend-request-model/approved-received-request row-index))
-      :shares
-        (:id (friend-request-model/approved-received-request row-index))
-      :unfriend
-        (:id (friend-request-model/approved-received-request row-index))
+      nick-column-id ""
+      groups-column-id ""
+      details-column-id
+        (korma-table-model/id-key
+          (friend-request-model/approved-received-request row-index))
+      shares-column-id
+        (korma-table-model/id-key
+          (friend-request-model/approved-received-request row-index))
+      unfriend-column-id
+        (korma-table-model/id-key
+          (friend-request-model/approved-received-request row-index))
       nil))
-  
-  (cell-editable? [this row-index column-id]
-    (contains? #{ :details :shares :unfriend } column-id ))
   
   (update-value [this _ _ _]))
 
 (defn create
   "Creates a new table model for use in the friends table."
   []
-  (korma-table-model/create (new FriendsTableModel)))
+  (korma-table-model/create-from-columns columns (new FriendsTableModel)))
 
 (defn profile-button-cell-renderer
   "A table cell renderer function for the details button."

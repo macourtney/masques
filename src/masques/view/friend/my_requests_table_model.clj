@@ -13,66 +13,64 @@
 
 (def request-id-key :request-id)
 
-(def columns [{ :id :avatar :text "" :class ImageIcon }
-              { :id :alias :text (term/alias) :class String }
-              { :id :message :text (term/message) :class String }
-              { :id :accept :text "" }
-              { :id :reject :text "" }])
+(def accept-column-id :accept)
+(def alias-column-id :alias)
+(def avatar-column-id :avatar)
+(def message-column-id :message)
+(def reject-column-id :reject)
 
-(def columns-map (reduce #(assoc %1 (:id %2) %2) {} columns))
-
-(defn find-column
-  "Finds the column with the given column-id"
-  [column-id]
-  (get columns-map column-id))
+(def columns [{ korma-table-model/id-key avatar-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key ImageIcon }
+              { korma-table-model/id-key alias-column-id
+                korma-table-model/text-key (term/alias)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key message-column-id
+                korma-table-model/text-key (term/message)
+                korma-table-model/class-key String }
+              { korma-table-model/id-key accept-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }
+              { korma-table-model/id-key reject-column-id
+                korma-table-model/text-key ""
+                korma-table-model/class-key Integer
+                korma-table-model/edtiable?-key true }])
 
 (deftype MyRequestsTableModel []
-  korma-table-model/DbModel
-  (column-id [this column-index]
-    (:id (nth columns column-index)))
 
-  (column-name [this column-id]
-    (:text (find-column column-id)))
-  
-  (column-class [this column-id]
-    (:class (find-column column-id)))
-  
-  (column-count [this]
-    (count columns))
-  
+  korma-table-model/ColumnValueList
   (row-count [this]
     (friend-request-model/count-pending-received-requests))
   
   (value-at [this row-index column-id]
     (condp = column-id
-      :avatar
+      avatar-column-id
         (ImageIcon.
           (ClassLoader/getSystemResource "profile.png"))
-      :alias
+      alias-column-id
         (profile-model/alias
           (:profile-id
             (friend-request-model/pending-received-request row-index)))
-      :message
+      message-column-id
         (message-model/body
           (share-model/message-id-key
             (share-model/find-friend-request-share
               (friend-request-model/pending-received-request row-index)
               (base-model/h2-keyword share-model/message-id-key))))
-      :accept
-        (:id (friend-request-model/pending-received-request row-index))
-      :reject
-        (:id (friend-request-model/pending-received-request row-index))
+      accept-column-id
+        (korma-table-model/id-key
+          (friend-request-model/pending-received-request row-index))
+      reject-column-id
+        (korma-table-model/id-key (friend-request-model/pending-received-request row-index))
       nil))
-  
-  (cell-editable? [this row-index column-id]
-    (contains? #{ :accept :reject } column-id ))
   
   (update-value [this _ _ _]))
 
 (defn create
   "Creates a new table model for use in the my requests table."
   []
-  (korma-table-model/create (new MyRequestsTableModel)))
+  (korma-table-model/create-from-columns columns (new MyRequestsTableModel)))
 
 (defn accept-button-cell-renderer
   "A table cell renderer function for the accept button."

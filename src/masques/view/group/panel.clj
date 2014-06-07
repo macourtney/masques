@@ -5,6 +5,8 @@
             [masques.model.grouping :as grouping-model]
             [masques.view.group.all-groups-combobox-model
               :as all-groups-combobox-model]
+            [masques.view.group.group-member-table-model
+              :as group-member-table-model]
             [masques.view.utils :as view-utils]
             [masques.view.utils.korma-combobox-model :as korma-combobox-model]
             [masques.view.utils.list-renderer :as list-renderer]
@@ -16,6 +18,7 @@
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
 
 (def group-combobox-id :group-combobox)
+(def group-member-table-id :group-member-table)
 
 (def group-manager-panel-id :group-manager-panel)
 (def group-edit-panel-id :group-edit-panel)
@@ -64,11 +67,7 @@
                          :id group-combobox-id
                          :preferred-size [250 :by 25]
                          :model (all-groups-combobox-model/create))]
-    (seesaw-core/selection! group-combobox
-                            (select-keys
-                              (grouping-model/find-grouping
-                                (grouping-model/find-everyone-id))
-                              [:id grouping-model/display-key]))
+    
     (list-renderer/set-renderer
       group-combobox 
       (list-renderer/create-record-text-cell-renderer
@@ -125,7 +124,9 @@
 
 (defn create-members-table []
   (seesaw-core/scrollable
-    (seesaw-core/table :model [:columns [:name :added-at :view :remove]])))
+    (seesaw-core/table
+      :id group-member-table-id
+      :model [:columns [:name :added-at :view :remove]])))
 
 (defn create-members []
   (seesaw-core/border-panel
@@ -161,6 +162,11 @@
   "Finds the group combobox in the given group panel."
   [panel]
   (view-utils/find-component panel group-combobox-id))
+
+(defn find-group-member-table
+  "Finds the group member table in the given group panel."
+  [panel]
+  (view-utils/find-component panel group-member-table-id))
 
 (defn destroy
   "Should be called right before the panel is destroyed."
@@ -353,6 +359,28 @@ view."
     (find-edit-group-button view) edit-group-listener
     edit-group-button-listener-key))
 
+(defn group-combobox-action-listener
+  "Updates the group member table to show the members of the selected group."
+  [event]
+  (let [group-panel (find-group-panel (view-utils/top-level-ancestor event))
+        group-combobox (find-group-combobox group-panel)
+        selected-group (seesaw-core/selection group-combobox)]
+    (seesaw-core/config! (find-group-member-table group-panel)
+      :model (group-member-table-model/create selected-group))))
+
+(defn attach-group-combobox-action-listener
+  "Attaches the group combobox action listener to the group combobox."
+  [view]
+  (let [group-combobox (find-group-combobox view)]
+    (seesaw-core/listen group-combobox
+      :action-performed group-combobox-action-listener)
+    (seesaw-core/selection!
+      group-combobox
+      (select-keys
+        (grouping-model/find-grouping
+          (grouping-model/find-everyone-id))
+        [model-base/clojure-id grouping-model/display-key]))))
+
 (defn initialize
   "Called when the panel is created to initialize the view by attaching
 listeners and loading initial data."
@@ -361,4 +389,5 @@ listeners and loading initial data."
   (attach-cancel-edit-listener view)
   (attach-save-edit-listener view)
   (attach-delete-group-listener view)
-  (attach-edit-group-listener view))
+  (attach-edit-group-listener view)
+  (attach-group-combobox-action-listener view))

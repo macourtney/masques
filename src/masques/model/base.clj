@@ -13,6 +13,9 @@
 ; The id key as a valid h2 keyword.
 (def id-key :ID)
 
+; The id key as a valid clojure keyword.
+(def clojure-id :id)
+
 ; Database connections. db is for non-korma stuff.
 (def db (deref masques-core/db))
 (korma-db/defdb mydb (drift-db/db-map))
@@ -156,7 +159,7 @@
     (reduce h2-field-name clean-data (keys clean-data))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Listener helpers
+; interceptor helpers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Called after a record has been inserted into the database.
@@ -180,7 +183,8 @@ entity"
   [interceptors-map entity interceptor]
   (if (and entity interceptor)
     (assoc interceptors-map entity
-           (conj (interceptor-set-for-entity interceptors-map entity) interceptor))
+           (conj (interceptor-set-for-entity interceptors-map entity)
+                 interceptor))
     interceptors-map))
 
 (defn remove-interceptor-from-interceptors-map
@@ -313,7 +317,7 @@ given entity."
 this function simply returns the record."
   [record]
   (cond
-    (map? record) (or (:ID record) (:id record))
+    (map? record) (or (id-key record) (clojure-id record))
     (integer? record) record
     (nil? record) nil
     :else (throw (RuntimeException. (str "Don't know how to get an id from a "

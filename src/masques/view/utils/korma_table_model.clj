@@ -1,6 +1,12 @@
 (ns masques.view.utils.korma-table-model
   (:import [javax.swing.table TableModel]))
 
+(def id-key :id)
+(def text-key :text)
+(def class-key :class)
+(def edtiable?-key :edtiable?)
+
+
 (defprotocol DbModel
   "A model for displaying data to a table from a korma db."
   (column-id [this column-index]
@@ -16,17 +22,49 @@ table.")
   (column-count [this]
     "Returns the total number of columns.")
   
-  (row-count [this] "Returns the number of rows for this model.")
+  (cell-editable? [this row-index column-id]
+    "Returns true if the cell at the given row index and column is editable."))
+
+(defprotocol ColumnValueList
+  "An interface for getting the rows for a table."
+  (row-count [this]
+    "Returns the number of values for this list.")
   
   (value-at [this row-index column-id]
-    "Returns the value at the given row index and column")
-  
-  (cell-editable? [this row-index column-id]
-    "Returns true if the cell at the given row index and column is editable.")
+     "Returns the value at the given index and column id.")
   
   (update-value [this row-index column-id value]
     "Updates the value at the given row index and column. Only called if
 cell-editable? is true for the given row index and column."))
+
+(deftype ColumnListDbModel
+  [columns columns-map column-value-list]
+
+  DbModel
+  (column-id [this column-index]
+    (id-key (nth columns column-index)))
+
+  (column-name [this column-id]
+    (text-key (get columns-map column-id)))
+  
+  (column-class [this column-id]
+    (class-key (get columns-map column-id)))
+  
+  (column-count [this]
+    (count columns))
+  
+  (cell-editable? [this row-index column-id]
+    (or (edtiable?-key (get columns-map column-id)) false))
+  
+  ColumnValueList
+  (row-count [this]
+    (row-count column-value-list))
+  
+  (value-at [this row-index column-id]
+    (value-at column-value-list row-index column-id))
+
+  (update-value [this row-index column-id value]
+    (update-value column-value-list row-index column-id value)))
 
 (deftype KormaTableModel [table-model-listener-set db-model]
   TableModel
@@ -57,5 +95,20 @@ cell-editable? is true for the given row index and column."))
   (setValueAt [this value row-index column-index]
     (update-value db-model row-index (column-id db-model column-index) value)))
 
-(defn create [db-model]
+(defn create
+  "Creates a new korma table model with the given db model."
+  [db-model]
   (KormaTableModel. (atom #{}) db-model))
+
+(defn create-column-map
+  "Creates a map from the column id to the column description map from the list
+of column descriptions."
+  [columns]
+  (reduce #(assoc %1 (id-key %2) %2) {} columns))
+
+(defn create-from-columns
+  "Creates a new korma table model with the given columns and column value
+list."
+  [columns column-value-list]
+  (create (ColumnListDbModel.
+            columns (create-column-map columns) column-value-list)))
