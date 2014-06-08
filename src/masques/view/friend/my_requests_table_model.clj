@@ -8,8 +8,7 @@
             [masques.view.utils.korma-table-model :as korma-table-model]
             [seesaw.core :as seesaw-core]
             [masques.view.utils :as utils])
-  (:import [javax.swing.table TableModel]
-           [javax.swing ImageIcon]))
+  (:import [javax.swing ImageIcon]))
 
 (def request-id-key :request-id)
 
