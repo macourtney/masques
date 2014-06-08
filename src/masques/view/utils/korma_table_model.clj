@@ -5,7 +5,8 @@
 (def text-key :text)
 (def class-key :class)
 (def edtiable?-key :edtiable?)
-
+(def value-at-key :value-at)
+(def update-value-key :update-value)
 
 (defprotocol DbModel
   "A model for displaying data to a table from a korma db."
@@ -112,3 +113,20 @@ list."
   [columns column-value-list]
   (create (ColumnListDbModel.
             columns (create-column-map columns) column-value-list)))
+
+(defn find-value-at-fn
+  "Returns the value at function from the column map for the column with the
+given id. If the column does not have a value at fn, then this function returns
+a function which takes any number of arguments but only returns an empty
+string."
+  [columns-map column-id]
+  (or (value-at-key (get columns-map column-id))
+      (fn [& args] "")))
+
+(defn find-update-value-fn
+  "Returns the update value function from the column map for the column with the
+given id. If the column does not have a update value fn, then this function returns
+a function which takes any number of arguments but does nothing."
+  [columns-map column-id]
+  (or (update-value-key (get columns-map column-id))
+      (fn [& args])))

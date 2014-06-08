@@ -16,6 +16,12 @@
 ; The id key as a valid clojure keyword.
 (def clojure-id :id)
 
+; The created at key as a valid h2 keyword.
+(def created-at :CREATED_AT)
+
+; The created at key as a valid clojure keyword.
+(def clojure-created-at :created-at)
+
 ; Database connections. db is for non-korma stuff.
 (def db (deref masques-core/db))
 (korma-db/defdb mydb (drift-db/db-map))
@@ -68,16 +74,26 @@
 (defn clean-date-time-for-h2 [record field-name field-data]
   (conj record { field-name (clojure-to-h2-date-time field-data) }))
 
-(defn created-at-is-set [record]
-  (or (:created-at record) (:CREATED_AT record)))
+(defn find-created-at
+  "Returns the created at value from the given record."
+  [record]
+  (or (clojure-created-at record) (created-at record)))
 
-(defn unset-created-at [record]
-  (if (:created-at record) (dissoc record :created-at) (dissoc record :CREATED_AT)))
+(defn unset-created-at
+  "Returns a new record with the created at key removed."
+  [record]
+  (if (clojure-created-at record)
+    (dissoc record clojure-created-at)
+    (dissoc record created-at)))
 
-(defn set-created-at [record]
-  (if (created-at-is-set record)
+(defn set-created-at
+  "Sets the created at value for the given record to the current date and time.
+If the record contains a created at key, then it is assumed the created at key
+is already set in the database and it is removed from the record."
+  [record]
+  (if (find-created-at record)
     (unset-created-at record)
-    (conj record {:CREATED_AT (str (clj-time/now))})))
+    (assoc record created-at (str (clj-time/now)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; UUID helpers.
@@ -140,7 +156,7 @@
   "Prepares clojure data, from the application, for the database."
   (let [field-data (get field-name record)]
     (cond
-      (instance? org.joda.time.DateTime (:created-at record))
+      (instance? org.joda.time.DateTime (clojure-created-at record))
         (clean-date-time-for-h2 record field-name field-data)
       :else record)))
 
@@ -380,9 +396,10 @@ given entity."
 an id, then this function performs an update. Otherwise, this function performs
 an insert."
   [entity record]
-  (if (id record)
-    (update-record entity record)
-    (insert-record entity record)))
+  (when (and entity record)
+    (if (id record)
+      (update-record entity record)
+      (insert-record entity record))))
 
 (defn create-delete-action
   "Creates an delete action which deletes a record in the database for the

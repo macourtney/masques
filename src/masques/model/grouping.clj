@@ -86,11 +86,7 @@ used for both the display and name of the newly created group."
 (defn count-groups
   "Counts all of the groups."
   []
-  (:count
-    (first
-      (korma/select
-        grouping
-        (korma/aggregate (count :*) :count)))))
+  (count-records grouping))
 
 (defn find-combobox-group
   "Returns a groups with just the id and name at the given index."
