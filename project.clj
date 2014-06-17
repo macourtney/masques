@@ -1,10 +1,9 @@
 (defproject masques "1.0.0-SNAPSHOT"
   :description "Masques is a distributed social network."
   :dependencies [[clojure-tools "1.1.3-SNAPSHOT"]
-                 [clj-crypto "1.0.1-SNAPSHOT"
-                   :exclusions [bouncycastle/bcprov-jdk16]]
-                 [clj-i2p "1.0.0-SNAPSHOT"]
-                 [clj-internationalization "1.0.1-SNAPSHOT"
+                 [clj-crypto "1.0.1"]
+                 [clj-i2p "1.0.0"]
+                 [clj-internationalization "1.0.1"
                    :exclusions [org.clojure/clojure]]
                  [clj-record "1.1.0"
                    :exclusions [org.clojure/clojure]]
