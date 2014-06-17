@@ -73,12 +73,16 @@ profile, then it is used as the id of the profile to get."
   "Returns the current user cleaned for sending across the network."
   []
   (select-keys (current-user)
-    [:alias :identity :identity-algorithm :destination]))
+    [alias-key identity-key identity-algorithm-key destination-key]))
   
 (defn set-current-user
   "Sets the currently logged in user."
   [profile]
-  (reset! saved-current-user profile))
+  (if (map? profile)
+    (reset! saved-current-user profile)
+    (throw (RuntimeException.
+             (str "Profile sent to set-current-user must be a profile map. Profile: "
+                  profile)))))
 
 (defn current-user?
   "Returns true if the given profile is the current user."
@@ -167,12 +171,12 @@ profile record."
 then the current logged in profile is used."
   ([] (create-masque-map (current-user)))
   ([profile]
-    (let [destination-map (if (clj-i2p/base-64-destination)
-                            { destination-key (clj-i2p/base-64-destination) }
-                            {})]
-      (merge
-        (select-keys profile [alias-key identity-key identity-algorithm-key])
-        destination-map))))
+    (let [clean-profile (select-keys
+                          (if (integer? profile) (find-profile profile) profile)
+                          [alias-key identity-key identity-algorithm-key])]
+      (if-let [base-64-destination (clj-i2p/base-64-destination)]
+        (assoc clean-profile destination-key base-64-destination)
+        clean-profile))))
            
 (defn create-masque-file
   "Given a file and a profile, this function saves the profile as a masques id
@@ -287,7 +291,7 @@ already registered."
   (if-let [logged-in-profile (find-profile current-user-id)]
     (set-current-user logged-in-profile)
     (let [user-name (db-config/current-username)]
-      (if-let [new-profile (create-user user-name)]
-        (set-current-user new-profile)
+      (if-let [new-profile-id (create-user user-name)]
+        (set-current-user (find-profile new-profile-id))
         (throw
           (RuntimeException. (str "Could not create user: " user-name)))))))
