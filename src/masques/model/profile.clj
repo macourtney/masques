@@ -78,7 +78,7 @@ profile, then it is used as the id of the profile to get."
 (defn set-current-user
   "Sets the currently logged in user."
   [profile]
-  (if (map? profile)
+  (if (or (map? profile) (nil? profile))
     (reset! saved-current-user profile)
     (throw (RuntimeException.
              (str "Profile sent to set-current-user must be a profile map. Profile: "
