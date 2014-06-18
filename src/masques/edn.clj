@@ -14,8 +14,9 @@
 (defn write
   "Writes the given forms to the given out. Out must be something which can be turned into a java.io.Writer."
   [out & forms]
-  (binding [*out* (java-io/writer out)]
-    (apply write-out forms)))
+  (with-open [out-writer (java-io/writer out)]
+    (binding [*out* out-writer]
+      (apply write-out forms))))
 
 (defn write-string
   "Writes the given forms as a string and returns the results."
@@ -28,7 +29,8 @@
   "Reads in in using edn and returns the results."
   ([in] (read in {}))
   ([in options]
-    (edn/read options (PushbackReader. (java-io/reader in)))))
+    (with-open [in-reader (java-io/reader in)]
+      (edn/read options (PushbackReader. in-reader)))))
 
 (defn read-string
   "Reads the string in using edn and returns the result."
