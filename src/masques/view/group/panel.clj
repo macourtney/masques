@@ -48,6 +48,17 @@
 (def create-group :create-group)
 (def edit-group :edit-group)
 
+(def add-member-button-id :add-member-button-id)
+(def members-card-panel-id :members-card-panel-id)
+(def cancel-add-member-button-id :cancel-add-member-button)
+(def add-member-table-id :add-member-table-id)
+
+(def main-panel-key :main-panel-key)
+(def add-member-panel-key :add-member-panel-key)
+(def add-member-button-listener-key :add-member-button-listener-key)
+(def cancel-add-member-button-listener-key 
+  :cancel-add-member-button-listener-key)
+
 (defn create-under-construction-button [id text]
   (view-utils/create-under-construction-link-button
     :id id
@@ -117,8 +128,7 @@
 (defn create-members-header []
   (seesaw-core/border-panel
     :west (seesaw-core/border-panel
-            :south (create-under-construction-button
-                     :add-member-button (term/add-member)))
+            :south (create-button add-member-button-id (term/add-member)))
     :east (create-under-construction-button
             :filter-members-button (term/filter))))
 
@@ -128,13 +138,41 @@
       :id group-member-table-id
       :model [:columns [:name :added-at :view :remove]])))
 
-(defn create-members []
+(defn create-members-table-panel []
   (seesaw-core/border-panel
     :north (create-members-header)
     :center (create-members-table)
 
     :vgap 5
     :border 11))
+
+(defn create-add-member-buttons []
+  (seesaw-core/border-panel
+    :east (seesaw-core/horizontal-panel
+            :items [(create-under-construction-button
+                      :add-member-button (term/add))
+                    (create-button
+                      cancel-add-member-button-id (term/cancel))])))
+
+(defn create-add-member []
+  (seesaw-core/border-panel
+
+    :center (seesaw-core/scrollable
+              (seesaw-core/table
+                :id add-member-table-id
+                :model [:columns [:alias]]))
+    :south (create-add-member-buttons)
+
+    :vgap 5
+    :border 11))
+
+(defn create-members []
+  (let [members-panel (seesaw-core/card-panel
+                        :id members-card-panel-id
+                        :items [[(create-members-table-panel) main-panel-key]
+                                [(create-add-member) add-member-panel-key]])]
+    (seesaw-core/show-card! members-panel main-panel-key)
+    members-panel))
 
 (defn create-shares []
   (seesaw-core/flow-panel :items ["Shares Tab"]))
@@ -228,8 +266,35 @@
 (defn show-group-filter-panel
   "Shows the group filter panel."
   [view]
-  (seesaw-core/show-card!
-    (find-group-manager-panel view) group-filter-card-id)
+  (seesaw-core/show-card! (find-group-manager-panel view) group-filter-card-id)
+  view)
+
+(defn find-add-member-button
+  "Finds the add member button in the given view."
+  [view]
+  (view-utils/find-component view add-member-button-id))
+
+
+(defn find-cancel-add-member-button
+  "Finds the cancel add member button in the given view."
+  [view]
+  (view-utils/find-component view cancel-add-member-button-id))
+
+(defn find-members-panel
+  "Finds the group members panel."
+  [view]
+  (view-utils/find-component view members-card-panel-id))
+
+(defn show-main-members-panel
+  "Shows the group members panel"
+  [view]
+  (seesaw-core/show-card! (find-members-panel view) main-panel-key)
+  view)
+
+(defn show-add-member-panel
+  "Shows the add member panel"
+  [view]
+  (seesaw-core/show-card! (find-members-panel view) add-member-panel-key)
   view)
 
 (defn create-group-listener
@@ -381,6 +446,32 @@ view."
           (grouping-model/find-everyone-id))
         [model-base/clojure-id grouping-model/display-key]))))
 
+(defn add-member-listener
+  "Shows the add member panel."
+  [event]
+  (show-add-member-panel (view-utils/top-level-ancestor event)))
+
+(defn attach-add-member-listener
+  "Attaches the add member listener to the add member button in the given
+view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-add-member-button view) add-member-listener
+    add-member-button-listener-key))
+
+(defn cancel-add-member-listener
+  "Shows the add member panel."
+  [event]
+  (show-main-members-panel (view-utils/top-level-ancestor event)))
+
+(defn attach-cancel-add-member-listener
+  "Attaches the cancel add member listener to the cancel add member button in
+the given view."
+  [view]
+  (view-utils/add-action-listener-to-button
+    (find-cancel-add-member-button view) cancel-add-member-listener
+    cancel-add-member-button-listener-key))
+
 (defn initialize
   "Called when the panel is created to initialize the view by attaching
 listeners and loading initial data."
@@ -390,4 +481,6 @@ listeners and loading initial data."
   (attach-save-edit-listener view)
   (attach-delete-group-listener view)
   (attach-edit-group-listener view)
-  (attach-group-combobox-action-listener view))
+  (attach-group-combobox-action-listener view)
+  (attach-add-member-listener view)
+  (attach-cancel-add-member-listener view))
