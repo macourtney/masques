@@ -333,3 +333,15 @@ friend request."
           unfriend-status nil
           (throw (RuntimeException.
                    (str "Unknown status: " request-status))))))))
+
+(defn find-all-friends-for-table
+  "Finds all of the friends and returns the map with the friend request id,
+profile id and profile alias."
+  []
+  (korma/select
+    friend-request
+    (korma/fields id-key (h2-keyword profile-id-key)
+                  (h2-keyword (str "profile." (name profile/alias-key))))
+    (korma/join profile
+                (= (h2-keyword "profile.id") (h2-keyword profile-id-key)))
+    (korma/where { (h2-keyword request-status-key) approved-status })))

@@ -3,6 +3,7 @@
             [clojure.tools.logging :as logging]
             [masques.model.base :as model-base]
             [masques.model.grouping :as grouping-model]
+            [masques.view.friend.selector :as friend-selector]
             [masques.view.group.all-groups-combobox-model
               :as all-groups-combobox-model]
             [masques.view.group.group-member-table-model
@@ -48,16 +49,14 @@
 (def create-group :create-group)
 (def edit-group :edit-group)
 
-(def add-member-button-id :add-member-button-id)
 (def members-card-panel-id :members-card-panel-id)
-(def cancel-add-member-button-id :cancel-add-member-button)
+
 (def add-member-table-id :add-member-table-id)
+(def add-member-button-id :add-member-button-id)
+(def add-member-button-listener-key :add-member-button-listener-key)
 
 (def main-panel-key :main-panel-key)
 (def add-member-panel-key :add-member-panel-key)
-(def add-member-button-listener-key :add-member-button-listener-key)
-(def cancel-add-member-button-listener-key 
-  :cancel-add-member-button-listener-key)
 
 (defn create-under-construction-button [id text]
   (view-utils/create-under-construction-link-button
@@ -146,31 +145,12 @@
     :vgap 5
     :border 11))
 
-(defn create-add-member-buttons []
-  (seesaw-core/border-panel
-    :east (seesaw-core/horizontal-panel
-            :items [(create-under-construction-button
-                      :add-member-button (term/add))
-                    (create-button
-                      cancel-add-member-button-id (term/cancel))])))
-
-(defn create-add-member []
-  (seesaw-core/border-panel
-
-    :center (seesaw-core/scrollable
-              (seesaw-core/table
-                :id add-member-table-id
-                :model [:columns [:alias]]))
-    :south (create-add-member-buttons)
-
-    :vgap 5
-    :border 11))
-
 (defn create-members []
-  (let [members-panel (seesaw-core/card-panel
-                        :id members-card-panel-id
-                        :items [[(create-members-table-panel) main-panel-key]
-                                [(create-add-member) add-member-panel-key]])]
+  (let [members-panel
+         (seesaw-core/card-panel
+           :id members-card-panel-id
+           :items [[(create-members-table-panel) main-panel-key]
+                   [(friend-selector/create (term/add)) add-member-panel-key]])]
     (seesaw-core/show-card! members-panel main-panel-key)
     members-panel))
 
@@ -274,12 +254,6 @@
   [view]
   (view-utils/find-component view add-member-button-id))
 
-
-(defn find-cancel-add-member-button
-  "Finds the cancel add member button in the given view."
-  [view]
-  (view-utils/find-component view cancel-add-member-button-id))
-
 (defn find-members-panel
   "Finds the group members panel."
   [view]
@@ -294,8 +268,10 @@
 (defn show-add-member-panel
   "Shows the add member panel"
   [view]
-  (seesaw-core/show-card! (find-members-panel view) add-member-panel-key)
-  view)
+  (let [members-panel (find-members-panel view)]
+    (friend-selector/load-data members-panel)
+    (seesaw-core/show-card! members-panel add-member-panel-key)
+  view))
 
 (defn create-group-listener
   "Shows the create group panel."
@@ -459,18 +435,13 @@ view."
     (find-add-member-button view) add-member-listener
     add-member-button-listener-key))
 
-(defn cancel-add-member-listener
-  "Shows the add member panel."
-  [event]
-  (show-main-members-panel (view-utils/top-level-ancestor event)))
-
-(defn attach-cancel-add-member-listener
-  "Attaches the cancel add member listener to the cancel add member button in
-the given view."
-  [view]
-  (view-utils/add-action-listener-to-button
-    (find-cancel-add-member-button view) cancel-add-member-listener
-    cancel-add-member-button-listener-key))
+(deftype MemberSelector [view]
+  friend-selector/FriendSelector
+  (cancel-selection [this]
+    (show-main-members-panel view))
+  
+  (submit-selection [this friend]
+    ))
 
 (defn initialize
   "Called when the panel is created to initialize the view by attaching
@@ -483,4 +454,5 @@ listeners and loading initial data."
   (attach-edit-group-listener view)
   (attach-group-combobox-action-listener view)
   (attach-add-member-listener view)
-  (attach-cancel-add-member-listener view))
+  (friend-selector/initialize
+    (friend-selector/find-panel view) (MemberSelector. view)))
