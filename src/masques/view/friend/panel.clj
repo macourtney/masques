@@ -80,15 +80,6 @@
     
     :vgap 5))
 
-(defn set-button-table-cell-renderer
-  "Sets the table cell renderer for the given column index on the given table.
-You can also set the column width. If no width is given, then it is set to 80."
-  ([table column-index renderer]
-    (set-button-table-cell-renderer table column-index renderer 80))
-  ([table column-index renderer width]
-    (table-renderer/set-renderer table column-index renderer)
-    (table-renderer/set-column-width table column-index width)))
-
 (defn create-unfriend-request-listener
   "Creates a listener for the unfriend button in the sent requests table."
   [table]
@@ -102,7 +93,6 @@ You can also set the column width. If no width is given, then it is set to 80."
                (profile-model/alias
                  (friend-request-model/find-to-profile request-id)))
              :choices [(term/unfriend)])]
-      (logging/info "choice:" choice)
       (when (= choice (term/unfriend))
         (future
           (unfriend-call/send-unfriend request-id))))))
@@ -111,13 +101,13 @@ You can also set the column width. If no width is given, then it is set to 80."
   (let [all-friends-table (seesaw-core/table
                             :model (all-friends-table-model/create)
                             :auto-resize :all-columns)]
-    (set-button-table-cell-renderer all-friends-table 0
+    (table-renderer/set-button-table-cell-renderer all-friends-table 0
       table-renderer/image-cell-renderer 36)
-    (set-button-table-cell-renderer all-friends-table 4
+    (table-renderer/set-button-table-cell-renderer all-friends-table 4
       all-friends-table-model/profile-button-cell-renderer)
-    (set-button-table-cell-renderer all-friends-table 5
+    (table-renderer/set-button-table-cell-renderer all-friends-table 5
       all-friends-table-model/shares-button-cell-renderer)
-    (set-button-table-cell-renderer all-friends-table 6
+    (table-renderer/set-button-table-cell-renderer all-friends-table 6
       all-friends-table-model/unfriend-button-cell-renderer)
     (button-table-cell-editor/set-cell-editor 
       all-friends-table 6 (term/unfriend)
@@ -161,11 +151,11 @@ You can also set the column width. If no width is given, then it is set to 80."
   (let [my-requests-table (seesaw-core/table
                             :model (my-requests-table-model/create)
                             :auto-resize :all-columns)]
-    (set-button-table-cell-renderer my-requests-table 0
+    (table-renderer/set-button-table-cell-renderer my-requests-table 0
       table-renderer/image-cell-renderer 36)
-    (set-button-table-cell-renderer my-requests-table 3
+    (table-renderer/set-button-table-cell-renderer my-requests-table 3
       my-requests-table-model/accept-button-cell-renderer)
-    (set-button-table-cell-renderer my-requests-table 4
+    (table-renderer/set-button-table-cell-renderer my-requests-table 4
       my-requests-table-model/reject-button-cell-renderer)
     (button-table-cell-editor/set-cell-editor 
       my-requests-table 3 (term/accept)
@@ -186,9 +176,9 @@ You can also set the column width. If no width is given, then it is set to 80."
   (let [sent-requests-table (seesaw-core/table
                               :model (sent-friend-request-table-model/create)
                               :auto-resize :all-columns)]
-    (set-button-table-cell-renderer sent-requests-table 0
+    (table-renderer/set-button-table-cell-renderer sent-requests-table 0
       table-renderer/image-cell-renderer 36)
-    (set-button-table-cell-renderer sent-requests-table 3
+    (table-renderer/set-button-table-cell-renderer sent-requests-table 3
       sent-friend-request-table-model/unfriend-button-cell-renderer)
     (button-table-cell-editor/set-cell-editor 
       sent-requests-table 3 (term/unfriend)

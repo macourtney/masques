@@ -2,7 +2,9 @@
   (:require [clj-internationalization.term :as term]
             [masques.model.base :as model-base]
             [masques.model.grouping-profile :as grouping-profile-model]
-            [masques.model.profile :as profile-model])
+            [masques.model.profile :as profile-model]
+            [masques.view.utils :as utils]
+            [masques.view.utils.button-table :as button-table])
   (:use [masques.view.utils.korma-table-model :exclude [create]]))
 
 (def date-added-column-id :date-added)
@@ -35,16 +37,10 @@ given group at the given row index."
                       (model-base/find-created-at
                         (grouping-profile-model/find-table-grouping-profile
                           group-id row-index)))) }
-              { id-key view-column-id
-                text-key (term/view)
-                class-key Integer
-                edtiable?-key true
-                value-at-key id-value-at }
-              { id-key remove-column-id
-                text-key (term/remove)
-                class-key Integer
-                edtiable?-key true
-                value-at-key id-value-at }])
+              (button-table/create-table-button-column-map
+                view-column-id id-value-at)
+              (button-table/create-table-button-column-map
+                remove-column-id id-value-at)])
 
 (deftype GroupMemberTableModel [group-id column-map]
 
@@ -68,3 +64,17 @@ of the group with the given id."
     columns
     (GroupMemberTableModel.
       (model-base/id group-id) (create-column-map columns))))
+
+(defn view-button-cell-renderer
+  "A table cell renderer function for the view button."
+  [table value isSelected hasFocus row column]
+  (let [button (utils/create-under-construction-link-button :text (term/view))]
+    (utils/save-component-property button id-key value)
+    button))
+
+(defn remove-button-cell-renderer
+  "A table cell renderer function for the view button."
+  [table value isSelected hasFocus row column]
+  (let [button (utils/create-link-button :text (term/remove))]
+    (utils/save-component-property button id-key value)
+    button))

@@ -2,15 +2,21 @@
   (:require [clj-internationalization.term :as term]
             [clojure.tools.logging :as logging]
             [masques.model.base :as model-base]
+            [masques.model.friend-request :as friend-request]
             [masques.model.grouping :as grouping-model]
+            [masques.model.grouping-profile :as grouping-profile]
             [masques.view.friend.selector :as friend-selector]
             [masques.view.group.all-groups-combobox-model
               :as all-groups-combobox-model]
             [masques.view.group.group-member-table-model
               :as group-member-table-model]
             [masques.view.utils :as view-utils]
+            [masques.view.utils.button-table :as button-table]
+            [masques.view.utils.button-table-cell-editor
+              :as button-table-cell-editor]
             [masques.view.utils.korma-combobox-model :as korma-combobox-model]
             [masques.view.utils.list-renderer :as list-renderer]
+            [masques.view.utils.table-renderer :as table-renderer]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core]))
 
@@ -132,10 +138,11 @@
             :filter-members-button (term/filter))))
 
 (defn create-members-table []
-  (seesaw-core/scrollable
-    (seesaw-core/table
-      :id group-member-table-id
-      :model [:columns [:name :added-at :view :remove]])))
+  (let [members-table (seesaw-core/table
+                        :id group-member-table-id
+                        :model [:columns [:name :added-at :view :remove]])]
+    
+    (seesaw-core/scrollable members-table)))
 
 (defn create-members-table-panel []
   (seesaw-core/border-panel
@@ -400,14 +407,31 @@ view."
     (find-edit-group-button view) edit-group-listener
     edit-group-button-listener-key))
 
+(defn create-remove-listener
+  "Creates a listener for the remove button in the group member table."
+  []
+  (fn [event]
+    (let [button (seesaw-core/to-widget event)
+          id-value (button-table-cell-editor/value-from button)]
+      (future
+        (grouping-profile/delete-grouping-profile
+          (grouping-profile/find-grouping-profile id-value))))))
+
 (defn group-combobox-action-listener
   "Updates the group member table to show the members of the selected group."
   [event]
   (let [group-panel (find-group-panel (view-utils/top-level-ancestor event))
         group-combobox (find-group-combobox group-panel)
-        selected-group (seesaw-core/selection group-combobox)]
-    (seesaw-core/config! (find-group-member-table group-panel)
-      :model (group-member-table-model/create selected-group))))
+        selected-group (seesaw-core/selection group-combobox)
+        group-member-table (find-group-member-table group-panel)]
+    (seesaw-core/config! group-member-table
+      :model (group-member-table-model/create selected-group))
+    (table-renderer/set-button-table-cell-renderer
+      group-member-table 2 group-member-table-model/view-button-cell-renderer)
+    (button-table/create-table-button
+      group-member-table 3
+      (view-utils/create-link-button :text (term/remove) :background :white)
+      (create-remove-listener))))
 
 (defn attach-group-combobox-action-listener
   "Attaches the group combobox action listener to the group combobox."
@@ -440,8 +464,14 @@ view."
   (cancel-selection [this]
     (show-main-members-panel view))
   
-  (submit-selection [this friend]
-    ))
+  (submit-selection [this friends]
+    (when friends
+      (doseq [friend friends]
+        (let [to-profile (friend-request/find-to-profile friend)]
+          (when-let [group (selected-group view)]
+            (grouping-profile/save
+              (grouping-profile/create-grouping-profile group to-profile))))))
+    (friend-selector/cancel-selection this)))
 
 (defn initialize
   "Called when the panel is created to initialize the view by attaching

@@ -30,4 +30,16 @@ table-renderer-fn."
 (defn set-column-width
   "Sets the width of the column at the given index to the given width."
   [table column-index width]
-  (.setMaxWidth (.getColumn (.getColumnModel table) column-index) width))
+  (let [column (.getColumn (.getColumnModel table) column-index)]
+    (.setMaxWidth column width)
+    (.setMinWidth column width)
+    (.setWidth column width)))
+
+(defn set-button-table-cell-renderer
+  "Sets the table cell renderer for the given column index on the given table.
+You can also set the column width. If no width is given, then it is set to 80."
+  ([table column-index renderer]
+    (set-button-table-cell-renderer table column-index renderer 80))
+  ([table column-index renderer width]
+    (set-renderer table column-index renderer)
+    (set-column-width table column-index width)))
