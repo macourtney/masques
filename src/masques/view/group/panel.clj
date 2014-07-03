@@ -49,6 +49,7 @@
 
 (def group-filter-card-id :group-filter-card)
 (def group-editor-card-id :group-editor-card)
+(def group-display-card-id :group-display-card-id)
 
 (def group-editor-id-key :group-editor-id-type)
 (def group-editor-type-key :group-editor-type)
@@ -56,6 +57,7 @@
 (def edit-group :edit-group)
 
 (def members-card-panel-id :members-card-panel-id)
+(def group-display-id :group-display-id)
 
 (def add-member-table-id :add-member-table-id)
 (def add-member-button-id :add-member-button-id)
@@ -118,11 +120,17 @@
             [:fill-h 3]
             (create-button cancel-edit-button-id (term/cancel))]))
 
+(defn create-group-display []
+  (seesaw-core/label
+    :id group-display-id :text (term/groups) :foreground "#380B61"
+    :font { :size 36 }))
+
 (defn create-group-manager []
   (seesaw-core/card-panel
     :id group-manager-panel-id
     :items [[(create-filter) group-filter-card-id]
-            [(create-group-editor) group-editor-card-id]]))
+            [(create-group-editor) group-editor-card-id]
+            [(create-group-display) group-display-card-id]]))
 
 (defn create-header []
   (seesaw-core/border-panel
@@ -238,10 +246,22 @@
   [view]
   (view-utils/find-component view group-editor-text-id))
 
+(defn find-group-display-label
+  "Finds the group display label field."
+  [view]
+  (view-utils/find-component view group-display-id))
+
 (defn selected-group
   "Returns the selected group in the group combobox."
   [view]
   (seesaw-core/selection (find-group-combobox view)))
+
+(defn copy-selected-group-to-display
+  "Copies the selected group to the display label."
+  [view]
+  (seesaw-core/config!
+    (find-group-display-label view)
+    :text (grouping-model/display (selected-group view))))
 
 (defn show-group-editor-panel
   "Shows the group editor panel."
@@ -254,6 +274,13 @@
   "Shows the group filter panel."
   [view]
   (seesaw-core/show-card! (find-group-manager-panel view) group-filter-card-id)
+  view)
+
+(defn show-group-display-panel
+  "Shows the group display panel."
+  [view]
+  (seesaw-core/show-card! (find-group-manager-panel view) group-display-card-id)
+  (copy-selected-group-to-display view)
   view)
 
 (defn find-add-member-button
@@ -449,7 +476,9 @@ view."
 (defn add-member-listener
   "Shows the add member panel."
   [event]
-  (show-add-member-panel (view-utils/top-level-ancestor event)))
+  (let [frame (view-utils/top-level-ancestor event)]
+    (show-group-display-panel frame)
+    (show-add-member-panel frame)))
 
 (defn attach-add-member-listener
   "Attaches the add member listener to the add member button in the given
@@ -462,7 +491,8 @@ view."
 (deftype MemberSelector [view]
   friend-selector/FriendSelector
   (cancel-selection [this]
-    (show-main-members-panel view))
+    (show-main-members-panel view)
+    (show-group-filter-panel view))
   
   (submit-selection [this friends]
     (when friends
