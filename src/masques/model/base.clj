@@ -187,6 +187,26 @@ is already set in the database and it is removed from the record."
 ; Called after a record has been changed in any way in the database.
 (def change-interceptors (atom {}))
 
+(defn insert-interceptors?
+  "Returns true if there are insert interceptors registered."
+  []
+  (not-empty @insert-interceptors))
+
+(defn update-interceptors?
+  "Returns true if there are update interceptors registered."
+  []
+  (not-empty @update-interceptors))
+
+(defn delete-interceptors?
+  "Returns true if there are delete interceptors registered."
+  []
+  (not-empty @delete-interceptors))
+
+(defn change-interceptors?
+  "Returns true if there are change interceptors registered."
+  []
+  (not-empty @change-interceptors))
+
 (defn interceptor-set-for-entity
   "Returns the interceptor set for the given entity in the given interceptors
 atom."
@@ -324,6 +344,85 @@ given entity."
   [entity interceptor]
   (remove-interceptor change-interceptors entity interceptor))
 
+(defprotocol InterceptorProtocol
+  "A protocol for registering interceptors."
+  (interceptor-entity [this]
+    "Returns the entity for this protocol.")
+  
+  (create-insert-interceptor [this]
+    "Creates a new insert interceptor to be added to the interceptor chain. If
+the protocol does not support this type of interceptor then return nil.")
+  
+  (create-update-interceptor [this]
+    "Creates a new update interceptor to be added to the interceptor chain. If
+the protocol does not support this type of interceptor then return nil.")
+  
+  (create-delete-interceptor [this]
+    "Creates a new delete interceptor to be added to the interceptor chain. If
+the protocol does not support this type of interceptor then return nil.")
+  
+  (create-change-interceptor [this]
+    "Creates a new change interceptor to be added to the interceptor chain. If
+the protocol does not support this type of interceptor then return nil."))
+
+(defprotocol InterceptorManagerProtocol
+  "An protocol for adding and inserting a set of interceptors."
+
+  (add-interceptors [this]
+    "Called to add all interceptors in this protocol to the interceptor chains")
+  
+  (remove-interceptors [this]
+    "Called to remove all interceptors in this protocol to the interceptor
+chains"))
+
+(deftype InterceptorManager [interceptor-protocol insert-interceptor
+                             update-interceptor delete-interceptor
+                             change-interceptor]
+  InterceptorManagerProtocol
+  (add-interceptors [this]
+    (when-let [current-entity (interceptor-entity interceptor-protocol)]
+      (when-let [new-insert-interceptor
+                 (create-insert-interceptor interceptor-protocol)]
+        (add-insert-interceptor current-entity new-insert-interceptor)
+        (reset! insert-interceptor new-insert-interceptor))
+      (when-let [new-update-interceptor
+                 (create-update-interceptor interceptor-protocol)]
+        (add-update-interceptor current-entity new-update-interceptor)
+        (reset! update-interceptor new-update-interceptor))
+      (when-let [new-delete-interceptor
+                 (create-delete-interceptor interceptor-protocol)]
+        (add-delete-interceptor current-entity new-delete-interceptor)
+        (reset! delete-interceptor new-delete-interceptor))
+      (when-let [new-change-interceptor
+                 (create-change-interceptor interceptor-protocol)]
+        (add-change-interceptor current-entity new-change-interceptor)
+        (reset! change-interceptor new-change-interceptor))))
+  
+  (remove-interceptors [this]
+    (when-let [current-entity (interceptor-entity interceptor-protocol)]
+      (when @insert-interceptor
+        (remove-insert-interceptor current-entity @insert-interceptor)
+        (reset! insert-interceptor nil))
+      (when @update-interceptor
+        (remove-update-interceptor current-entity @update-interceptor)
+        (reset! update-interceptor nil))
+      (when @delete-interceptor
+        (remove-delete-interceptor current-entity @delete-interceptor)
+        (reset! delete-interceptor nil))
+      (when @change-interceptor
+        (remove-change-interceptor current-entity @change-interceptor)
+        (reset! change-interceptor nil)))))
+
+(defn create-interceptor-manager
+  "Creates a new interceptor manager with the given interceptor protocol and
+adds the interceptors to the interceptor chains."
+  [interceptor-protocol]
+  (let [manager (InterceptorManager.
+                  interceptor-protocol (atom nil) (atom nil) (atom nil)
+                  (atom nil))]
+    (add-interceptors manager)
+    manager))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; SQL/ORM helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -456,7 +555,7 @@ use as a prototype of the records to count."
 ; FRIEND_REQUEST
 (defn prepare-friend-request-for-h2 [record]
   (set-created-at record))
-(defentity friend-request 
+(defentity friend-request
   (prepare prepare-friend-request-for-h2)
   (transform clean-up-for-clojure)
   (table (h2-keyword :friend-request)))

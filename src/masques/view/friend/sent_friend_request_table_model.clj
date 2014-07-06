@@ -31,9 +31,12 @@
                 korma-table-model/class-key Integer
                 korma-table-model/edtiable?-key true }])
 
-(deftype SentFriendRequestTableModel []
+(deftype SentFriendRequestTableModel [table-data-listeners interceptor-manager]
 
-  korma-table-model/ColumnValueList
+  korma-table-model/TableDbModel
+  (db-entity [this]
+    base-model/friend-request)
+
   (row-count [this]
     (friend-request-model/count-pending-sent-requests))
   
@@ -56,11 +59,14 @@
         (korma-table-model/id-key (friend-request-model/pending-sent-request row-index))
       nil))
   
-  (update-value [this _ _ _]))
+  (update-value [this _ _ _])
+  
+  (index-of [this record-or-id]
+    (friend-request-model/pending-sent-request-index record-or-id)))
 
 (defn create []
   (korma-table-model/create-from-columns
-    columns (new SentFriendRequestTableModel)))
+    columns (SentFriendRequestTableModel. (atom nil) (atom nil))))
 
 (defn unfriend-button-cell-renderer
   "A table cell renderer function for the unfriend button."

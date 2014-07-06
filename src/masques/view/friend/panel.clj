@@ -18,6 +18,7 @@
             [masques.view.utils :as view-utils]
             [masques.view.utils.button-table-cell-editor
              :as button-table-cell-editor]
+            [masques.view.utils.korma-table-model :as korma-table-model]
             [masques.view.utils.table-renderer :as table-renderer]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
@@ -34,6 +35,10 @@
 
 (def main-panel-key :main-panel-key)
 (def send-friend-request-panel-key :send-friend-request-panel-key)
+
+(def all-friends-table-id :all-friends-table)
+(def my-requests-table-id :my-requests-table)
+(def sent-requests-table-id :sent-requests-table)
 
 (defn create-search-fields-panel []
   (seesaw-core/vertical-panel
@@ -99,6 +104,7 @@
 
 (defn create-all-friends-table []
   (let [all-friends-table (seesaw-core/table
+                            :id all-friends-table-id
                             :model (all-friends-table-model/create)
                             :auto-resize :all-columns)]
     (table-renderer/set-button-table-cell-renderer all-friends-table 0
@@ -149,6 +155,7 @@
 
 (defn create-my-requests-table []
   (let [my-requests-table (seesaw-core/table
+                            :id my-requests-table-id
                             :model (my-requests-table-model/create)
                             :auto-resize :all-columns)]
     (table-renderer/set-button-table-cell-renderer my-requests-table 0
@@ -174,6 +181,7 @@
 
 (defn create-sent-requests-table []
   (let [sent-requests-table (seesaw-core/table
+                              :id sent-requests-table-id
                               :model (sent-friend-request-table-model/create)
                               :auto-resize :all-columns)]
     (table-renderer/set-button-table-cell-renderer sent-requests-table 0
@@ -237,6 +245,21 @@
   "Finds the send friend request button in the given view."
   [view]
   (view-utils/find-component view send-friend-request-button-id))
+
+(defn find-all-friends-table
+  "Finds the all friends table in the given view."
+  [view]
+  (view-utils/find-component view all-friends-table-id))
+
+(defn find-my-requests-table
+  "Finds the my requests table in the given view."
+  [view]
+  (view-utils/find-component view my-requests-table-id))
+
+(defn find-sent-requests-table
+  "Finds the sent requests table in the given view."
+  [view]
+  (view-utils/find-component view sent-requests-table-id))
 
 (defn add-action-listener-to-export-masque-button
   "Adds the given action listener to the export mid button."
@@ -307,3 +330,25 @@ listeners and loading initial data."
   "Makes sure the main panel is visible."
   [view args]
   (show-main-panel view))
+
+(defn destroy-all-friends-table
+  "Unregisters all of the listeners for the all friends table."
+  [view]
+  (korma-table-model/destroy-model (find-all-friends-table view)))
+
+(defn destroy-my-requests-table
+  "Unregisters all of the listeners for the my requests table."
+  [view]
+  (korma-table-model/destroy-model (find-my-requests-table view)))
+
+(defn destroy-sent-requests-table
+  "Unregisters all of the listeners for the sent requests table."
+  [view]
+  (korma-table-model/destroy-model (find-sent-requests-table view)))
+
+(defn destroy
+  "Cleans up anything that needs to be cleaned up when the panel is destroyed."
+  [view]
+  (destroy-all-friends-table view)
+  (destroy-my-requests-table view)
+  (destroy-sent-requests-table view))

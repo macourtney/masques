@@ -1,6 +1,6 @@
 (ns masques.view.friend.my-requests-table-model
   (:require [clj-internationalization.term :as term]
-            [masques.model.base :as base-model]
+            [masques.model.base :as model-base]
             [masques.model.friend-request :as friend-request-model]
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
@@ -38,7 +38,10 @@
 
 (deftype MyRequestsTableModel []
 
-  korma-table-model/ColumnValueList
+  korma-table-model/TableDbModel
+  (db-entity [this]
+    model-base/friend-request)
+  
   (row-count [this]
     (friend-request-model/count-pending-received-requests))
   
@@ -56,7 +59,7 @@
           (share-model/message-id-key
             (share-model/find-friend-request-share
               (friend-request-model/pending-received-request row-index)
-              (base-model/h2-keyword share-model/message-id-key))))
+              (model-base/h2-keyword share-model/message-id-key))))
       accept-column-id
         (korma-table-model/id-key
           (friend-request-model/pending-received-request row-index))
@@ -64,7 +67,10 @@
         (korma-table-model/id-key (friend-request-model/pending-received-request row-index))
       nil))
   
-  (update-value [this _ _ _]))
+  (update-value [this _ _ _])
+
+  (index-of [this record-or-id]
+    (friend-request-model/pending-received-request-index record-or-id)))
 
 (defn create
   "Creates a new table model for use in the my requests table."

@@ -113,5 +113,6 @@
   "Calls destroy for all panels in the display panel."
   [display-panel]
   (doseq [panel-map (vals (find-panel-map display-panel))]
-    (when (and panel-map (panel-id panel-map))
-      (panel-protocol/destroy (panel-id panel-map) (view-id panel-map)))))
+    (when panel-map
+      (when-let [panel (panel-id panel-map)]
+        (panel-protocol/destroy panel (view-id panel-map))))))

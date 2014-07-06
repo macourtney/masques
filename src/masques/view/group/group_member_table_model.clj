@@ -44,7 +44,10 @@ given group at the given row index."
 
 (deftype GroupMemberTableModel [group-id column-map]
 
-  ColumnValueList
+  TableDbModel
+  (db-entity [this]
+    model-base/grouping-profile)
+  
   (row-count [this]
     (grouping-profile-model/count-grouping-profiles group-id))
   
@@ -54,7 +57,10 @@ given group at the given row index."
   
   (update-value [this row-index column-id value]
     ((find-update-value-fn column-map column-id)
-      group-id row-index column-id value)))
+      group-id row-index column-id value))
+  
+  (index-of [this record-or-id]
+    (grouping-profile-model/table-index-of record-or-id group-id)))
 
 (defn create
   "Creates a new group member table model which shows all of the group members

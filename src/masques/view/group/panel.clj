@@ -15,6 +15,7 @@
             [masques.view.utils.button-table-cell-editor
               :as button-table-cell-editor]
             [masques.view.utils.korma-combobox-model :as korma-combobox-model]
+            [masques.view.utils.korma-table-model :as korma-table-model]
             [masques.view.utils.list-renderer :as list-renderer]
             [masques.view.utils.table-renderer :as table-renderer]
             [seesaw.color :as seesaw-color]
@@ -204,7 +205,8 @@
 (defn destroy
   "Should be called right before the panel is destroyed."
   [panel]
-  (korma-combobox-model/destroy-model (find-group-combobox panel)))
+  (korma-combobox-model/destroy-model (find-group-combobox panel))
+  (korma-table-model/destroy-model (find-group-member-table panel)))
 
 (defn find-create-new-group-button
   "Finds the create new group button in the given view."
@@ -451,6 +453,7 @@ view."
         group-combobox (find-group-combobox group-panel)
         selected-group (seesaw-core/selection group-combobox)
         group-member-table (find-group-member-table group-panel)]
+    (korma-table-model/destroy-model group-member-table)
     (seesaw-core/config! group-member-table
       :model (group-member-table-model/create selected-group))
     (table-renderer/set-button-table-cell-renderer

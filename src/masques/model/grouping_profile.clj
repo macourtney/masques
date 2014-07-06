@@ -99,8 +99,8 @@ the given index."
 (defn table-index-of
   "Returns the index of the given grouping profile record in the list of
 grouping profiles."
-  [record]
-  (let [grouping-id (grouping-id-key record)]
+  ([record] (table-index-of record (grouping-id-key record)))
+  ([record grouping-id]
     (index-of
       record
       (korma/select

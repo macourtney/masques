@@ -229,6 +229,35 @@ with the given where map."
   (find-table-request index
     { (h2-keyword request-status-key) approved-status }))
 
+(defn index-of-request
+  "Returns the index of the given friend request or id in the set of requests
+constrained by the given where map."
+  [friend-request-id where-map]
+  (index-of
+    friend-request-id
+    (korma/select
+      friend-request
+      (korma/fields (h2-keyword :id))
+      (korma/where where-map))))
+
+(defn pending-sent-request-index
+  "Returns the index of the given pending sent request."
+  [pending-request]
+  (index-of-request pending-request
+    { (h2-keyword request-status-key) pending-sent-status }))
+
+(defn pending-received-request-index
+  "Returns the index of the given pending received request."
+  [pending-request]
+  (index-of-request pending-request
+    { (h2-keyword request-status-key) pending-received-status }))
+
+(defn friend-index
+  "Returns the index of the given friend request."
+  [friend-request]
+  (index-of-request friend-request
+    { (h2-keyword request-status-key) approved-status }))
+
 (defn find-to-profile
   "Returns the profile for the given request"
   [request]

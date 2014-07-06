@@ -1,5 +1,6 @@
 (ns masques.view.friend.all-friends-table-model
   (:require [clj-internationalization.term :as term]
+            [masques.model.base :as model-base]
             [masques.model.friend-request :as friend-request-model]
             [masques.model.profile :as profile-model]
             [masques.view.utils.korma-table-model :as korma-table-model]
@@ -41,9 +42,12 @@
                 korma-table-model/class-key Integer
                 korma-table-model/edtiable?-key true }])
 
-(deftype FriendsTableModel []
+(deftype FriendsTableModel [table-data-listeners interceptor-manager]
 
-  korma-table-model/ColumnValueList
+  korma-table-model/TableDbModel
+  (db-entity [this]
+    model-base/friend-request)
+
   (row-count [this]
     (friend-request-model/count-friends))
   
@@ -69,12 +73,16 @@
           (friend-request-model/approved-received-request row-index))
       nil))
   
-  (update-value [this _ _ _]))
+  (update-value [this _ _ _])
+  
+  (index-of [this record-or-id]
+    (friend-request-model/friend-index record-or-id)))
 
 (defn create
   "Creates a new table model for use in the friends table."
   []
-  (korma-table-model/create-from-columns columns (new FriendsTableModel)))
+  (korma-table-model/create-from-columns
+    columns (FriendsTableModel. (atom nil) (atom nil))))
 
 (defn profile-button-cell-renderer
   "A table cell renderer function for the details button."

@@ -1,4 +1,6 @@
 (ns masques.view.utils.test.korma-table-model
+  (:require test.init
+            [masques.model.base :as model-base])
   (:use clojure.test
         masques.view.utils.korma-table-model))
 
@@ -12,8 +14,8 @@
 
 (def test-rows [row0 row1])
 
-(deftype TestTableModel []
-  DbModel
+(deftype TestColumnModel []
+  TableColumnProtocol
   (column-id [this column-index]
     (nth test-columns column-index))
 
@@ -30,19 +32,50 @@
     (count test-columns))
   
   (cell-editable? [this row-index column]
-    false)
+    false))
+
+(deftype TestDbModel []
+
+  TableDbModel
+  (db-entity [this]
+    nil)
   
-  ColumnValueList
   (row-count [this] (count test-rows))
   
   (value-at [this row-index column-id]
     ((keyword column-id) (nth test-rows row-index)))
   
   (update-value [this _ _ _]
-    ))
+    )
+  
+  (index-of [this record-or-id]
+    (some
+      #(when (= (model-base/id record-or-id) (model-base/id (first %1)))
+         (second %1))
+      (map list test-rows (range)))))
+
+(deftype TestDBListeners [table-data-listeners]
+
+  TableDBListeners
+  (set-table-data-listeners [this new-table-data-listeners]
+    (when @table-data-listeners
+      (remove-table-data-listeners this @table-data-listeners))
+    (reset! table-data-listeners new-table-data-listeners))
+  
+  (remove-table-data-listeners [this _]
+    (reset! table-data-listeners nil))
+  
+  (table-data-listeners [this]
+    @table-data-listeners)
+  
+  (destroy [this]
+    (remove-table-data-listeners this nil))
+  
+  (set-table-model [this table-model]))
 
 (deftest test-create
-  (let [korma-table-model (create (new TestTableModel))]
+  (let [korma-table-model (create (new TestColumnModel) (new TestDbModel)
+                                  (TestDBListeners. (atom nil)))]
     (is (= (.getColumnName korma-table-model 0) column0))
     (is (= (.getColumnClass korma-table-model 1) String))
     (is (= (.getColumnCount korma-table-model) (count test-columns)))
