@@ -443,8 +443,11 @@ view."
     (let [button (seesaw-core/to-widget event)
           id-value (button-table-cell-editor/value-from button)]
       (future
-        (grouping-profile/delete-grouping-profile
-          (grouping-profile/find-grouping-profile id-value))))))
+        (try
+          (grouping-profile/delete-grouping-profile
+            (grouping-profile/find-grouping-profile id-value))
+          (catch Throwable t
+            (logging/error t "An exception was thrown while deleting a grouping profile.")))))))
 
 (defn group-combobox-action-listener
   "Updates the group member table to show the members of the selected group."

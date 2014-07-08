@@ -457,9 +457,10 @@ this function simply returns the record."
 
 (defn find-by-id
   "Returns the record for the given entity with the given id."
-  [entity id]
-  (when id
-    (clean-up-for-clojure (first (select entity (where {:ID id}))))))
+  [entity record-id]
+  (when (and entity record-id)
+    (clean-up-for-clojure
+      (first (select entity (where { id-key (id record-id) }))))))
 
 (defn create-insert-action
   "Creates an insert action which inserts a record into the database for the

@@ -1,5 +1,6 @@
 (ns masques.view.utils.korma-table-model
-  (:require [masques.model.base :as model-base]
+  (:require [clojure.tools.logging :as logging]
+            [masques.model.base :as model-base]
             [masques.view.utils.listener-list :as listener-list]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing.event TableModelEvent]
@@ -72,7 +73,13 @@ destroyed.")
 (defprotocol KormaTableModelProtocol
   (destroy-table-model [this]
     "Cleans up anything that needs to be cleaned up when the model is ready to
-be destroyed."))
+be destroyed.")
+  
+  (table-db-model [this]
+    "Returns the table db model associated with this table model.")
+  
+  (table-db-listeners [this]
+    "Returns the table db listeners associated with this table model."))
 
 (deftype ColumnListDbModel [columns columns-map]
 
@@ -134,63 +141,61 @@ interval removed event."
 (defn notify-model-of-update
   "Notifies all of the listeners in the given DbComboBoxModel that the record
 with the given id has been editted."
-  [db-table-model id]
-  (when db-table-model
-    (when-let [record-index (index-of db-table-model id)]
+  [table-model id]
+  (when table-model
+    (when-let [record-index (index-of (table-db-model table-model) id)]
       (notify-all-of-contents-changed
-        (table-data-listeners db-table-model)
-        (create-table-model-event
-          db-table-model TableModelEvent/UPDATE record-index
-          record-index)))))
+        (table-data-listeners (table-db-listeners table-model))
+        (create-table-model-event table-model TableModelEvent/UPDATE
+                                  record-index record-index)))))
 
 (defn notify-model-of-insert
   "Notifies all of the listeners in the given DbComboBoxModel that the record
 with the given id has been added."
-  [db-table-model id]
-  (when db-table-model
-    (when-let [record-index (index-of db-table-model id)]
+  [table-model id]
+  (when table-model
+    (when-let [record-index (index-of (table-db-model table-model) id)]
       (notify-all-of-interval-added
-        (table-data-listeners db-table-model)
-        (create-table-model-event
-          db-table-model TableModelEvent/INSERT record-index
-          record-index)))))
+        (table-data-listeners (table-db-listeners table-model))
+        (create-table-model-event table-model TableModelEvent/INSERT
+                                  record-index record-index)))))
 
 (defn notify-model-of-delete
   "Notifies all of the listeners in the given DbComboBoxModel that the record
 with the given id has been added."
-  [db-table-model record-index]
-  (when (and db-table-model record-index)
+  [table-model record-index]
+  (when (and table-model record-index)
     (notify-all-of-interval-removed
-      (table-data-listeners db-table-model)
-      (create-table-model-event db-table-model TableModelEvent/DELETE
+      (table-data-listeners (table-db-listeners table-model))
+      (create-table-model-event table-model TableModelEvent/DELETE
         record-index record-index))))
 
 (defn create-model-delete-interceptor
   "Creates a model interceptor which notifies all of the table data listeners in
 the given model that a record was deleted."
-  [model]
+  [table-model]
   (fn [action record]
-    (let [record-index (index-of model record)
+    (let [record-index (index-of (table-db-model table-model) record)
           output (action record)]
-      (notify-model-of-delete model record-index)
+      (notify-model-of-delete table-model record-index)
       output)))
 
 (defn create-model-insert-interceptor
   "Creates a model interceptor which notifies all of the table data listeners in
 the given model that a record was inserted."
-  [model]
+  [table-model]
   (fn [action record]
     (let [record-id (action record)]
-      (notify-model-of-insert model record-id)
+      (notify-model-of-insert table-model record-id)
       record-id)))
 
 (defn create-model-update-interceptor
   "Creates a model interceptor which notifies all of the table data listeners in
 the given model that a record was updated."
-  [model]
+  [table-model]
   (fn [action record]
     (let [record-id (action record)]
-      (notify-model-of-update model record-id)
+      (notify-model-of-update table-model record-id)
       record-id)))
 
 (deftype TableInterceptors [entity table-model]
@@ -252,6 +257,12 @@ the given model that a record was updated."
     (doseq [listener (listener-list/listeners table-model-listener-list)]
       (listener-list/remove-listener table-model-listener-list listener)))
   
+  (table-db-model [this]
+    db-model)
+  
+  (table-db-listeners [this]
+    listener-model)
+  
   TableModel
   (getColumnName [this column-index]
     (column-name column-model (column-id column-model column-index)))
@@ -292,8 +303,8 @@ the given model that a record was updated."
     (let [table-model-listener-list (listener-list/create)
           table-model (KormaTableModel. table-model-listener-list column-model
                                         db-model table-db-listeners)]
-      (set-table-data-listeners table-db-listeners table-model-listener-list)
       (set-table-model table-db-listeners table-model)
+      (set-table-data-listeners table-db-listeners table-model-listener-list)
       table-model)))
 
 (defn create-column-map

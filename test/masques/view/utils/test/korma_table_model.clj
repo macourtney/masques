@@ -1,5 +1,6 @@
 (ns masques.view.utils.test.korma-table-model
   (:require test.init
+            [clojure.tools.logging :as logging]
             [masques.model.base :as model-base])
   (:use clojure.test
         masques.view.utils.korma-table-model))
@@ -54,7 +55,7 @@
          (second %1))
       (map list test-rows (range)))))
 
-(deftype TestDBListeners [table-data-listeners]
+(deftype TestDBListeners [table-data-listeners table-model]
 
   TableDBListeners
   (set-table-data-listeners [this new-table-data-listeners]
@@ -71,11 +72,15 @@
   (destroy [this]
     (remove-table-data-listeners this nil))
   
-  (set-table-model [this table-model]))
+  (set-table-model [this new-table-model]
+    (reset! table-model new-table-model)))
 
 (deftest test-create
-  (let [korma-table-model (create (new TestColumnModel) (new TestDbModel)
-                                  (TestDBListeners. (atom nil)))]
+  (let [table-model-atom (atom nil)
+        test-db-listeners (TestDBListeners. (atom nil) table-model-atom)
+        korma-table-model (create (new TestColumnModel) (new TestDbModel)
+                                  test-db-listeners)]
+    (is (= korma-table-model @table-model-atom))
     (is (= (.getColumnName korma-table-model 0) column0))
     (is (= (.getColumnClass korma-table-model 1) String))
     (is (= (.getColumnCount korma-table-model) (count test-columns)))
