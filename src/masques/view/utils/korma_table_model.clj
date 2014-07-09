@@ -53,10 +53,7 @@ then nil is retured."))
 
 (defprotocol TableDBListeners
   "Handles all of the listeners for a table."
-  (set-table-data-listeners [this table-data-listeners]
-    "Sets the table data listeners which should be updated when ever the data in
-the model changes.")
-  
+
   (remove-table-data-listeners [this table-data-listeners]
     "Removes the table data listeners.")
   
@@ -67,8 +64,8 @@ the model changes.")
     "Cleans up anything that needs to be cleaned up when this model will be
 destroyed.")
   
-  (set-table-model [this table-model]
-    "Sets the table-model for use with the listeners."))
+  (initialize-listeners [this table-model table-data-listeners]
+    "Sets the table-model and listeners."))
 
 (defprotocol KormaTableModelProtocol
   (destroy-table-model [this]
@@ -224,14 +221,14 @@ the given model that a record was updated."
   [db-model table-model table-data-listeners interceptor-manager]
 
   TableDBListeners
-  (set-table-data-listeners [this new-table-data-listeners]
-    (when @table-data-listeners
-      (remove-table-data-listeners this @table-data-listeners))
-    (reset! table-data-listeners new-table-data-listeners)
-    (reset!
-      interceptor-manager
-      (model-base/create-interceptor-manager
-        (create-table-interceptors (db-entity db-model) @table-model))))
+;  (set-table-data-listeners [this new-table-data-listeners]
+;    (when @table-data-listeners
+;      (remove-table-data-listeners this @table-data-listeners))
+;    (reset! table-data-listeners new-table-data-listeners)
+;    (reset!
+;      interceptor-manager
+;      (model-base/create-interceptor-manager
+;        (create-table-interceptors (db-entity db-model) @table-model))))
   
   (remove-table-data-listeners [this _]
     (when @interceptor-manager
@@ -245,8 +242,16 @@ the given model that a record was updated."
   (destroy [this]
     (remove-table-data-listeners this nil))
   
-  (set-table-model [this new-table-model]
-    (reset! table-model new-table-model)))
+  (initialize-listeners [this new-table-model new-table-data-listeners]
+    (reset! table-model new-table-model)
+    (when @table-data-listeners
+      (remove-table-data-listeners this @table-data-listeners))
+    (when new-table-model
+      (reset! table-data-listeners new-table-data-listeners)
+      (reset!
+        interceptor-manager
+        (model-base/create-interceptor-manager
+          (create-table-interceptors (db-entity db-model) new-table-model))))))
 
 (deftype KormaTableModel
   [table-model-listener-list column-model db-model listener-model]
@@ -303,8 +308,8 @@ the given model that a record was updated."
     (let [table-model-listener-list (listener-list/create)
           table-model (KormaTableModel. table-model-listener-list column-model
                                         db-model table-db-listeners)]
-      (set-table-model table-db-listeners table-model)
-      (set-table-data-listeners table-db-listeners table-model-listener-list)
+      (initialize-listeners
+        table-db-listeners table-model table-model-listener-list)
       table-model)))
 
 (defn create-column-map

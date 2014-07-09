@@ -58,11 +58,6 @@
 (deftype TestDBListeners [table-data-listeners table-model]
 
   TableDBListeners
-  (set-table-data-listeners [this new-table-data-listeners]
-    (when @table-data-listeners
-      (remove-table-data-listeners this @table-data-listeners))
-    (reset! table-data-listeners new-table-data-listeners))
-  
   (remove-table-data-listeners [this _]
     (reset! table-data-listeners nil))
   
@@ -72,15 +67,21 @@
   (destroy [this]
     (remove-table-data-listeners this nil))
   
-  (set-table-model [this new-table-model]
-    (reset! table-model new-table-model)))
+  (initialize-listeners [this new-table-model new-table-data-listeners]
+    (reset! table-model new-table-model)
+    (when @table-data-listeners
+      (remove-table-data-listeners this @table-data-listeners))
+    (reset! table-data-listeners new-table-data-listeners)))
 
 (deftest test-create
   (let [table-model-atom (atom nil)
-        test-db-listeners (TestDBListeners. (atom nil) table-model-atom)
+        table-data-listeners-atom (atom nil)
+        test-db-listeners (TestDBListeners.
+                            table-data-listeners-atom table-model-atom)
         korma-table-model (create (new TestColumnModel) (new TestDbModel)
                                   test-db-listeners)]
     (is (= korma-table-model @table-model-atom))
+    (is @table-data-listeners-atom)
     (is (= (.getColumnName korma-table-model 0) column0))
     (is (= (.getColumnClass korma-table-model 1) String))
     (is (= (.getColumnCount korma-table-model) (count test-columns)))
