@@ -16,12 +16,11 @@
 (deftype ListenerListImpl [listener-list]
   ListenerList
   (add-listener [this listener]
-    (reset! listener-list
-            (cons listener @listener-list)))
+    (swap! listener-list #(cons listener %)))
   
   (remove-listener [this listener]
-    (reset! listener-list
-            (filter #(not (= listener %)) @listener-list)))
+    (swap! listener-list
+            (fn [listener-list] (filter #(not (= listener %)) listener-list))))
   
   (listeners [this]
     @listener-list)

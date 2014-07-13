@@ -53,19 +53,25 @@ then nil is retured."))
 
 (defprotocol TableDBListeners
   "Handles all of the listeners for a table."
+  
+  (add-listener [this listener]
+    "Adds the given listener to this table db listeners")
+  
+  (remove-listener [this listener]
+    "Removes the given listener from this table db listeners")
+  
+  (listener-list [this]
+    "Returns the listener list in this table db listeners")
 
   (remove-table-data-listeners [this table-data-listeners]
     "Removes the table data listeners.")
-  
-  (table-data-listeners [this]
-    "Returns the table data listeners in this model.")
   
   (destroy [this]
     "Cleans up anything that needs to be cleaned up when this model will be
 destroyed.")
   
-  (initialize-listeners [this table-model table-data-listeners]
-    "Sets the table-model and listeners."))
+  (initialize-listeners [this table-model]
+    "Sets the table-model and performs any initialization necessary."))
 
 (defprotocol KormaTableModelProtocol
   (destroy-table-model [this]
@@ -142,7 +148,7 @@ with the given id has been editted."
   (when table-model
     (when-let [record-index (index-of (table-db-model table-model) id)]
       (notify-all-of-contents-changed
-        (table-data-listeners (table-db-listeners table-model))
+        (listener-list (table-db-listeners table-model))
         (create-table-model-event table-model TableModelEvent/UPDATE
                                   record-index record-index)))))
 
@@ -153,7 +159,7 @@ with the given id has been added."
   (when table-model
     (when-let [record-index (index-of (table-db-model table-model) id)]
       (notify-all-of-interval-added
-        (table-data-listeners (table-db-listeners table-model))
+        (listener-list (table-db-listeners table-model))
         (create-table-model-event table-model TableModelEvent/INSERT
                                   record-index record-index)))))
 
@@ -163,7 +169,7 @@ with the given id has been added."
   [table-model record-index]
   (when (and table-model record-index)
     (notify-all-of-interval-removed
-      (table-data-listeners (table-db-listeners table-model))
+      (listener-list (table-db-listeners table-model))
       (create-table-model-event table-model TableModelEvent/DELETE
         record-index record-index))))
 
@@ -221,46 +227,39 @@ the given model that a record was updated."
   [db-model table-model table-data-listeners interceptor-manager]
 
   TableDBListeners
-;  (set-table-data-listeners [this new-table-data-listeners]
-;    (when @table-data-listeners
-;      (remove-table-data-listeners this @table-data-listeners))
-;    (reset! table-data-listeners new-table-data-listeners)
-;    (reset!
-;      interceptor-manager
-;      (model-base/create-interceptor-manager
-;        (create-table-interceptors (db-entity db-model) @table-model))))
+  (add-listener [this listener]
+    (listener-list/add-listener table-data-listeners listener))
+  
+  (remove-listener [this listener]
+    (listener-list/remove-listener table-data-listeners listener))
+  
+  (listener-list [this]
+    table-data-listeners)
   
   (remove-table-data-listeners [this _]
     (when @interceptor-manager
       (model-base/remove-interceptors @interceptor-manager)
       (reset! interceptor-manager nil))
-    (reset! table-data-listeners nil))
-  
-  (table-data-listeners [this]
-    @table-data-listeners)
-  
+    (when table-data-listeners
+      (doseq [listener (listener-list/listeners table-data-listeners)]
+        (listener-list/remove-listener table-data-listeners listener))))
+
   (destroy [this]
     (remove-table-data-listeners this nil))
   
-  (initialize-listeners [this new-table-model new-table-data-listeners]
+  (initialize-listeners [this new-table-model]
     (reset! table-model new-table-model)
-    (when @table-data-listeners
-      (remove-table-data-listeners this @table-data-listeners))
     (when new-table-model
-      (reset! table-data-listeners new-table-data-listeners)
       (reset!
         interceptor-manager
         (model-base/create-interceptor-manager
           (create-table-interceptors (db-entity db-model) new-table-model))))))
 
-(deftype KormaTableModel
-  [table-model-listener-list column-model db-model listener-model]
+(deftype KormaTableModel [column-model db-model listener-model]
 
   KormaTableModelProtocol
   (destroy-table-model [this]
-    (destroy listener-model)
-    (doseq [listener (listener-list/listeners table-model-listener-list)]
-      (listener-list/remove-listener table-model-listener-list listener)))
+    (destroy listener-model))
   
   (table-db-model [this]
     db-model)
@@ -294,22 +293,20 @@ the given model that a record was updated."
       column-model row-index (column-id column-model column-index)))
   
   (removeTableModelListener [this listener]
-    (listener-list/add-listener table-model-listener-list listener))
+    (remove-listener listener-model listener))
   
   (addTableModelListener [this listener]
-    (listener-list/remove-listener table-model-listener-list listener)))
+    (add-listener listener-model listener)))
 
 (defn create
   "Creates a new korma table model with the given db model."
   ([column-model db-model]
     (create column-model db-model
-            (KormaTableDbListeners. db-model (atom nil) (atom nil) (atom nil))))
+            (KormaTableDbListeners.
+              db-model (atom nil) (listener-list/create) (atom nil))))
   ([column-model db-model table-db-listeners]
-    (let [table-model-listener-list (listener-list/create)
-          table-model (KormaTableModel. table-model-listener-list column-model
-                                        db-model table-db-listeners)]
-      (initialize-listeners
-        table-db-listeners table-model table-model-listener-list)
+    (let [table-model (KormaTableModel. column-model db-model table-db-listeners)]
+      (initialize-listeners table-db-listeners table-model)
       table-model)))
 
 (defn create-column-map

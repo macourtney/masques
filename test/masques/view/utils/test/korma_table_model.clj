@@ -1,7 +1,8 @@
 (ns masques.view.utils.test.korma-table-model
   (:require test.init
             [clojure.tools.logging :as logging]
-            [masques.model.base :as model-base])
+            [masques.model.base :as model-base]
+            [masques.view.utils.listener-list :as listener-list])
   (:use clojure.test
         masques.view.utils.korma-table-model))
 
@@ -59,29 +60,26 @@
 
   TableDBListeners
   (remove-table-data-listeners [this _]
-    (reset! table-data-listeners nil))
+    (when table-data-listeners
+      (doseq [listener (listener-list/listeners table-data-listeners)]
+        (listener-list/remove-listener table-data-listeners listener))))
   
-  (table-data-listeners [this]
-    @table-data-listeners)
+  (listener-list [this]
+    table-data-listeners)
   
   (destroy [this]
     (remove-table-data-listeners this nil))
   
-  (initialize-listeners [this new-table-model new-table-data-listeners]
-    (reset! table-model new-table-model)
-    (when @table-data-listeners
-      (remove-table-data-listeners this @table-data-listeners))
-    (reset! table-data-listeners new-table-data-listeners)))
+  (initialize-listeners [this new-table-model]
+    (reset! table-model new-table-model)))
 
 (deftest test-create
   (let [table-model-atom (atom nil)
-        table-data-listeners-atom (atom nil)
         test-db-listeners (TestDBListeners.
-                            table-data-listeners-atom table-model-atom)
+                            (listener-list/create) table-model-atom)
         korma-table-model (create (new TestColumnModel) (new TestDbModel)
                                   test-db-listeners)]
     (is (= korma-table-model @table-model-atom))
-    (is @table-data-listeners-atom)
     (is (= (.getColumnName korma-table-model 0) column0))
     (is (= (.getColumnClass korma-table-model 1) String))
     (is (= (.getColumnCount korma-table-model) (count test-columns)))
