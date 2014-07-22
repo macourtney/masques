@@ -108,3 +108,18 @@ grouping profiles."
         (korma/fields id-key)
         (where { (h2-keyword grouping-id-key) grouping-id })
         (korma/order (h2-keyword profile-id-key) :ASC)))))
+
+(defn find-grouping-profiles-for-profile
+  "Finds all of the grouping profiles with the given profile id."
+  [profile-id]
+  (when-let [profile-id (id profile-id)]
+    (korma/select
+      grouping-profile
+      (korma/fields id-key)
+      (where { (h2-keyword profile-id-key) profile-id }))))
+
+(defn delete-grouping-profiles
+  "Deletes all of the grouping profiles with the given profile id."
+  [profile-id]
+  (doseq [grouping-profile (find-grouping-profiles-for-profile profile-id)]
+    (delete-grouping-profile grouping-profile)))

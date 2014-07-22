@@ -44,6 +44,9 @@
     (is (nil? (table-index-of { id-key -1 })))
     (is (nil? (table-index-of nil)))
     
+    (delete-grouping-profiles test-profile)
+    (is (nil? (find-grouping-profile (id test-grouping-profile))))
+    
     (delete-grouping-profile test-grouping-profile)
     (grouping/delete-grouping test-grouping)
     (profile/delete-profile test-profile)))

@@ -110,16 +110,26 @@ groups."
       (korma/fields id-key)
       (korma/order (h2-keyword display-key) :ASC))))
 
-(defn find-everyone-id
-  "Returns the id for the everyone group."
-  []
+(defn find-id-by-name
+  "Returns the id of the group with the given name."
+  [name]
   (id
     (first
       (korma/select
         grouping
         (korma/fields id-key)
-        (korma/where { (h2-keyword name-key) everyone-name })
+        (korma/where { (h2-keyword name-key) name })
         (korma/limit 1)))))
+
+(defn find-everyone-id
+  "Returns the id for the everyone group."
+  []
+  (find-id-by-name everyone-name))
+
+(defn find-friends-id
+  "Returns the id for the friends group."
+  []
+  (find-id-by-name friends-name))
 
 (defn init
   "Initializes the grouping. If no groupings exists then this function adds all

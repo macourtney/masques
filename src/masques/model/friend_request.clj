@@ -2,6 +2,7 @@
   (:require [clj-time.core :as clj-time]
             [clojure.tools.logging :as logging]
             [korma.core :as korma]
+            [masques.model.grouping-profile :as grouping-profile]
             [masques.model.profile :as profile]
             [masques.model.share :as share])
   (:use masques.model.base))
@@ -258,17 +259,21 @@ constrained by the given where map."
   (index-of-request friend-request
     { (h2-keyword request-status-key) approved-status }))
 
+(defn find-to-profile-id
+  "Returns the profile id for the given request"
+  [request]
+  (let [request-id (id request)]
+    (profile-id-key
+      (clean-up-for-clojure
+        (first
+          (korma/select friend-request
+                        (korma/fields (h2-keyword profile-id-key))
+                        (korma/where { :ID request-id })))))))
+
 (defn find-to-profile
   "Returns the profile for the given request"
   [request]
-  (let [request-id (id request)]
-    (profile/find-profile
-      (profile-id-key
-        (clean-up-for-clojure
-          (first
-            (korma/select friend-request
-              (korma/fields (h2-keyword profile-id-key))
-              (korma/where { :ID request-id }))))))))
+  (profile/find-profile (find-to-profile-id request)))
 
 (defn update-to-unfriend
   "Updates the given request status to unfriend and returns the share attached
@@ -276,6 +281,7 @@ to the given request."
   [request]
   (do
     (status request unfriend-status)
+    (grouping-profile/delete-grouping-profiles (find-to-profile-id request))
     (share/find-friend-request-share request)))
 
 (defn unfriend
