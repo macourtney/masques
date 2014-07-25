@@ -25,10 +25,23 @@
   (when request-id
     (find-by-id friend-request (id request-id))))
 
+(defn find-to-profile-id
+  "Returns the profile id for the given request"
+  [request]
+  (let [request-id (id request)]
+    (profile-id-key
+      (clean-up-for-clojure
+        (first
+          (korma/select friend-request
+                        (korma/fields (h2-keyword profile-id-key))
+                        (korma/where { :ID request-id })))))))
+
 (defn delete-friend-request
   "Deletes the given friend request from the database. The friend request should
 include the id."
   [friend-request-record]
+  (grouping-profile/delete-grouping-profiles
+    (find-to-profile-id friend-request-record))
   (share/delete-share (share/find-friend-request-share friend-request-record))
   (delete-record friend-request friend-request-record))
 
@@ -259,17 +272,6 @@ constrained by the given where map."
   (index-of-request friend-request
     { (h2-keyword request-status-key) approved-status }))
 
-(defn find-to-profile-id
-  "Returns the profile id for the given request"
-  [request]
-  (let [request-id (id request)]
-    (profile-id-key
-      (clean-up-for-clojure
-        (first
-          (korma/select friend-request
-                        (korma/fields (h2-keyword profile-id-key))
-                        (korma/where { :ID request-id })))))))
-
 (defn find-to-profile
   "Returns the profile for the given request"
   [request]
@@ -333,6 +335,7 @@ to the given request."
   [request]
   (do
     (status request approved-status)
+    (grouping-profile/add-profile-to-everyone-group (find-to-profile-id request))
     (share/find-friend-request-share request)))
 
 (defn send-accept

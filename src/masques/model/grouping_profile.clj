@@ -123,3 +123,8 @@ grouping profiles."
   [profile-id]
   (doseq [grouping-profile (find-grouping-profiles-for-profile profile-id)]
     (delete-grouping-profile grouping-profile)))
+
+(defn add-profile-to-everyone-group
+  "Adds the profile with the given id to the everyone group."
+  [profile-id]
+  (save (create-grouping-profile (grouping/find-everyone-id) profile-id)))

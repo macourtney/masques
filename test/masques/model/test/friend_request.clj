@@ -2,6 +2,7 @@
   (:require test.init
             [clj-time.core :as clj-time]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as logging]
             [masques.model.grouping :as grouping]
             [masques.model.grouping-profile :as grouping-profile]
             [masques.model.message :as message]
@@ -288,7 +289,15 @@
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
-      (is (= (status updated-request) approved-status)))
+      (is (= (status updated-request) approved-status))
+      (let [profile-groups (grouping-profile/find-grouping-profiles-for-profile
+                             (find-to-profile updated-request))]
+        (is (= (count profile-groups) 1))
+        (is (= (grouping/read-name
+                 (grouping-profile/find-group
+                   (grouping-profile/find-grouping-profile
+                     (first profile-groups))))
+               grouping/everyone-name))))
     (let [new-status (status test-request pending-sent-status)
           updated-share (send-accept (find-friend-request test-request))]
       (is (not updated-share)))
@@ -302,7 +311,8 @@
       (is (= (id updated-share) (id test-share)))
       (is (= (status updated-request) approved-status)))
     (share/delete-share test-share)
-    (profile/delete-profile test-profile)))
+    (profile/delete-profile test-profile)
+    (delete-friend-request test-request)))
 
 (deftest test-receive-accept
   (let [test-message "test message"

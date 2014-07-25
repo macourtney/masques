@@ -25,6 +25,7 @@
     (db-config/update-username-password test-user-name "password")
     (masques-core/database-init)
     (masques-core/run-fn 'masques.model.profile 'init)
-    (clj-i2p/set-destination test-destination)))
+    (clj-i2p/set-destination test-destination)
+    (masques-core/run-fn 'masques.model.grouping 'init)))
 
 (init-tests)
