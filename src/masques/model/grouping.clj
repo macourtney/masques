@@ -1,7 +1,6 @@
 (ns masques.model.grouping
   (:require [clj-internationalization.term :as term]
-            [clojure.tools.logging :as logging]
-            [korma.core :as korma])
+            [clojure.tools.logging :as logging])
   (:use masques.model.base
         korma.core))
 
@@ -21,6 +20,11 @@
   [grouping-id]
   (when grouping-id
     (find-by-id grouping (id grouping-id))))
+
+(defn all-grouping
+  "Returns all of the groupings."
+  []
+  (select grouping (fields id-key)))
 
 (defn save [record]
   (insert-or-update grouping record))
@@ -97,12 +101,12 @@ used for both the display and name of the newly created group."
   "Returns a groups with just the id and name at the given index."
   [index]
   (first
-    (korma/select
+    (select
       grouping
-      (korma/fields id-key (h2-keyword display-key))
-      (korma/limit 1)
-      (korma/offset index)
-      (korma/order (h2-keyword display-key) :ASC))))
+      (fields id-key (h2-keyword display-key))
+      (limit 1)
+      (offset index)
+      (order (h2-keyword display-key) :ASC))))
 
 (defn combobox-index-of
   "Returns the index of the given grouping record in the list of combobox
@@ -110,21 +114,21 @@ groups."
   [record]
   (index-of
     record
-    (korma/select
+    (select
       grouping
-      (korma/fields id-key)
-      (korma/order (h2-keyword display-key) :ASC))))
+      (fields id-key)
+      (order (h2-keyword display-key) :ASC))))
 
 (defn find-id-by-name
   "Returns the id of the group with the given name."
   [name]
   (id
     (first
-      (korma/select
+      (select
         grouping
-        (korma/fields id-key)
-        (korma/where { (h2-keyword name-key) name })
-        (korma/limit 1)))))
+        (fields id-key)
+        (where { (h2-keyword name-key) name })
+        (limit 1)))))
 
 (defn find-everyone-id
   "Returns the id for the everyone group."

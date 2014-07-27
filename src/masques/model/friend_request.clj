@@ -309,6 +309,7 @@ to the given request."
   [request]
   (do
     (status request rejected-status)
+    (grouping-profile/delete-grouping-profiles (find-to-profile-id request))
     (share/find-friend-request-share request)))
 
 (defn reject

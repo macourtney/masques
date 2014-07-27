@@ -17,6 +17,9 @@
     (delete-grouping grouping-record)))
 
 (deftest test-init
+  (when-let [groupings (all-grouping)]
+    (doseq [grouping groupings]
+      (delete-grouping grouping)))
   (is (= 0 (count-groups)))
   (init)
   (is (= 5 (count-groups)))
