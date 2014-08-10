@@ -32,7 +32,7 @@ it to the database."
   true)
 
 (defn run
-  "Updates the profile in the given request map as rejected. If successful,
+  "Updates the profile in the given request map as accepted. If successful,
 returns true. Otherwise, throws an exception."
   [request-map]
   { :data
