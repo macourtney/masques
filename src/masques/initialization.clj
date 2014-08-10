@@ -2,6 +2,7 @@
   (:require [clj-i2p.server :as clj-i2p-server]
             [masques.interceptor :as interceptor]
             [masques.model.grouping :as grouping-model]
+            [masques.model.peer-persister :as peer-persister]
             [masques.model.profile :as profile-model]
             [masques.service.protocol :as service-protocol]))
 
@@ -10,6 +11,7 @@
 should already be initialized. This function should be called after a successful
 login."
   []
+  (peer-persister/init)
   (profile-model/init)
   (grouping-model/init)
   (service-protocol/init)

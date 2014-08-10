@@ -1,5 +1,6 @@
 (ns masques.interceptor
   (:require [clj-i2p.server-interceptors :as server-interceptors]
+            [clojure.tools.logging :as logging]
             [masques.model.profile :as profile]))
 
 (defn cleaned-current-user []

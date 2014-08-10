@@ -32,6 +32,34 @@
     (request-tester request-record)
     (delete-friend-request request-record)))
 
+(deftest test-status-for-profile
+  (let [test-profile (profile/load-masque-map test-util/profile-map)
+        test-request (find-friend-request
+                       (save { created-at-key (str (clj-time/now))
+                               request-status-key approved-status
+                               requested-at-key (str (clj-time/now))
+                               request-approved-at-key (str (clj-time/now))
+                               profile-id-key (id test-profile) }))]
+    (try
+      (is (= approved-status (status-for-profile test-profile)))
+      (is (profile-approved? test-profile))
+      (finally
+        (delete-friend-request test-request)
+        (profile/delete-profile test-profile))))
+  (let [test-profile (profile/load-masque-map test-util/profile-map)
+        test-request (find-friend-request
+                       (save { created-at-key (str (clj-time/now))
+                               request-status-key rejected-status
+                               requested-at-key (str (clj-time/now))
+                               request-approved-at-key (str (clj-time/now))
+                               profile-id-key (id test-profile) }))]
+    (try
+      (is (= rejected-status (status-for-profile test-profile)))
+      (is (not (profile-approved? test-profile)))
+      (finally
+        (delete-friend-request test-request)
+        (profile/delete-profile test-profile)))))
+
 (deftest test-update-send-request
   (let [test-message "test message"
         test-profile (profile/load-masque-map test-util/profile-map)

@@ -2,7 +2,6 @@
   (:refer-clojure :exclude [identity alias])
   (:require [clj-crypto.core :as clj-crypto]
             [clj-i2p.core :as clj-i2p]
-            [clj-i2p.peer-service.persister-protocol :as persister-protocol]
             [clojure.java.io :as io]
             [clojure.tools.logging :as logging]
             [config.db-config :as db-config]
@@ -231,63 +230,10 @@ send-request in friend_request instead."
   []
   (map id (select profile (fields [id-key]))))
 
-(deftype DbPeerPersister [peer-update-listeners peer-delete-listeners]
-  persister-protocol/PeerPersister
-  (insert-peer [persister peer])
-
-  (update-peer [persister peer])
-
-  (delete-peer [persister peer])
-
-  (all-peers [persister])
-
-  (all-foreign-peers [persister])
-
-  (find-peer [persister peer])
-
-  (find-all-peers [persister peer])
-
-  (last-updated-peer [persister])
-
-  (all-unnotified-peers [persister])
-
-  (all-notified-peers [persister])
-
-  (add-peer-update-listener [persister listener]
-    (swap! peer-update-listeners conj listener))
-
-  (remove-peer-update-listener [persister listener]
-    (swap! peer-update-listeners
-           (fn [listeners] (remove #(not (= % listener)) listeners))))
-
-  (add-peer-delete-listener [persister listener]
-    (swap! peer-delete-listeners conj listener))
-
-  (remove-peer-delete-listener [persister listener]
-    (swap! peer-delete-listeners
-           (fn [listeners] (remove #(not (= % listener)) listeners))))
-
-  (default-destinations [persister]
-    (all-destinations))
-
-  (peers-downloaded? [persister]
-    true)
-
-  (set-peers-downloaded? [persister value]))
-
-(defn create-peer-persister
-  "Creates a new instance of DbPeerPersister and returns it."
-  []
-  (DbPeerPersister. (atom []) (atom [])))
-
 (defn init
   "Loads the currently logged in user's profile into memory. Creating the
-profile if it does not alreay exist. Also, creates a new instance of
-DbPeerPersister and registers it with the persister protocol if one is not
-already registered."
+profile if it does not already exist."
   []
-  (when (not (persister-protocol/protocol-registered?))
-    (persister-protocol/register (create-peer-persister)))
   (if-let [logged-in-profile (find-profile current-user-id)]
     (set-current-user logged-in-profile)
     (let [user-name (db-config/current-username)]

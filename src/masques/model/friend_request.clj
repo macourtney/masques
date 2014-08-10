@@ -5,7 +5,8 @@
             [masques.model.grouping-profile :as grouping-profile]
             [masques.model.profile :as profile]
             [masques.model.share :as share])
-  (:use masques.model.base))
+  (:use masques.model.base
+        korma.core))
 
 (def created-at-key :created-at)
 (def request-status-key :request-status)
@@ -92,6 +93,24 @@ user."
   "Finds the friend request with the given profile."
   [profile]
   (find-first friend-request { profile-id-key (id profile) }))
+
+(defn status-for-profile
+  "Returns the status for the friend request for the given profile."
+  [profile]
+  (when profile
+    (request-status-key
+      (first
+        (map clean-up-for-clojure
+             (select friend-request
+                     (fields (h2-keyword request-status-key))
+                     (where (clean-up-for-h2 { profile-id-key (id profile) }))
+                     (limit 1)))))))
+
+(defn profile-approved?
+  "Returns true if the friend request for the given profile has the approved
+status."
+  [profile]
+  (= (status-for-profile profile) approved-status))
 
 (defn rejected?
   "Returns true if the profile in the given masque file has already rejected the
