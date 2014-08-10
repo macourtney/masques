@@ -1,7 +1,7 @@
 (defproject masques "1.0.0-SNAPSHOT"
   :description "Masques is a distributed social network."
   :dependencies [[clojure-tools "1.1.3-SNAPSHOT"]
-                 [clj-crypto "1.0.1"]
+                 [clj-crypto "1.0.2"]
                  [clj-i2p "1.0.0"]
                  [clj-internationalization "1.0.1"
                    :exclusions [org.clojure/clojure]]
@@ -18,7 +18,7 @@
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/data.xml "0.0.4"]
                  [org.clojure/tools.cli "0.2.1"]
-                 [org.clojure/tools.logging "0.2.3"]
+                 [org.clojure/tools.logging "0.3.0"]
                  [org.drift-db/drift-db-h2 "1.1.7-SNAPSHOT"]
                  [seesaw "1.4.1"]]
 
