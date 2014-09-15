@@ -1,9 +1,11 @@
 (ns masques.model.test.share
   (:require test.init)
   (:require [clojure.tools.logging :as logging]
+            [masques.model.grouping :as grouping-model]
             [masques.model.friend-request :as friend-request-model]
             [masques.model.message :as message-model]
-            [masques.model.profile :as profile-model])
+            [masques.model.profile :as profile-model]
+            [masques.model.share-profile :as share-profile-model])
   (:use clojure.test
         masques.model.base
         masques.model.share))
@@ -72,12 +74,14 @@
     (is test-share)
     (is (is-friend-request test-share))
     (is (= (content-id-key test-share) (id test-request)))
-    (is (= (profile-to-id-key test-share) (id test-profile)))
+    (is (= (share-profile-model/first-profile-id-for-share test-share)
+           (id test-profile)))
     (is (= (id (find-friend-request-share-with-to-profile test-profile))
            (id test-share)))
     (let [test-message2 "test-message2"
-          test-share2 (create-send-friend-request-share
-                        test-message2 test-profile test-request)
+          test-share2 (find-share
+                        (create-send-friend-request-share
+                          test-message2 test-profile test-request))
           test-message-id2 (message-id test-share2)]
       (is test-share2)
       (is (= (id test-share2) (id test-share)))
@@ -85,18 +89,70 @@
       (is (= (message-model/body test-message-id) test-message2))
       (is (is-friend-request test-share2))
       (is (= (content-id-key test-share2) (id test-request)))
-      (is (= (profile-to-id-key test-share2) (id test-profile))))
+      (is (= (share-profile-model/first-profile-id-for-share test-share2)
+             (id test-profile))))
     (delete-share test-share)
     (profile-model/delete-profile test-profile)
     (is (nil? (message-model/find-message test-message-id)))
     (is (nil? (friend-request-model/find-friend-request (id test-request))))))
 
-(deftest test-other-profile
+(deftest test-first-other-profile
   (let [saved-other-profile (profile-model/find-profile
                               (profile-model/save profile-map))]
-    (let [test-share { profile-from-id-key (id saved-other-profile)
-                       profile-to-id-key (id (profile-model/current-user)) }]
-      (is (= saved-other-profile (other-profile test-share))))
-    (let [test-share { profile-from-id-key (id (profile-model/current-user))
-                       profile-to-id-key (id saved-other-profile) }]
-      (is (= saved-other-profile (other-profile test-share))))))
+    (let [test-share (create-status-share "test" nil [saved-other-profile])]
+      (is (= saved-other-profile (first-other-profile test-share)))
+      (delete-share test-share))
+    (let [test-share (create-received-share "test" (id saved-other-profile) "")]
+      (is (= saved-other-profile (first-other-profile test-share)))
+      (delete-share test-share))))
+
+(deftest test-create-status-share
+  (let [test-message "New status!"
+        test-profile (profile-model/load-masque-map
+                         (profile-model/create-masque-map profile-map))
+        test-share (find-share
+                     (create-status-share test-message nil [test-profile]))]
+    (is test-share)
+    (is (= (content-type-key test-share) status-type))
+    (is (= (message-model/body
+             (message-model/find-message (message-id-key test-share)))
+           test-message))
+    (is (= (share-profile-model/first-profile-id-for-share test-share)
+           (id test-profile)))
+    (is (= (profile-from-id-key test-share) (id (profile-model/current-user))))
+    (delete-share test-share)
+    (profile-model/delete-profile test-profile))
+  (let [test-message "New status!"
+        test-group (grouping-model/find-grouping
+                     (grouping-model/create-user-group "Test Group"))
+        test-share (find-share
+                     (create-status-share test-message [test-group] nil))]
+    (is test-share)
+    (is (= (content-type-key test-share) status-type))
+    (is (= (message-model/body
+             (message-model/find-message (message-id-key test-share)))
+           test-message))
+    (is (nil? (share-profile-model/first-profile-id-for-share test-share)))
+    (is (= (profile-from-id-key test-share) (id (profile-model/current-user))))
+    (delete-share test-share)
+    (grouping-model/delete-grouping test-group)))
+
+(deftest test-create-received-share
+  (let [test-message "New status!"
+        test-profile (profile-model/load-masque-map
+                         (profile-model/create-masque-map profile-map))
+        test-uuid "test-uuid"
+        test-share (find-share
+                     (create-received-share test-message test-profile
+                                            test-uuid))]
+    (is test-share)
+    (is (= (content-type-key test-share) status-type))
+    (is (= (uuid test-share) test-uuid))
+    (is (= (message-model/body
+             (message-model/find-message (message-id-key test-share)))
+           test-message))
+    (is (= (share-profile-model/first-profile-id-for-share test-share)
+           (id (profile-model/current-user))))
+    (is (= (profile-from-id-key test-share) (id test-profile)))
+    (delete-share test-share)
+    (profile-model/delete-profile test-profile)))

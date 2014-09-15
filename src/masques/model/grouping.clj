@@ -52,8 +52,8 @@ used for both the display and name of the newly created group."
           name-key group-name
           user-generated-key true }))
 
-(defn get-profiles [grouping-id]
-  (into [] (select grouping-profile (where {:GROUPING_ID grouping-id}))))
+(defn profiles [grouping-id]
+  (into [] (select grouping-profile (where {:GROUPING_ID (id grouping-id)}))))
 
 (defn add-grouping-delete-interceptor
   "Adds the given group delete interceptor."
@@ -84,13 +84,6 @@ used for both the display and name of the newly created group."
   "Removes the given group update interceptor."
   [interceptor]
   (remove-update-interceptor grouping interceptor))
-
-(defn attach-profiles [album-record file-records]
-  (assoc album-record :files file-records))
-
-(defn with-profiles [id]
-  (let [grouping-record (find-by-id grouping id)]
-    (attach-profiles grouping-record (get-profiles id))))
 
 (defn count-groups
   "Counts all of the groups."

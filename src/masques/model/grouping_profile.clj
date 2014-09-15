@@ -128,3 +128,13 @@ grouping profiles."
   "Adds the profile with the given id to the everyone group."
   [profile-id]
   (save (create-grouping-profile (grouping/find-everyone-id) profile-id)))
+
+(defn profile-ids
+  "Returns all of the profile ids in the group with the given id."
+  [grouping-id]
+  (map (h2-keyword profile-id-key)
+    (korma/select
+      grouping-profile
+      (korma/fields (h2-keyword profile-id-key))
+      (where { (h2-keyword grouping-id-key) (id grouping-id) })
+      (korma/order (h2-keyword profile-id-key) :ASC))))

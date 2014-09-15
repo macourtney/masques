@@ -99,11 +99,16 @@ is already set in the database and it is removed from the record."
 ; UUID helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn uuid [] 
-  (str (java.util.UUID/randomUUID)))
+(defn uuid
+  "If no record is passed in then this function returns a new random uuid. If a
+record is passed in then the uuid attached to it is returned."
+  ([] 
+    (str (java.util.UUID/randomUUID)))
+  ([record]
+    (or (:uuid record) (:UUID record))))
 
 (defn uuid-is-set [record]
-  (or (:uuid record) (:UUID record)))
+  (uuid record))
 
 (defn unset-uuid [record]
   (if (:uuid record)
@@ -112,8 +117,8 @@ is already set in the database and it is removed from the record."
 
 (defn set-uuid [record]
   (if (uuid-is-set record)
-    (unset-uuid record)
-    (conj record {:UUID (uuid)})))
+    record
+    (assoc record :UUID (uuid))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Turn h2 keywords (:THAT_LOOK_LIKE_THIS) into clojure-style
@@ -445,6 +450,13 @@ this function simply returns the record."
     (map clean-up-for-clojure
       (select entity (where (clean-up-for-h2 record))))))
 
+(defn find-all-ids
+  "Finds the ids for all of the records which statisfy the given prototype."
+  [entity record]
+  (when (and entity record)
+    (map clojure-id
+      (select entity (fields id-key) (where (clean-up-for-h2 record))))))
+
 (defn find-first
   "Finds the first record which statisfy the given prototype."
   [entity record]
@@ -608,6 +620,11 @@ use as a prototype of the records to count."
   (transform clean-up-for-clojure)
   (prepare prepare-share-for-h2)
   (table (h2-keyword :share)))
+
+; SHARE_PROFILE
+(defentity share-profile
+  (transform clean-up-for-clojure)
+  (table (h2-keyword :share-profile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Other randomness, used in models.

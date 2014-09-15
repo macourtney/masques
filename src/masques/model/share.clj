@@ -1,23 +1,26 @@
 (ns masques.model.share
   (:require [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
-            [clojure.tools.logging :as logging])
+            [masques.model.grouping :as grouping-model]
+            [masques.model.share-profile :as share-profile-model]
+            )
   (:use masques.model.base
-        korma.core)
-  (:import [java.util Date]))
+        korma.core))
 
 (def friend-content-type "FRIEND_REQUEST")
+(def status-type "STATUS")
 
 (def content-id-key :content-id)
 (def content-type-key :content-type)
-(def profile-from-id-key :profile-from-id)
-(def profile-to-id-key :profile-to-id)
 (def message-id-key :message-id)
+(def profile-from-id-key :profile-from-id)
+(def uuid-key :uuid)
 
 (def content-key :content)
 (def message-key :message)
 (def to-profile-key :to-profile)
 (def from-profile-key :from-profile)
+(def group-key :group)
 
 (defn find-share
   "Finds the share with the given prototype. If the given record is an int, then
@@ -54,6 +57,11 @@ it needs to be created."
   "Returns the message id for the message attached to the given share."
   [share]
   (message-id-key share))
+
+(defn message-text
+  "Returns the text of the message attached to the given share."
+  [share]
+  (or (message-key share) (message-model/body (message-id share))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Content.
@@ -108,37 +116,6 @@ profile is returned."
       share-from-profile)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; To identity
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn to-profile
-  "Returns the to profile attached to the given share."
-  [share]
-  (or (to-profile-key share)
-      (profile-model/find-profile (profile-to-id-key share))))
-
-(defn remove-to-profile
-  "Removes the to-profile key from the given share."
-  [share]
-  (dissoc share to-profile-key))
-
-(defn attach-to-identity
-  "Attaches the to identity to the given share record."
-  [share]
-  (let [sanitized-share (remove-to-profile share)]
-    (if-let [to-profile (to-profile share)]
-      (assoc sanitized-share profile-to-id-key (id to-profile))
-      sanitized-share)))
-
-(defn to-profile-is-current-user?
-  "If the to profile of the given share is the current user then the to profile
-is returned."
-  [share]
-  (let [share-to-profile (to-profile share)]
-    (when (profile-model/current-user? share-to-profile)
-      share-to-profile)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Build/Save.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -170,20 +147,22 @@ is returned."
   (println (str "\nTesting if from from friend " share-record))
   true)
 
-(defn other-profile
-  "Returns the to or from profile which is not the current user."
+(defn first-other-profile
+  "Returns the first to or from profile which is not the current user."
   [share-record]
   (let [share-record (if (integer? share-record)
                        (find-share share-record)
                        share-record)]
     (profile-model/find-profile
-      (or (profile-model/not-current-user? (profile-to-id-key share-record))
+      (or (profile-model/not-current-user?
+            (profile-from-id-key share-record))
           (profile-model/not-current-user?
-            (profile-from-id-key share-record))))))
+            (share-profile-model/first-profile-id-for-share share-record))))))
 
 (defn delete-share [share-record]
   (when share-record
     (let [share-record (find-share (id share-record))]
+      (share-profile-model/delete-all share-record)
       (message-model/delete-message (message-id share-record))
       (delete-content share-record)
       (delete-record share share-record))))
@@ -191,14 +170,15 @@ is returned."
 (defn create-share
   "Creates a share which is sent out to a peer."
   [share]
-  (save (attach-to-identity (attach-from-profile (attach-message-id share)))))
+  (save (attach-from-profile (attach-message-id share))))
 
 (defn find-friend-request-share-with-to-profile
   "Finds the friend request share sent to the given profile."
   [profile]
-  (find-first share
-    { content-type-key friend-content-type
-      profile-to-id-key (id profile) }))
+  (some identity
+        (map
+          #(find-first share { content-type-key friend-content-type id-key % })
+          (share-profile-model/share-ids-for-profile profile))))
 
 (defn find-friend-request-share-with-from-profile
   "Finds the friend request share sent from the given profile."
@@ -211,30 +191,33 @@ is returned."
   "Updates the given share to have the given message."
   [share message]
   (message-model/update-message (message-id share) message)
-  share)
+  (id share))
 
 (defn create-send-friend-request-share
   "Creates a friend request share."
   [message profile friend-request]
   (if-let [old-share (find-friend-request-share-with-to-profile profile)]
     (update-message old-share message)
-    (create-share
-      { content-type-key friend-content-type
-        message-key message
-        profile-to-id-key (id profile)
-        profile-from-id-key (id (profile-model/current-user))
-        content-id-key (id friend-request) })))
+    (let [share-id (create-share
+                     { content-type-key friend-content-type
+                       content-id-key (id friend-request)
+                       message-key message
+                       profile-from-id-key (id (profile-model/current-user)) })]
+      (share-profile-model/create-share-profile share-id (id profile))
+      share-id)))
 
 (defn create-received-friend-request-share
   "Creates an incoming friend request share."
   [message profile friend-request]
   (if-let [old-share (find-friend-request-share-with-from-profile profile)]
     (update-message old-share message)
-    (create-share { content-type-key friend-content-type
-                    message-key message
-                    profile-to-id-key (id (profile-model/current-user))
-                    profile-from-id-key (id profile)
-                    content-id-key (id friend-request) })))
+    (let [share-id (create-share { content-type-key friend-content-type
+                                   content-id-key (id friend-request)
+                                   message-key message 
+                                   profile-from-id-key (id profile) })]
+      (share-profile-model/create-share-profile
+        share-id (id (profile-model/current-user)))
+      share-id)))
 
 (defn find-friend-request-share
   "Finds the share for the given friend request. Friend request can be either an
@@ -242,9 +225,35 @@ integer id or map containing the id of the friend request."
   [friend-request & share-fields]
   (when friend-request
     (let [friend-request-id (id friend-request)]
-      (first
-        (select share
-                ;(apply fields share-fields) Doesn't work since select is a macro
-                (where { (h2-keyword content-type-key) friend-content-type
-                         (h2-keyword content-id-key) friend-request-id })
-                (limit 1))))))
+      (clean-up-for-clojure
+        (first
+          (select share
+                  (where { (h2-keyword content-type-key) friend-content-type
+                           (h2-keyword content-id-key) friend-request-id })
+                  (limit 1)))))))
+
+(defn create-status-share
+  "Creates a new status share with the given message sent to the group id
+and/or profile id."
+  [message group-ids profile-ids]
+  (when-let [share-id (create-share { content-type-key status-type
+                                      message-key message
+                                      profile-from-id-key
+                                        (id (profile-model/current-user)) })]
+    (doseq [profile-id profile-ids]
+      (share-profile-model/create-share-profile share-id profile-id))
+    (doseq [group-id group-ids]
+      (share-profile-model/create-all-share-profiles-for-group
+        share-id group-id))
+    share-id))
+
+(defn create-received-share
+  "Creates a new share received from a friend."
+  [message from-profile uuid]
+  (when-let [share-id (create-share { content-type-key status-type
+                                      message-key message
+                                      profile-from-id-key (id from-profile)
+                                      uuid-key uuid })]
+    (share-profile-model/create-share-profile
+      share-id (id (profile-model/current-user)))
+    share-id))

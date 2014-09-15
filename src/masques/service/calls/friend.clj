@@ -7,17 +7,17 @@
             [masques.service.core :as service-core]))
 
 (defn friend
-  "Sends off an unfriend for the given friend request share."
+  "Sends off a friend for the given friend request share."
   [friend-request-share]
   (when friend-request-share
-    (let [other-profile (share-model/other-profile friend-request-share)]
+    (let [other-profile (share-model/first-other-profile friend-request-share)]
       (service-core/send-message
         (profile-model/destination other-profile)
         friend-action/action
         { :data { :profile (profile-model/clean-user-data) } }))))
 
 (defn send-friend
-  "Sends a unfriend request for the given friend request."
+  "Sends a friend request for the given friend request."
   [request]
   (when-let [friend-request-share (friend-request-model/send-accept request)]
     (friend friend-request-share)

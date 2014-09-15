@@ -1,5 +1,6 @@
 (ns masques.model.test.base
   (:require test.init)
+  (:require [masques.model.message :as message-model])
   (:use clojure.test
         masques.model.base))
 
@@ -233,9 +234,17 @@
   (is (= {} @delete-interceptors)))
 
 (deftest test-index-of
-  (let [test-record { :id 1 }
-        test-record-2 { :id 2 }]
+  (let [test-record { id-key 1 }
+        test-record-2 { id-key 2 }]
     (is (nil? (index-of test-record [])))
     (is (= (index-of test-record [test-record]) 0))
     (is (= (index-of test-record [test-record-2 test-record]) 1))
     (is (nil? (index-of test-record [test-record-2])))))
+
+(deftest test-find-all-ids
+  (let [test-message "Hello!"
+        test-record { message-model/body-key test-message }
+        test-message (insert-record message test-record)]
+    (is (= (find-all-ids message { id-key (id test-message) })
+           [(id test-message)]))
+    (delete-record message test-message)))

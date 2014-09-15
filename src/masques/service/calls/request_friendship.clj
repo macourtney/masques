@@ -35,7 +35,7 @@ request share."
 (defn request-friendship
   "Sends off a friend request for the given friend request share."
   [share]
-  (let [other-profile (share-model/other-profile share)]
+  (let [other-profile (share-model/first-other-profile share)]
     (when (received?
             (service-core/send-message
               (profile-model/destination other-profile)

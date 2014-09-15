@@ -80,8 +80,9 @@
       (is (= (id updated-share) (id test-share))))
     (let [test-message-3 "test message 3"
           new-status (status test-request pending-received-status)
-          updated-share (update-send-request test-message-3 test-profile
-                           (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-send-request test-message-3 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
@@ -90,8 +91,9 @@
       (is (= (status updated-request) approved-status)))
     (let [test-message-4 "test message 4"
           new-status (status test-request pending-sent-status)
-          updated-share (update-send-request test-message-4 test-profile
-                          (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-send-request test-message-4 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
@@ -105,8 +107,9 @@
       (is (not updated-share)))
     (let [test-message-6 "test message 6"
           new-status (status test-request unfriend-status)
-          updated-share (update-send-request test-message-6 test-profile
-                          (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-send-request test-message-6 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
@@ -135,8 +138,9 @@
       (is (= (id updated-share) (id test-share))))
     (let [test-message-3 "test message 3"
           new-status (status test-request pending-received-status)
-          updated-share (update-receive-request test-message-3 test-profile
-                           (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-receive-request test-message-3 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
@@ -145,8 +149,9 @@
       (is (= (status updated-request) pending-received-status)))
     (let [test-message-4 "test message 4"
           new-status (status test-request pending-sent-status)
-          updated-share (update-receive-request test-message-4 test-profile
-                          (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-receive-request test-message-4 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))
@@ -155,8 +160,9 @@
       (is (= (status updated-request) approved-status)))
     (let [test-message-5 "test message 5"
           new-status (status test-request rejected-status)
-          updated-share (update-receive-request test-message-5 test-profile
-                          (find-friend-request test-request))
+          updated-share (share/find-share
+                          (update-receive-request test-message-5 test-profile
+                            (find-friend-request test-request)))
           updated-request (share/get-content updated-share)]
       (is updated-share)
       (is (= (id updated-share) (id test-share)))

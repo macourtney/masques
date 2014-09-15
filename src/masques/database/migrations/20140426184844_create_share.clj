@@ -6,18 +6,18 @@
   []
   (create-table :share
     (id)
+    (string :uuid)
     (date-time :created-at)
     (integer :message-id)
     (integer :content-id)
-    (integer :group-id)
     (string :content-type)
-    (date-time :shown-in-stream-at)
-    (date-time :transferred-at)
-    (string :uuid)
-    (integer :profile-to-id)
-    (integer :profile-from-id)))
+    (integer :profile-from-id))
+  
+  (create-index :share :share-uuid { :columns [:uuid] }))
 
 (defn down
   "Drops the share table in the database."
   []
+  (drop-index :share-uuid)
+  
   (drop-table :share))
