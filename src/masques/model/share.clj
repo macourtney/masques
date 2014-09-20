@@ -1,9 +1,9 @@
 (ns masques.model.share
-  (:require [masques.model.message :as message-model]
+  (:require [clj-time.core :as clj-time]
+            [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
             [masques.model.grouping :as grouping-model]
-            [masques.model.share-profile :as share-profile-model]
-            )
+            [masques.model.share-profile :as share-profile-model])
   (:use masques.model.base
         korma.core))
 
@@ -255,5 +255,5 @@ and/or profile id."
                                       profile-from-id-key (id from-profile)
                                       uuid-key uuid })]
     (share-profile-model/create-share-profile
-      share-id (id (profile-model/current-user)))
+      share-id (id (profile-model/current-user)) nil (clj-time/now))
     share-id))

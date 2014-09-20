@@ -69,10 +69,10 @@
   (clj-time-coerce/to-sql-date clojure-date-time))
 
 (defn clean-date-time-for-clojure [record field-name field-data]
-  (conj record { field-name (h2-to-clojure-date-time field-data) }))
+  (assoc record field-name (h2-to-clojure-date-time field-data)))
 
 (defn clean-date-time-for-h2 [record field-name field-data]
-  (conj record { field-name (clojure-to-h2-date-time field-data) }))
+  (assoc record field-name (clojure-to-h2-date-time field-data)))
 
 (defn find-created-at
   "Returns the created at value from the given record."
@@ -147,7 +147,7 @@ record is passed in then the uuid attached to it is returned."
 (defn h2-keyword [clojure-keyword]
   (keyword (upper-case (replace-hyphens-with-underscores (name clojure-keyword)))))
 
-(defn clean-field-data [record field-name]
+(defn clean-field-data-for-clojure [record field-name]
   "Prepares H2 data, from the database, for the rest of our clojure application."
   (let [field-data (get record field-name)]
     (cond
@@ -159,9 +159,9 @@ record is passed in then the uuid attached to it is returned."
 
 (defn clean-field-data-for-h2 [record field-name]
   "Prepares clojure data, from the application, for the database."
-  (let [field-data (get field-name record)]
+  (let [field-data (get record field-name)]
     (cond
-      (instance? org.joda.time.DateTime (clojure-created-at record))
+      (instance? org.joda.time.DateTime field-data)
         (clean-date-time-for-h2 record field-name field-data)
       :else record)))
 
@@ -172,11 +172,11 @@ record is passed in then the uuid attached to it is returned."
   (assoc (remove-item field-name record) (h2-keyword field-name) (get record field-name)))
 
 (defn clean-up-for-clojure [record]
-  (let [clean-data (reduce clean-field-data record (keys record))]
+  (let [clean-data (reduce clean-field-data-for-clojure record (keys record))]
     (reduce clojure-field-name clean-data (keys clean-data))))
 
 (defn clean-up-for-h2 [record]
-  (let [clean-data (reduce clean-field-data record (keys record))]
+  (let [clean-data (reduce clean-field-data-for-h2 record (keys record))]
     (reduce h2-field-name clean-data (keys clean-data))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
