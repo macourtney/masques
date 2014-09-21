@@ -1,5 +1,6 @@
 (ns masques.model.share
   (:require [clj-time.core :as clj-time]
+            [clojure.tools.logging :as logging]
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
             [masques.model.grouping :as grouping-model]
@@ -257,3 +258,9 @@ and/or profile id."
     (share-profile-model/create-share-profile
       share-id (id (profile-model/current-user)) nil (clj-time/now))
     share-id))
+
+(defn all-to-profiles
+  "Returns all of the to profiles for the given share."
+  [share]
+  (when share
+    (share-profile-model/profile-ids-for-share share)))

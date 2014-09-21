@@ -2,6 +2,7 @@
   (:require [clj-i2p.core :as clj-i2p]
             [clojure.java.io :as io]
             [clojure.test :as clojure-test]
+            [clojure.tools.logging :as logging]
             [config.db-config :as db-config]
             [fixtures.profile :as profile-fixture]
             [fixtures.util :as fixture-util]
@@ -33,14 +34,19 @@
 (defn logout []
   (profile-model/logout))
 
-(defn login-fixture [function]
+(defn login-fixture
+  "Logs in with the user loaded in the test/init.clj file."
+  [function]
   (try
     (login) 
     (function)
     (finally
       (logout))))
 
-(defn destination-fixture [function]
+(defn destination-fixture
+  "Sets the destination to the above test destination and notifies all
+destination listeners."
+  [function]
   (try
     (clj-i2p/set-destination test-destination)
     (clj-i2p/notify-destination-listeners)

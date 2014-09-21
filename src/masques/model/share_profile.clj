@@ -1,5 +1,6 @@
 (ns masques.model.share-profile
-  (:require [clojure.tools.logging :as logging]
+  (:require [clj-time.core :as clj-time]
+            [clojure.tools.logging :as logging]
             [masques.model.grouping :as grouping-model]
             [masques.model.grouping-profile :as grouping-profile-model])
   (:use masques.model.base
@@ -45,6 +46,17 @@ was added as part of group, then the group is added."
                 group-id-key group-id
                 transferred-at-key transferred-at })))))
 
+(defn update-transferred-at-to-now
+  "Updates the transferred at value to now for the share-profile with the given
+share and profile."
+  [share-id profile-id]
+  (when-let [share-profile-to-update (find-share-profile
+                                       { share-id-key (id share-id)
+                                         profile-to-id-key (id profile-id) })]
+    (update-record share-profile
+      { id-key (id share-profile-to-update)
+        transferred-at-key (clj-time/now) })))
+
 (defn create-all-share-profiles-for-group
   "Creates share-profiles for the given share and group. One share profile is
 created for each profile in the given group."
@@ -56,6 +68,15 @@ created for each profile in the given group."
   "Returns all of the share profile ids for the share with the given id."
   [share-id]
   (find-all-ids share-profile { share-id-key (id share-id) }))
+
+(defn profile-ids-for-share
+  "Returns all of the profile ids for the given share."
+  [share-id]
+  (map profile-to-id-key
+    (select
+      share-profile
+      (fields (h2-keyword profile-to-id-key))
+      (where { (h2-keyword share-id-key) (id share-id) }))))
 
 (defn first-profile-id-for-share
   "Returns the first profile id for the given share."

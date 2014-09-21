@@ -49,7 +49,9 @@ profile, then it is used as the id of the profile to get."
 (defn destination
   "Returns the destination attached to the given profile."
   [profile]
-  (destination-key profile))
+  (if-let [destination-value (destination-key profile)]
+    destination-value
+    (destination-key (find-profile profile))))
 
 (defn identity
   "Returns the identity for the given profile."
