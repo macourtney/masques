@@ -13,14 +13,19 @@
     (integer :avatar-file-id)
     (integer :avatar-nick-file-id)
     (text :comments)
-    (text :identity)
-    (string :identity-algorithm)
+    (string :identity { :length 512 })
+    (string :identity-algorithm { :length 40 })
     (text :private-key)
-    (string :private-key-algorithm)
+    (string :private-key-algorithm { :length 40 })
     (text :destination)
-    (text :page)))
+    (text :page))
+  
+  (create-index :profile :profile-identity
+                { :columns [:identity :identity-algorithm] :unique? true }))
 
 (defn down
   "Drops the profile table."
   []
+  (drop-index :profile-identity)
+  
   (drop-table :profile))

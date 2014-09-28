@@ -22,14 +22,7 @@
                                 :profile test-profile
                                 :uuid test-uuid } })
 
-(defn load-profile-fixture [function]
-  (try
-    (profile-model/save test-util/profile-map)
-    (function)
-    (finally
-      (profile-model/delete-profile test-util/profile-map))))
-
-(test-util/use-combined-login-fixture load-profile-fixture)
+(test-util/use-combined-login-fixture)
 
 (deftest run-test
   (let [response (run test-request-map)]
