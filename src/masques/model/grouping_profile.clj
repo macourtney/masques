@@ -124,10 +124,18 @@ grouping profiles."
   (doseq [grouping-profile (find-grouping-profiles-for-profile profile-id)]
     (delete-grouping-profile grouping-profile)))
 
+(defn find-grouping-profile-with-ids
+  "Returns the grouping profile given the group id and profile id."
+  [group-id profile-id]
+  (find-first grouping-profile
+              { grouping-id-key group-id profile-id-key profile-id }))
+
 (defn add-profile-to-everyone-group
   "Adds the profile with the given id to the everyone group."
   [profile-id]
-  (save (create-grouping-profile (grouping/find-everyone-id) profile-id)))
+  (let [everyone-id (grouping/find-everyone-id)]
+    (when-not (find-grouping-profile-with-ids everyone-id profile-id)
+      (save (create-grouping-profile everyone-id profile-id)))))
 
 (defn profile-ids
   "Returns all of the profile ids in the group with the given id."
