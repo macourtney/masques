@@ -2,6 +2,7 @@
   (:require [clj-i2p.core :as clj-i2p]
             [clojure.tools.logging :as logging]
             [masques.model.base :as base-model]
+            [masques.model.grouping :as grouping-model]
             [masques.model.profile :as profile-model]
             [masques.model.share :as share-model]
             [masques.model.share-profile :as share-profile-model]
@@ -42,3 +43,8 @@ the to profile on the given status share is used."
     (doseq [profile (share-model/all-to-profiles status-share)]
       (send-status-to-profile status-share profile))
     status-share))
+
+(defn send-to-default-group
+  "Sends a status update to the default group."
+  [message]
+  (send-status message [(grouping-model/find-friends-id)] nil))

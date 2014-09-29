@@ -23,6 +23,36 @@
 (def from-profile-key :from-profile)
 (def group-key :group)
 
+(defn add-share-delete-interceptor
+  "Adds the given share delete interceptor."
+  [interceptor]
+  (add-delete-interceptor share interceptor))
+
+(defn remove-share-delete-interceptor
+  "Removes the given share delete interceptor."
+  [interceptor]
+  (remove-delete-interceptor share interceptor))
+
+(defn add-share-insert-interceptor
+  "Adds the given share insert interceptor."
+  [interceptor]
+  (add-insert-interceptor share interceptor))
+
+(defn remove-share-insert-interceptor
+  "Removes the given share insert interceptor."
+  [interceptor]
+  (remove-insert-interceptor share interceptor))
+
+(defn add-share-update-interceptor
+  "Adds the given share update interceptor."
+  [interceptor]
+  (add-update-interceptor share interceptor))
+
+(defn remove-share-update-interceptor
+  "Removes the given share update interceptor."
+  [interceptor]
+  (remove-update-interceptor share interceptor))
+
 (defn find-share
   "Finds the share with the given prototype. If the given record is an int, then
 this function finds the share by id."

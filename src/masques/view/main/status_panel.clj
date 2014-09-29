@@ -1,5 +1,7 @@
 (ns masques.view.main.status-panel
   (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
+            [masques.service.calls.send-status :as send-status-call]
             [masques.view.utils :as view-utils]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
@@ -14,22 +16,34 @@
 (def title-color (seesaw-color/color 100 100 100))
 (def title-font { :name "DIALOG" :style :bold :size 14 })
 
+(def status-panel-id :status-panel)
+
+(def status-text-id :status-text)
+
+(def update-status-button-id :update-status-button)
+(def update-status-button-listener-key :update-status-button-listener)
+
 (defn under-construction-button
   "Creates a link button with a font for the status panel."
   [id text]
   (view-utils/create-under-construction-link-button
     :id id :text text :font button-font))
 
+(defn link-button
+  "Creates a link button with a font for the status panel."
+  [id text]
+  (view-utils/create-link-button :id id :text text :font button-font))
+
 (defn create-update-status []
   (seesaw-core/border-panel
     :north
       (seesaw-core/scrollable
         (seesaw-core/text
-          :id :status-text :multi-line? true :wrap-lines? true :rows 4)
+          :id status-text-id :multi-line? true :wrap-lines? true :rows 4)
         :preferred-size [panel-width :by 75])
     :south
       (seesaw-core/border-panel
-        :west (under-construction-button :update-button (term/update-status))
+        :west (link-button update-status-button-id (term/update-status))
         :east (under-construction-button
                 :create-new-share-button (term/create-new-share))
         :hgap 3) 
@@ -66,8 +80,11 @@
              :preferred-size [panel-width :by 200])
     :vgap 3))
 
-(defn create []
+(defn create-main-panel
+  "Creates the main status panel."
+  []
   (seesaw-core/border-panel
+    :id status-panel-id
     :north (create-update-status)
     :center (create-recent-shares)
     :south (create-online-friends)
@@ -76,3 +93,61 @@
     :border (seesaw-border/compound-border
               (seesaw-border/empty-border :thickness 10)
               (seesaw-border/line-border :right 1))))
+
+(defn find-status-panel
+  "Finds the status panel in the given view."
+  [view]
+  (view-utils/find-component view status-panel-id))
+
+(defn find-update-status-button
+  "Finds the update status button in the given view."
+  [view]
+  (view-utils/find-component view update-status-button-id))
+
+(defn find-status-text
+  "Finds the status text in the given view."
+  [view]
+  (view-utils/find-component view status-text-id))
+
+(defn status-text
+  ([view]
+    (seesaw-core/text (find-status-text view)))
+  ([view text]
+    (seesaw-core/config! (find-status-text view) :text text)))
+
+(defn add-action-listener-to-update-status-button
+  "Adds the given action listener to the update status button."
+  [view listener]
+  (view-utils/add-action-listener-to-button
+    (find-update-status-button view) listener
+    update-status-button-listener-key))
+
+(defn update-status-listener
+  "Sends the text in the status text area as a status update."
+  [event]
+  (let [status-panel (find-status-panel
+                       (view-utils/top-level-ancestor
+                         (seesaw-core/to-widget event)))
+        status-text-value (status-text status-panel)]
+    (status-text status-panel "")
+    (when (not-empty status-text-value)
+      (future
+        (send-status-call/send-to-default-group status-text-value)
+        (logging/debug "Sent status update:" status-text-value)))))
+
+(defn attach-update-status-listener
+  "Attaches the update status listener to the update status button in the given
+view."
+  [view]
+  (add-action-listener-to-update-status-button view update-status-listener))
+
+(defn attach-listeners
+  "Attaches all listeners and models to the given status panel."
+  [view]
+  (attach-update-status-listener view)
+  view)
+
+(defn create
+  "Creates the status panel and attaches all listeners."
+  []
+  (attach-listeners (create-main-panel)))

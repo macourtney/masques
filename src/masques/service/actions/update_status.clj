@@ -38,6 +38,8 @@ returns the uuid."
   (let [from-profile (read-profile request-map)
         message (read-message request-map)
         uuid (read-uuid request-map)]
+    (logging/debug "Received from" (profile-model/alias from-profile)
+                   "status update:" message)
     (when (share-model/create-received-share message from-profile uuid)
       true)))
 

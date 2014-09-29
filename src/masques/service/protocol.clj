@@ -7,6 +7,7 @@
             [masques.service.actions.request-friendship
               :as request-friendship]
             [masques.service.actions.unfriend :as unfriend]
+            [masques.service.actions.update-status :as update-status]
             [masques.service.request-map-utils :as request-map-utils]))
 
 (def service-name :masques-service)
@@ -16,7 +17,8 @@
   { friend/action friend/run
     profile/action profile/run
     request-friendship/action request-friendship/run
-    unfriend/action unfriend/run })
+    unfriend/action unfriend/run
+    update-status/action update-status/run })
 
 (deftype MasquesService []
   service-protocol/Service

@@ -12,8 +12,6 @@
             [masques.view.utils :as view-utils]
             [seesaw.core :as seesaw-core]))
 
-(declare show-panel)
-
 (defn show-panel
   "Shows the given panel (or panel id) passing along the args to the panel."
   [main-frame panel & args]
