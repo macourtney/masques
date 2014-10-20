@@ -37,7 +37,7 @@ table.")
     "Returns the entity this table db model uses and listen to.")
   
   (row-count [this]
-    "Returns the number of values for this list.")
+    "Returns the number of values for this table.")
   
   (value-at [this row-index column-id]
      "Returns the value at the given index and column id.")
@@ -142,8 +142,8 @@ interval removed event."
       table-data-listeners #(table-changed % table-model-event))))
 
 (defn notify-model-of-update
-  "Notifies all of the listeners in the given DbComboBoxModel that the record
-with the given id has been editted."
+  "Notifies all of the listeners in the given KormaTableModelProtocol that the
+record with the given id has been editted."
   [table-model id]
   (when table-model
     (when-let [record-index (index-of (table-db-model table-model) id)]
@@ -153,8 +153,8 @@ with the given id has been editted."
                                   record-index record-index)))))
 
 (defn notify-model-of-insert
-  "Notifies all of the listeners in the given DbComboBoxModel that the record
-with the given id has been added."
+  "Notifies all of the listeners in the given KormaTableModelProtocol that the
+record with the given id has been added."
   [table-model id]
   (when table-model
     (when-let [record-index (index-of (table-db-model table-model) id)]
@@ -164,8 +164,8 @@ with the given id has been added."
                                   record-index record-index)))))
 
 (defn notify-model-of-delete
-  "Notifies all of the listeners in the given DbComboBoxModel that the record
-with the given id has been added."
+  "Notifies all of the listeners in the given KormaTableModelProtocol that the
+record with the given id has been added."
   [table-model record-index]
   (when (and table-model record-index)
     (notify-all-of-interval-removed
