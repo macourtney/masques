@@ -1,8 +1,10 @@
 (ns masques.model.share-profile
   (:require [clj-time.core :as clj-time]
             [clojure.tools.logging :as logging]
+            [korma.core :as korma]
             [masques.model.grouping :as grouping-model]
-            [masques.model.grouping-profile :as grouping-profile-model])
+            [masques.model.grouping-profile :as grouping-profile-model]
+            [masques.model.profile :as profile-model])
   (:use masques.model.base
         korma.core))
 
@@ -16,6 +18,11 @@
   "Saves the given profile record to the database."
   [record]
   (insert-or-update share-profile record))
+
+(defn share-id
+  "Returns the share id in the given profile share."
+  [profile-share]
+  (share-id-key profile-share))
 
 (defn find-share-profile
   "Finds the share-profile with the given record. If the record is an integer or
@@ -78,6 +85,16 @@ created for each profile in the given group."
       (fields (h2-keyword profile-to-id-key))
       (where { (h2-keyword share-id-key) (id share-id) }))))
 
+(defn find-current-share-profile
+  "Returns the share profile with the given share id and the current profile
+id."
+  [share-id]
+  (first
+    (select
+      share-profile
+      (fields id-key)
+      (where { (h2-keyword share-id-key) (id share-id) }))))
+
 (defn first-profile-id-for-share
   "Returns the first profile id for the given share."
   [share-id]
@@ -90,13 +107,16 @@ created for each profile in the given group."
         (limit 1)))))
 
 (defn share-ids-for-profile
-  "Returns all of the share ids for the profile with the given id."
-  [profile-id]
-  (map share-id-key
-    (select
-      share-profile
-      (fields (h2-keyword share-id-key))
-      (where { (h2-keyword profile-to-id-key) (id profile-id) }))))
+  "Returns all of the share ids for the profile with the given id. If no profile
+is given, then the current user is used."
+  ([]
+    (share-ids-for-profile (id (profile-model/current-user))))
+  ([profile-id]
+    (map share-id-key
+         (select
+           share-profile
+           (fields (h2-keyword share-id-key))
+           (where { (h2-keyword profile-to-id-key) (id profile-id) })))))
 
 (defn delete-all
   "Deletes all of the share-profiles for the given share id."

@@ -25,7 +25,8 @@
 
   (hide [this view])
   
-  (destroy [this view]))
+  (destroy [this view]
+    (panel-view/destroy view)))
 
 (defn create []
   (StreamPanel.))

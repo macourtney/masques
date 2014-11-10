@@ -1,6 +1,8 @@
 (ns masques.view.stream.panel
   (:require [clj-internationalization.term :as term]
+            [masques.view.stream.stream-list-model :as stream-list-model]
             [masques.view.utils :as view-utils]
+            [masques.view.utils.korma-list-model :as korma-list-model]
             [seesaw.border :as seesaw-border]
             [seesaw.color :as seesaw-color]
             [seesaw.core :as seesaw-core])
@@ -13,6 +15,8 @@
 (def share-types [:friend-request :file])
 
 (def group-button-font { :name "DIALOG" :style :plain :size 10 })
+
+(def stream-listbox-id :stream-listbox)
 
 (defn create-under-construction-button
   ([id text]
@@ -111,10 +115,11 @@
 
 (defn create-stream-list []
   (seesaw-core/scrollable
-     (seesaw-core/listbox :id :stream-listbox
-         ; :model A ListModel, or a sequence of values with which a 
-         ; DefaultListModel will be constructed. :renderer A cell renderer to 
-         ; use. See (seesaw.cells/to-cell-renderer).
+     (seesaw-core/listbox
+       :id stream-listbox-id
+       :model (stream-list-model/create)
+         ; :renderer A cell renderer to use. See
+         ; (seesaw.cells/to-cell-renderer).
      )))
 
 (defn create-body []
@@ -131,3 +136,13 @@
     
     :vgap 10
     :border 11))
+
+(defn find-stream-list
+  "Returns the stream list from the given panel view."
+  [view]
+  (view-utils/find-component view stream-listbox-id))
+
+(defn destroy
+  "Cleans up the given stream panel."
+  [view]
+  (korma-list-model/destroy-model (find-stream-list view)))

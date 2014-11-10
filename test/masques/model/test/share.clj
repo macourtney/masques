@@ -5,7 +5,8 @@
             [masques.model.friend-request :as friend-request-model]
             [masques.model.message :as message-model]
             [masques.model.profile :as profile-model]
-            [masques.model.share-profile :as share-profile-model])
+            [masques.model.share-profile :as share-profile-model]
+            [masques.test.util :as test-util])
   (:use clojure.test
         masques.model.base
         masques.model.share))
@@ -37,7 +38,9 @@
                                   (save (assoc test-share-record :message-id
                                                (:id test-message-record))))
               test-friend-request (find-share (save test-friend-request))]
+      (test-util/login)
       (function)
+      (test-util/logout)
       (delete-share test-friend-request)
       (delete-share test-share-record))
     (message-model/delete-message test-message-record)))
@@ -156,3 +159,23 @@
     (is (= (profile-from-id-key test-share) (id test-profile)))
     (delete-share test-share)
     (profile-model/delete-profile test-profile)))
+
+(deftest test-stream-functions
+  (let [test-share (create-share { :content-type status-type })
+        test-profile (profile-model/find-profile (profile-model/current-user))
+        test-profile-id (id test-profile)
+        test-share-profile-id (share-profile-model/create-share-profile
+                                test-share test-profile-id)
+        test-share-profile (share-profile-model/find-share-profile
+                             test-share-profile-id)]
+    (is test-share)
+    (is test-profile)
+    (is test-profile-id)
+    (is test-share-profile-id)
+    (is test-share-profile)
+    (is (= (count-stream-shares) 1))
+    (is (= (find-stream-share-at 0) (find-share test-share)))
+    (is (= (index-of-stream-share test-share) 0))
+    (share-profile-model/delete-all test-share)
+    (share-profile-model/delete-share-profile test-share-profile)
+    (delete-share test-share)))

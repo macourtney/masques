@@ -144,8 +144,15 @@ record is passed in then the uuid attached to it is returned."
 (defn clojure-keyword [h2-keyword]
   (keyword (lower-case (replace-underscores-with-hyphens (name h2-keyword)))))
 
-(defn h2-keyword [clojure-keyword]
-  (keyword (upper-case (replace-hyphens-with-underscores (name clojure-keyword)))))
+(defn h2-keyword
+  "Takes a keyword in normal clojure form and converts it to a from usable by
+h2. If a table and field are given, then they are concatenated with a period."
+  ([table field]
+    (h2-keyword
+      (str (name (if (map? table) (:name table) table)) "." (name field))))
+  ([clojure-keyword]
+    (keyword
+      (upper-case (replace-hyphens-with-underscores (name clojure-keyword))))))
 
 (defn clean-field-data-for-clojure [record field-name]
   "Prepares H2 data, from the database, for the rest of our clojure application."

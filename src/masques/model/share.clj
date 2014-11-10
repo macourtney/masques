@@ -294,3 +294,53 @@ and/or profile id."
   [share]
   (when share
     (share-profile-model/profile-ids-for-share share)))
+
+(defn count-stream-shares
+  "Counts all of the shares which should show up in the stream."
+  []
+  (:count
+    (first
+      (select
+        share
+        (aggregate (count :*) :count)
+        (join share-profile
+          (= (h2-keyword share-profile share-profile-model/share-id-key)
+             id-key))
+        (where
+          { 
+            (h2-keyword share-profile share-profile-model/profile-to-id-key)
+              (id (profile-model/current-user))
+            (h2-keyword content-type-key) [not= friend-content-type] })))))
+
+(defn find-stream-share-at
+  "Returns a stream share at the given index."
+  [index]
+  (first
+    (select
+      share
+      (join share-profile
+          (= (h2-keyword share-profile share-profile-model/share-id-key)
+             id-key))
+      (where
+          { (h2-keyword share-profile share-profile-model/profile-to-id-key)
+              (id (profile-model/current-user))
+            (h2-keyword content-type-key) [not= friend-content-type] })
+      (limit 1)
+      (offset index))))
+
+(defn index-of-stream-share
+  "Returns the index of the given share or id in the set of shares which should
+be shown in the stream."
+  [share-id]
+  (index-of
+    (id share-id)
+    (select
+      share
+      (fields id-key)
+      (join share-profile
+                  (= (h2-keyword share-profile share-profile-model/share-id-key)
+                     id-key))
+      (where
+        { (h2-keyword share-profile share-profile-model/profile-to-id-key)
+            (id (profile-model/current-user))
+          (h2-keyword content-type-key) [not= friend-content-type] }))))
