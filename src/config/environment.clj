@@ -18,9 +18,9 @@
   (let [mode (System/getProperty conjure-environment-property)]
     (require (symbol (str "config.environments." mode)))))
 
-(defn
-#^{ :doc "Returns the name of the environment." }
-  environment-name []
+(defn environment-name
+  "Returns the name of the environment."
+  []
   (System/getProperty conjure-environment-property))
 
 (defn environment-init []

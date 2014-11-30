@@ -319,8 +319,7 @@ and/or profile id."
     (select
       share
       (join share-profile
-          (= (h2-keyword share-profile share-profile-model/share-id-key)
-             id-key))
+        (= (h2-keyword share-profile share-profile-model/share-id-key) id-key))
       (where
           { (h2-keyword share-profile share-profile-model/profile-to-id-key)
               (id (profile-model/current-user))
@@ -338,8 +337,7 @@ be shown in the stream."
       share
       (fields id-key)
       (join share-profile
-                  (= (h2-keyword share-profile share-profile-model/share-id-key)
-                     id-key))
+        (= (h2-keyword share-profile share-profile-model/share-id-key) id-key))
       (where
         { (h2-keyword share-profile share-profile-model/profile-to-id-key)
             (id (profile-model/current-user))

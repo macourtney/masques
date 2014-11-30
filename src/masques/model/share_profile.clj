@@ -22,7 +22,9 @@
 (defn share-id
   "Returns the share id in the given profile share."
   [profile-share]
-  (share-id-key profile-share))
+  (if (integer? profile-share)
+    (share-id (find-by-id share-profile profile-share))
+    (share-id-key profile-share)))
 
 (defn find-share-profile
   "Finds the share-profile with the given record. If the record is an integer or

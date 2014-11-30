@@ -276,7 +276,10 @@ interceptor for the given entity."
   "Generates an interceptor chain for the given interceptors and action then
 calls the chain with the given record."
   [interceptors action record]
-  ((create-interceptor-chain action interceptors) record))
+  (try
+    ((create-interceptor-chain action interceptors) record)
+    (catch Throwable t
+      (logging/error t "An error occurred while executing interceptors"))))
 
 (defn add-insert-interceptor
   "Adds the given interceptor to the list of insert interceptors for the given

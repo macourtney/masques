@@ -112,7 +112,8 @@ be destroyed.")
   (.tableChanged listener table-model-event))
 
 (defn create-table-model-event
-  "Creates a new TableModelEvent with the given source type start and end index."
+  "Creates a new TableModelEvent with the given source type start and end
+index."
   [source type start-index end-index]
   (TableModelEvent.
     source start-index end-index TableModelEvent/ALL_COLUMNS type))
@@ -305,7 +306,8 @@ the given model that a record was updated."
             (KormaTableDbListeners.
               db-model (atom nil) (listener-list/create) (atom nil))))
   ([column-model db-model table-db-listeners]
-    (let [table-model (KormaTableModel. column-model db-model table-db-listeners)]
+    (let [table-model (KormaTableModel. column-model db-model
+                                        table-db-listeners)]
       (initialize-listeners table-db-listeners table-model)
       table-model)))
 
@@ -333,8 +335,8 @@ string."
 
 (defn find-update-value-fn
   "Returns the update value function from the column map for the column with the
-given id. If the column does not have a update value fn, then this function returns
-a function which takes any number of arguments but does nothing."
+given id. If the column does not have a update value fn, then this function
+returns a function which takes any number of arguments but does nothing."
   [columns-map column-id]
   (or (update-value-key (get columns-map column-id))
       (fn [& args])))
