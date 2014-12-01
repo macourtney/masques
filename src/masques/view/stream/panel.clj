@@ -14,7 +14,7 @@
 
 (def share-types [:friend-request :file])
 
-(def group-button-font { :name "DIALOG" :style :plain :size 10 })
+(def stream-button-font { :name "DIALOG" :style :plain :size 10 })
 
 (def stream-listbox-id :stream-listbox)
 
@@ -23,7 +23,7 @@
     (view-utils/create-under-construction-link-button
       :id id
       :text text
-      :font group-button-font))
+      :font stream-button-font))
   ([id text size]
     (let [button (create-under-construction-button id text)]
       (seesaw-core/config! button :preferred-size size :maximum-size size)
@@ -118,9 +118,7 @@
      (seesaw-core/listbox
        :id stream-listbox-id
        :model (stream-list-model/create)
-         ; :renderer A cell renderer to use. See
-         ; (seesaw.cells/to-cell-renderer).
-     )))
+       :renderer (stream-list-model/create-renderer))))
 
 (defn create-body []
   (seesaw-core/border-panel

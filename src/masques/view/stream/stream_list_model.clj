@@ -1,9 +1,28 @@
 (ns masques.view.stream.stream-list-model
-  (:require [masques.model.base :as base-model]
+  (:require [clj-internationalization.term :as term]
+            [clojure.tools.logging :as logging]
+            [masques.model.base :as base-model]
+            [masques.model.profile :as profile-model]
             [masques.model.share :as share-model]
             [masques.model.share-profile :as share-profile-model]
+            [masques.view.utils :as view-utils]
             [masques.view.utils.korma-list-model :as korma-list-model]
-            [masques.view.utils.listener-list :as listener-list]))
+            [masques.view.utils.listener-list :as listener-list]
+            [seesaw.core :as seesaw-core])
+  (:import [javax.swing ImageIcon]))
+
+(def stream-button-font { :name "DIALOG" :style :plain :size 10 })
+
+(defn create-under-construction-button
+  ([id text]
+    (view-utils/create-under-construction-link-button
+      :id id
+      :text text
+      :font stream-button-font))
+  ([id text size]
+    (let [button (create-under-construction-button id text)]
+      (seesaw-core/config! button :preferred-size size :maximum-size size)
+      button)))
 
 (deftype StreamListModel [table-data-listeners interceptor-manager]
 
@@ -109,3 +128,57 @@
     (korma-list-model/create
       db-model
       (StreamListDbListeners. db-model (listener-list/create) (atom nil)))))
+
+;*******************************************************************************
+; Render functions
+;*******************************************************************************
+
+(defn avatar
+  "Finds and renders the avatar for a user in a stream."
+  [share]
+  (seesaw-core/label
+    :icon (ImageIcon. (ClassLoader/getSystemResource "profile.png"))))
+
+(defn title-label
+  "Creates the title label for a share in the stream."
+  [share]
+  (condp = (share-model/get-type share)
+    share-model/status-type
+      (seesaw-core/label
+        :text (term/updated-status
+                (profile-model/alias (share-model/from-profile share))))))
+
+(defn body
+  "Renders the avatar for a user in a stream."
+  [share]
+  (seesaw-core/border-panel
+    :north (title-label share)
+    :center (seesaw-core/label :text (share-model/message-text share))
+    :opaque? false))
+
+(defn buttons
+  "Renders the buttons on for a share in the stream."
+  [share]
+  (seesaw-core/border-panel
+    :north
+      (seesaw-core/horizontal-panel
+        :items [(create-under-construction-button :view-share (term/view))
+                " | " (create-under-construction-button :archive (term/archive))
+                " | " (create-under-construction-button :delete (term/delete))]
+        :opaque? false)
+    :south (seesaw-core/label
+             :text (str (share-profile-model/transferred-at
+                          (first (share-profile-model/ids-for-share share)))))
+    :opaque? false))
+
+(defn create-renderer
+  "Creates a renderer for the stream."
+  []
+  (proxy [javax.swing.DefaultListCellRenderer] []
+    (getListCellRendererComponent [component value index selected? focus?]
+      (seesaw-core/border-panel
+        :west (avatar value)
+        :center (body value)
+        :east (buttons value)
+        
+        :background (if (even? index) "white" "lightgray")))))

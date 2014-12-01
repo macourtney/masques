@@ -35,6 +35,13 @@ used as a prototype."
     (find-by-id share-profile record)
     (find-first share-profile record)))
 
+(defn transferred-at
+  "Returns the transferred at date on the given profile share."
+  [profile-share]
+  (if (integer? profile-share)
+    (transferred-at (find-share-profile profile-share))
+    (transferred-at-key profile-share)))
+
 (defn delete-share-profile
   "Deletes the given share-profile record."
   [record]
