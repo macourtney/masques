@@ -34,6 +34,7 @@
   (let [test-message "test message"
         request-share
           (send-friend-request test-util/test-masque-file test-message)]
+    (is (share-model/get-content request-share))
     (is (friend-request-model/requested-at
           (share-model/get-content request-share)))
     (is (= @network-destination test-util/test-destination))

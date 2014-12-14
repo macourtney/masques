@@ -34,31 +34,6 @@
   (dissoc (into {} record) item))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Data sanitation: Clob helpers.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn clob-string [clob]
-  (when clob
-    (let [clob-stream (.getCharacterStream clob)]
-      (try
-        (string/join "\n" (take-while identity (repeatedly #(.readLine clob-stream))))
-        (catch Exception e
-          (logging/error (str "An error occured while reading a clob: " e)))))))
-
-(defn get-clob [record clob-key]
-  (when-let [clob (clob-key record)]
-    (when (instance? Clob clob)
-      clob)))
-
-(defn clean-clob-key [record clob-key]
-  (if-let [clob (get-clob record clob-key)]
-    (assoc record clob-key (clob-string clob))
-    record))
-
-(defn clean-clob-for-clojure [record field-name field-data]
-  (assoc record field-name (clob-string field-data)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Data sanitation: Date/time helpers.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -66,7 +41,7 @@
   (clj-time-coerce/to-date-time h2-date-time))
 
 (defn clojure-to-h2-date-time [clojure-date-time]
-  (clj-time-coerce/to-sql-date clojure-date-time))
+  (clj-time-coerce/to-sql-time clojure-date-time))
 
 (defn clean-date-time-for-clojure [record field-name field-data]
   (assoc record field-name (h2-to-clojure-date-time field-data)))
@@ -157,12 +132,9 @@ h2. If a table and field are given, then they are concatenated with a period."
 (defn clean-field-data-for-clojure [record field-name]
   "Prepares H2 data, from the database, for the rest of our clojure application."
   (let [field-data (get record field-name)]
-    (cond
-      (instance? Clob field-data)
-        (clean-clob-for-clojure record field-name field-data)
-      (instance? java.sql.Timestamp field-data)
-        (clean-date-time-for-clojure record field-name field-data)
-      :else record)))
+    (if (instance? java.sql.Timestamp field-data)
+      (clean-date-time-for-clojure record field-name field-data)
+      record)))
 
 (defn clean-field-data-for-h2 [record field-name]
   "Prepares clojure data, from the application, for the database."
@@ -559,12 +531,9 @@ use as a prototype of the records to count."
 ; ALBUM
 (defn prepare-album-for-h2 [record]
   (set-created-at record))
-(defn transform-album-for-clojure [record]
-  (let [clean (clean-up-for-clojure record)]
-    clean))
 (defentity album
   (prepare prepare-album-for-h2)
-  (transform transform-album-for-clojure)
+  (transform clean-up-for-clojure)
   (table (h2-keyword :album)))
 
 ; FILE

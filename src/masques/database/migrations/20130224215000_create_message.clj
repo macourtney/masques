@@ -9,7 +9,7 @@
     (id)
     (date-time :created-at)
     (string :subject)
-    (text :body)))
+    (string :body)))
   
 (defn down
   "Drops the message table in the database."

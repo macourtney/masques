@@ -1,5 +1,6 @@
 (ns masques.view.stream.stream-list-model
   (:require [clj-internationalization.term :as term]
+            [clj-time.format :as time-format]
             [clojure.tools.logging :as logging]
             [masques.model.base :as base-model]
             [masques.model.profile :as profile-model]
@@ -10,6 +11,8 @@
             [masques.view.utils.listener-list :as listener-list]
             [seesaw.core :as seesaw-core])
   (:import [javax.swing ImageIcon]))
+
+(def time-formatter (time-format/formatter "yyyy-MM-dd HH:mm"))
 
 (def stream-button-font { :name "DIALOG" :style :plain :size 10 })
 
@@ -167,8 +170,10 @@
                 " | " (create-under-construction-button :delete (term/delete))]
         :opaque? false)
     :south (seesaw-core/label
-             :text (str (share-profile-model/transferred-at
-                          (first (share-profile-model/ids-for-share share)))))
+             :text (time-format/unparse
+                     time-formatter
+                     (share-profile-model/transferred-at
+                       (first (share-profile-model/ids-for-share share)))))
     :opaque? false))
 
 (defn create-renderer
@@ -181,4 +186,6 @@
         :center (body value)
         :east (buttons value)
         
-        :background (if (even? index) "white" "lightgray")))))
+        :background (if (even? index) "white" "lightgray")
+        :hgap 5
+        :border 5))))

@@ -325,7 +325,8 @@ and/or profile id."
               (id (profile-model/current-user))
             (h2-keyword content-type-key) [not= friend-content-type] })
       (limit 1)
-      (offset index))))
+      (offset index)
+      (order id-key :DESC))))
 
 (defn index-of-stream-share
   "Returns the index of the given share or id in the set of shares which should
@@ -341,4 +342,5 @@ be shown in the stream."
       (where
         { (h2-keyword share-profile share-profile-model/profile-to-id-key)
             (id (profile-model/current-user))
-          (h2-keyword content-type-key) [not= friend-content-type] }))))
+          (h2-keyword content-type-key) [not= friend-content-type] })
+      (order id-key :DESC))))

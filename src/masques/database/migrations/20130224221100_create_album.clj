@@ -10,7 +10,7 @@
     (date-time :created-at)
     (string :name)
     (integer :size-of-all-files)
-    (text :comments)))
+    (string :comments)))
   
 (defn down
   "Drops the album table in the database."

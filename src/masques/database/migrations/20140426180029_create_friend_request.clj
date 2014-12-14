@@ -7,7 +7,7 @@
   (create-table :friend-request
     (id)
     (date-time :created-at)
-    (string :request-status)
+    (string :request-status { :length 20 })
     (date-time :requested-at) ; Notice that this item and the one below it now have better names.
     (date-time :request-approved-at)
     (belongs-to :profile)))

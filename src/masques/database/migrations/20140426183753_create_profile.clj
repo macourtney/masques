@@ -12,13 +12,13 @@
     (string :time-zone)
     (integer :avatar-file-id)
     (integer :avatar-nick-file-id)
-    (text :comments)
+    (string :comments { :length 1024 })
     (string :identity { :length 512 })
     (string :identity-algorithm { :length 40 })
-    (text :private-key)
+    (string :private-key { :length 2048 })
     (string :private-key-algorithm { :length 40 })
-    (text :destination)
-    (text :page))
+    (string :destination { :length 1024 })
+    (string :page))
   
   (create-index :profile :profile-identity
                 { :columns [:identity :identity-algorithm] :unique? true }))

@@ -17,14 +17,14 @@
 (defn set-offline
   "Sets the peer with the given id as offline."
   [peer-id]
-  (logging/debug "Setting offline:" peer-id)
+;  (logging/debug "Setting offline:" peer-id)
   (let [peer-id (id peer-id)]
     (swap! online-peers (fn [peers] (filter #(not (= peer-id (id %))) peers)))))
 
 (defn set-online
   "Sets the peer with the given id as online."
   [peer-id]
-  (logging/debug "Setting online:" peer-id)
+;  (logging/debug "Setting online:" peer-id)
   (let [peer-id2 (id peer-id)
         online-peer { clojure-id peer-id2
                       profile/alias-key (profile/alias peer-id) }]

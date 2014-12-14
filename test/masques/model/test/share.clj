@@ -184,8 +184,10 @@
           test-share-profile2 (share-profile-model/find-share-profile
                                 test-share-profile-id2)]
       (is (= (count-stream-shares) 2))
-      (is (= (find-stream-share-at 1) (find-share test-share2)))
-      (is (= (index-of-stream-share test-share2) 1))
+      (is (= (find-stream-share-at 0) (find-share test-share2)))
+      (is (= (find-stream-share-at 1) (find-share test-share)))
+      (is (= (index-of-stream-share test-share2) 0))
+      (is (= (index-of-stream-share test-share) 1))
       (share-profile-model/delete-all test-share2)
       (share-profile-model/delete-share-profile test-share-profile2)
       (delete-share test-share2))

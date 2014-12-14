@@ -12,7 +12,7 @@
     (string :path)
     (integer :album-id)
     (string :mime-type)
-    (text :comments)
+    (string :comments)
     (integer :size)))
   
 (defn down

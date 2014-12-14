@@ -3,7 +3,7 @@
   (:require test.init)
   (:use [masques.service.actions.profile])
   (:use [clojure.test])
-  (:require [fixtures.address :as address-fixture]
+  (:require ;[fixtures.address :as address-fixture]
             [fixtures.email-address :as email-address-fixture]
             [fixtures.friend :as friend-fixture]
             [fixtures.group-membership :as group-membership-fixture]
