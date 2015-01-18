@@ -19,7 +19,7 @@
                  [org.clojure/java.jdbc "0.3.6"]
                  [org.clojure/tools.cli "0.2.1"]
                  [org.clojure/tools.logging "0.3.0"]
-                 [org.drift-db/drift-db-h2 "1.1.7-SNAPSHOT"]
+                 [org.drift-db/drift-db-h2 "1.1.7"]
                  [seesaw "1.4.4"]]
 
   :plugins [[lein-libdir "0.1.0"]
